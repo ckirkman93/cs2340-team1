@@ -48,6 +48,9 @@ public class Game{
 		Random rand = new Random();
 		for(int i=0;i<players.length;i++)
 		players[i]=playerList.remove(rand.nextInt(players.length-i));
-		
+	}
+	
+	public Player[] getPlayers() {
+		return players;
 	}
 }

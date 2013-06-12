@@ -22,4 +22,7 @@ public class Player {
 		return armies;
 	}
 	
+	public void setArmies(int armies) {
+		this.armies = armies;
+	}	
 }
