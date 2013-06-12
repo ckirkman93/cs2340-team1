@@ -30,5 +30,9 @@ public class Territory {
 		return owner;
 	}
 	
+	public void setArmies(int i) {
+		armiesOnTerritory = i;
+	}
+	
 
 }
