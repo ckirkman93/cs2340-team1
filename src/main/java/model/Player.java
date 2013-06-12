@@ -1,3 +1,5 @@
+package main.java;
+
 /**
  * @author Aris Santas<asantas93@gmail.com>
  * @version alpha 0.023
