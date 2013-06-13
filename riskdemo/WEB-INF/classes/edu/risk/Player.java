@@ -1,3 +1,5 @@
+package edu.risk;
+
 /**
  * @author Aris Santas<asantas93@gmail.com>
  * @version alpha 0.023
@@ -12,6 +14,10 @@ public class Player {
 		this.armies = armies;
 	}
 	
+	public Player(String name) {
+		this(name, 0);
+	}
+	
 	public String getName() {
 		return name;
 	}
@@ -20,4 +26,7 @@ public class Player {
 		return armies;
 	}
 	
+	public void setArmies(int i) {
+		armies = i;
+	}
 }

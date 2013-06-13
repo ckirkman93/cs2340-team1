@@ -1,3 +1,5 @@
+package edu.risk;
+
 /**
  * @author Aris Santas<asantas93@gmail.com>
  * @version alpha 0.023
@@ -32,7 +34,5 @@ public class Territory {
 	
 	public void setArmies(int i) {
 		armiesOnTerritory = i;
-	}
-	
-
+	}	
 }
