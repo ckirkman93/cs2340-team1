@@ -1,8 +1,4 @@
-<<<<<<< HEAD:src/main/java/model/Territory.java
-package model;
-=======
 package edu.risk;
->>>>>>> 03505cace99079411c101e8e0de00a4e391c8cb1:riskdemo/WEB-INF/classes/edu/risk/Territory.java
 
 /**
  * @author Aris Santas<asantas93@gmail.com>
@@ -38,7 +34,5 @@ public class Territory {
 	
 	public void setArmies(int i) {
 		armiesOnTerritory = i;
-	}
-	
-
+	}	
 }

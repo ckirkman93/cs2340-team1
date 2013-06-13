@@ -1,8 +1,4 @@
-<<<<<<< HEAD:src/main/java/model/Game.java
-package model;
-=======
 package edu.risk;
->>>>>>> 03505cace99079411c101e8e0de00a4e391c8cb1:riskdemo/WEB-INF/classes/edu/risk/Game.java
 
 import java.util.ArrayList;
 import java.util.Random;
@@ -28,6 +24,7 @@ public class Game{
 	 *@param list arraylist containg the players
 	 *@param board
 	 */
+	@SuppressWarnings("unchecked")
 	public Game(ArrayList<Player> list){
 		ArrayList<Player> playerList=(ArrayList<Player>)(list.clone());
 		//this.board=board;
@@ -51,10 +48,6 @@ public class Game{
 		Random rand = new Random();
 		for(int i=0;i<players.length;i++)
 		players[i]=playerList.remove(rand.nextInt(players.length-i));
-	}
-	
-	public Player[] getPlayers() {
-		return players;
 	}
 	
 	public Player[] getPlayers() {
