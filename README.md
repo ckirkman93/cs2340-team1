@@ -1,5 +1,3 @@
-cs2340-team1
+Enter localhost:8080/riskdemo/Risk in browser to access web app.
 
-...Christina made an edit
-
-And then Aris made an edit.
+This is obviously a really rough idea of what we need, but it is functional--not sure if using Swing like this is acceptable or something we want to do, but here ya go.
