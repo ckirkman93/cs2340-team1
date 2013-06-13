@@ -20,7 +20,7 @@ public class RiskServlet extends HttpServlet{
 		out.println("<body>");
 		ArrayList<Player> list = new ArrayList<Player>();
 		for(int i = 0; i < 6;) {
-			String str = JOptionPane.showInputDialog("Enter Player " + i + 1 + "'s name.");
+			String str = JOptionPane.showInputDialog("Enter Player " + (i + 1) + "'s name.");
 			if(str == null && i >= 3)
 				break;
 			list.add(new Player(str));
@@ -30,7 +30,8 @@ public class RiskServlet extends HttpServlet{
 		String str = "";
 		for(Player p : game.getPlayers())
 			str += p.getName() + ", ";
-		out.println("<h1> Order of players: " + str + "<h1>");
+		out.println("<h1> Order of players: " + str 
+				+ " number of initial armies: " + game.getInitialArmies() + "<h1>");
 		
 		out.println("</body>");
 		out.println("</html>");	

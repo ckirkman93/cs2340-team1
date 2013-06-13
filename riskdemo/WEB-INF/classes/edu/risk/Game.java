@@ -16,6 +16,7 @@ public class Game{
 	public static final int INITIAL_ARMIES_FOR_4=30;
 	public static final int INITIAL_ARMIES_FOR_5=25;
 	public static final int INITIAL_ARMIES_FOR_6=20;
+	private int initialArmies;
 	
 	/**
 	 *Constructs a game from an arraylist of 3-6 players and a board.
@@ -27,24 +28,22 @@ public class Game{
 		ArrayList<Player> playerList=(ArrayList<Player>)(list.clone());
 		//this.board=board;
 		if(playerList.size()==3){
+			initialArmies = INITIAL_ARMIES_FOR_3;
 			players = new Player[3];
-			for(Player pl : playerList) pl.setArmies(INITIAL_ARMIES_FOR_3);
-		}
-		else if(playerList.size()==4){
+		} else if(playerList.size()==4){
+			initialArmies = INITIAL_ARMIES_FOR_4;
 			players=new Player[4];
-			for(Player pl : playerList) pl.setArmies(INITIAL_ARMIES_FOR_4);
-		}
-		else if(playerList.size()==5){
+		} else if(playerList.size()==5){
+			initialArmies = INITIAL_ARMIES_FOR_5;
 			players=new Player[5];
-			for(Player pl : playerList) pl.setArmies(INITIAL_ARMIES_FOR_5);
-		}
-		else if(playerList.size()==6){
+		} else if(playerList.size()==6){
+			initialArmies = INITIAL_ARMIES_FOR_6;
 			players=new Player[6];
-			for(Player pl : playerList) pl.setArmies(INITIAL_ARMIES_FOR_6);
+		} else{
+			throw new IllegalArgumentException("Invalid number of players.");
 		}
-		else{
-			//fail
-		}
+		for(Player pl : playerList) pl.setArmies(initialArmies);
+		
 		Random rand = new Random();
 		for(int i=0;i<players.length;i++)
 		players[i]=playerList.remove(rand.nextInt(players.length-i));
@@ -53,5 +52,9 @@ public class Game{
 	
 	public Player[] getPlayers() {
 		return players;
+	}
+	
+	public int getInitialArmies() {
+		return initialArmies;
 	}
 }
