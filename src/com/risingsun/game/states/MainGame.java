@@ -18,23 +18,23 @@ public class MainGame extends BasicGameState{
 	public MainGame(int stateID) {
 		this.stateID=stateID;
 	}
-	@Override
+	
 	public void init(GameContainer gc, StateBasedGame sbg) throws SlickException {
 		gameController = new GameController();
 		gameController.init(gc,sbg);
 	}
-	@Override
+
 	public void update(GameContainer gc, StateBasedGame sbg, int delta) throws SlickException {
 		gameController.update(gc,sbg,delta);
 	}
 
-	@Override
+	
 	public void render(GameContainer gc, StateBasedGame sbg, Graphics g) throws SlickException {
 		gameController.render(gc, sbg, g);
 	}
 
 
-	@Override
+	
 	public int getID() {
 		return 1;
 	}
