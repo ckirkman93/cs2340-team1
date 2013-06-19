@@ -34,7 +34,7 @@ public class RisingSun extends StateBasedGame {
 		AppGameContainer appgc;
 		try {
 			appgc = new AppGameContainer(new RisingSun(title));
-			appgc.setDisplayMode(640, 360, false);
+			appgc.setDisplayMode(800, 600, false);
 			appgc.start();
 		}
 		catch(SlickException e){e.printStackTrace();}
