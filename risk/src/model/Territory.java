@@ -1,4 +1,4 @@
-package edu.risk;
+package model;
 
 /**
  * @author Aris Santas<asantas93@gmail.com>

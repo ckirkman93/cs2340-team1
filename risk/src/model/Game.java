@@ -1,4 +1,4 @@
-package edu.risk;
+package model;
 
 import java.util.ArrayList;
 import java.util.Random;
