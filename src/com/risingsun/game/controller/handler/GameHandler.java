@@ -7,11 +7,11 @@ import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.StateBasedGame;
 
 import com.risingsun.game.model.Player;
-import com.risingsun.game.model.Board;
+import com.risingsun.game.model.Map;
 
 public class GameHandler {
 
-	private Board board = new Board();
+	private Map map = new Map();
 
 	public GameHandler () {
 
@@ -24,9 +24,9 @@ public class GameHandler {
 
 	}
 	public void update(GameContainer gc, StateBasedGame sbg, int delta, Player[] playerList) throws SlickException {
-		board.update(gc, sbg, delta, playerList);
+		map.update(gc, sbg, delta, playerList);
 	}
 	public void render(GameContainer gc, StateBasedGame sbg, Graphics g) throws SlickException {
-		board.render(gc, sbg, g);
+		map.render(gc, sbg, g);
 	}
 }

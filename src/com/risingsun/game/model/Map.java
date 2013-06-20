@@ -8,14 +8,14 @@ import org.newdawn.slick.Graphics;
 import org.newdawn.slick.SlickException;
 import org.newdawn.slick.state.StateBasedGame;
 
-public class Board {
+public class Map {
 
 	private final Province[][] provinces = new Province[15][13];
 
 	//blacklist is list of spaces intended to be empty on the board
 	private final ArrayList<Point> blacklist = new ArrayList<Point>();
 
-	public Board() {
+	public Map() {
 		fillBlackList();		
 		for(int i = 0; i < provinces.length; i++)
 			for(int j = 0; j < provinces[i].length; j++) {
