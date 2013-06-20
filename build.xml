@@ -78,7 +78,7 @@
 		<fileset dir="${res.dir}"/>  
 		</copy>
 		<copy todir="${build.dir}">  
-		<fileset dir="${lib.dir}/Jars">  
+		<fileset dir="${lib.dir}/jars">  
 		<exclude name="servlet-api.jar"/>  
 		</fileset>  
 		</copy>

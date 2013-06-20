@@ -22,6 +22,8 @@ public class Province {
 	
 	private int xDrift;
 	private int yDrift;
+	
+	private int numberOfArmies;
 
 	private Color currentColor;
 	private Color neutral = new Color(0xc0c0c0);
@@ -77,10 +79,19 @@ public class Province {
 	}
 
 	public void render(GameContainer gc, StateBasedGame sbg, Graphics g) throws SlickException {
-		g.setColor(Color.black);
-		g.draw(area);
+		
 		g.setColor(currentColor);
 		g.fill(area);
+		g.setColor(Color.black);
+		g.draw(area);
+		if(numberOfArmies > 9)
+			g.drawString("" + numberOfArmies, 
+					xDefaultPosition + xDrift + width/2 - 10, 
+					yDefaultPosition + yDrift + height/2 - 8);
+		else if(numberOfArmies > 0)
+			g.drawString("" + numberOfArmies, 
+					xDefaultPosition + xDrift + width/2 - 6, 
+					yDefaultPosition + yDrift + height/2 - 8);
 	}
 	
 	public void setDrift(int xAmount, int yAmount){

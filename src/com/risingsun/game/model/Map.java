@@ -55,6 +55,7 @@ public class Map {
 		blacklist.add(new Point(0, 5));
 		blacklist.add(new Point(0, 6));
 		blacklist.add(new Point(0, 7));
+		blacklist.add(new Point(0, 10));
 		blacklist.add(new Point(0, 11));
 		blacklist.add(new Point(0, 12));
 		blacklist.add(new Point(1, 0));
@@ -129,7 +130,7 @@ public class Map {
 		blacklist.add(new Point(14, 3));		
 		blacklist.add(new Point(14, 4));		
 		blacklist.add(new Point(14, 5));		
-		blacklist.add(new Point(14, 6));		
+		blacklist.add(new Point(14, 8));		
 		blacklist.add(new Point(14, 9));		
 		blacklist.add(new Point(14, 10));		
 		blacklist.add(new Point(14, 11));		
