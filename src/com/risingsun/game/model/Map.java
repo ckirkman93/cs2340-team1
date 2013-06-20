@@ -10,14 +10,17 @@ import org.newdawn.slick.state.StateBasedGame;
 
 public class Map {
 
+	private int xDrift,yDrift;
 	private final Province[][] provinces = new Province[15][13];
 
 	//blacklist is list of spaces intended to be empty on the board
 	private final ArrayList<Point> blacklist = new ArrayList<Point>();
 
 	public Map() {
+		xDrift = 0;
+		yDrift = 0;
 		fillBlackList();		
-		for(int i = 0; i < provinces.length; i++)
+		for(int i = 0; i < provinces.length; i++){
 			for(int j = 0; j < provinces[i].length; j++) {
 				if(!blacklist.contains(new Point(i, j))) {
 					if(i % 2 == 0)
@@ -28,17 +31,23 @@ public class Map {
 							25 + i * Province.choppedHeight);
 				}
 			}
+		}
 	}
 
 	public void update(GameContainer gc, StateBasedGame sbg, int delta, Player[] playerList) throws SlickException {
 		for(Province[] p : provinces)
 			for(Province province : p)
-				if(province != null) province.update(gc, sbg, delta, playerList);
+				if(province != null) {province.setDrift(xDrift,yDrift); province.update(gc, sbg, delta, playerList);}
 	}
 	public void render(GameContainer gc, StateBasedGame sbg, Graphics g) throws SlickException {
 		for(Province[] p : provinces)
 			for(Province province : p)
 				if(province != null) province.render(gc, sbg, g);
+	}
+	
+	public void setDrift(int xAmount, int yAmount){
+		xDrift = xAmount;
+		yDrift = yAmount;
 	}
 
 	private void fillBlackList() {
