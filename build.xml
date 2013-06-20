@@ -4,8 +4,10 @@
 	<property name="tomcat.dir" value="${env.CATALINA_HOME}webapps"/>
 	<property name="project.name" value="RisingSun"/>
 	<property name="lib.dir" value="lib"/>
+	<property name="res.dir" value="res"/>
 	<property name="src.dir" value="src"/>
 	<property name="web.dir" value="web"/>
+	<property name="bin.dir" value="bin"/>
 	<property name="build.dir" value="build"/>
 	<property name="dist.dir" value="dist"/>
 	
@@ -40,15 +42,25 @@
 	</copy>  
 	</target> 
 	
-	<target name="war" depends="jar">  
+	<target name="war" depends="sign">  
 		<echo>Building ${dist.dir}/${project.name}.war</echo>  
 		<war destfile="${dist.dir}/${project.name}.war" webxml="${build.dir}/WEB-INF/web.xml">
 		<fileset dir="${build.dir}"/>  
 		</war>  
 	</target>
 	
+	<target name="sign" depends="jar">
+	<signjar
+	    alias="Pennington" keystore="CS2340KeyStore.jks"
+	    storepass="2394704137">
+	  <path>
+	    <fileset dir="${build.dir}" includes="**/*.jar" />
+	  </path>
+	</signjar>
+	</target>
+
 	<target name="jar" depends="copy">
-		<jar destfile="${build.dir}/Game.jar" basedir="bin">
+		<jar destfile="${build.dir}/Game.jar" basedir="${bin.dir}">
 		<manifest>
 		<attribute name="RisingSun" value="com.risingsun.game.RisingSun"/>
 		</manifest>
@@ -61,7 +73,10 @@
 		</copy>
 		<copy todir="${build.dir}">  
 		<fileset dir="${web.dir}"/>  
-		</copy>  
+		</copy>
+		<copy todir="${bin.dir}/res/">  
+		<fileset dir="${res.dir}"/>  
+		</copy>
 		<copy todir="${build.dir}">  
 		<fileset dir="${lib.dir}/Jars">  
 		<exclude name="servlet-api.jar"/>  
