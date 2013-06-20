@@ -50,8 +50,8 @@ public class GameController {
 	public void render(GameContainer gc, StateBasedGame sbg, Graphics g) throws SlickException {
 		if (!setupFinished) { setupHandler.render(gc, sbg, g); }
 		else if (!gameFinished && gameStarted){
-			summaryHandler.render(gc, sbg, g, playerList);
 			gameHandler.render(gc, sbg, g);
+			summaryHandler.render(gc, sbg, g, playerList);
 		}
 	}
 }
