@@ -1,67 +1,114 @@
-<?xml version="1.0"?>  
-<project name="FeudalWar" default="deploy_local" basedir=".">  
-  
-	<property environment="env"/>
-	<property name="project.name" value="FeudalWar"/>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project basedir="." default="deploy" name="RisingSun">
+    <property environment="env"/>
+	<property name="tomcat.dir" value="${env.CATALINA_HOME}webapps"/>
+	<property name="project.name" value="RisingSun"/>
 	<property name="lib.dir" value="lib"/>
+	<property name="res.dir" value="res"/>
 	<property name="src.dir" value="src"/>
 	<property name="web.dir" value="web"/>
+	<property name="bin.dir" value="bin"/>
 	<property name="build.dir" value="build"/>
 	<property name="dist.dir" value="dist"/>
-	<property name="tomcat.dir" value="${env.CATALINA_HOME}/webapps"/>
-  
-<path id="classpath">  
-<fileset dir="${lib.dir}" includes="servlet-api.jar"/>  
-</path>  
-  
-<target name="clean">  
-<echo>Cleaning the ${build.dir}</echo>  
-<delete dir="${build.dir}"/>  
-<delete dir="${dist.dir}"/>  
-</target>  
-  
-<target name="init" depends="clean">  
-<echo>Creating the build directory</echo>  
-<mkdir dir="${build.dir}/WEB-INF/classes"/>  
-<mkdir dir="${build.dir}/WEB-INF/lib"/>  
-<mkdir dir="${dist.dir}"/>  
-</target>  
-  
-<target name="compile" depends="init">  
-<echo>Compile the source files</echo>  
-<javac srcdir="${src.dir}" destdir="${build.dir}/WEB-INF/classes">  
-<classpath refid="classpath"/>  
-</javac>  
-</target>  
-  
-<target name="copy" depends="compile">  
-<copy todir="${build.dir}/WEB-INF">  
-<fileset dir="${web.dir}/WEB-INF"/>  
-</copy>  
-<copy todir="${build.dir}">  
-<fileset dir="${web.dir}"/>  
-</copy>  
-<copy todir="${build.dir}/WEB-INF/lib">  
-<fileset dir="${lib.dir}">  
-<exclude name="servlet-api.jar"/>  
-</fileset>  
-</copy>  
-</target>  
-  
-<target name="war" depends="copy">  
-<echo>Building the war file</echo>  
-<war destfile="${dist.dir}/${project.name}.war" webxml="${build.dir}/WEB-INF/web.xml">  
-<fileset dir="${build.dir}"/>  
-</war>  
-</target>  
-  
-<target name="deploy_local" depends="war">  
-<echo>Deploying .war to local Tomcat</echo>  
-<copy todir="${tomcat.dir}">  
-<fileset dir="${dist.dir}">  
-<include name="${project.name}.war"/>  
-</fileset>  
-</copy>  
-</target>  
-  
-</project> 
+	
+    <property name="ECLIPSE_HOME" value="../../../../../eclipse"/>
+    <property name="debuglevel" value="source,lines,vars"/>
+    <property name="target" value="1.7"/>
+    <property name="source" value="1.7"/>
+    <path id="RisingSun.classpath">
+        <pathelement location="bin"/>
+        <pathelement location="lib/jars/lwjgl.jar"/>
+        <pathelement location="lib/jars/slick.jar"/>
+    </path>
+    <target name="init">
+        <mkdir dir="bin"/>
+        <copy includeemptydirs="false" todir="bin">
+            <fileset dir="src">
+                <exclude name="**/*.launch"/>
+                <exclude name="**/*.java"/>
+            </fileset>
+        </copy>
+    </target>
+    <target name="clean">
+        <delete dir="bin"/>
+    </target>
+    <target depends="clean" name="cleanall"/>
+    
+	<target name="deploy" depends="war">  
+	<echo>Deploying .war to ${tomcat.dir}</echo>
+	<echo>From: ${dist.dir}</echo>
+	<copy todir="${tomcat.dir}">  
+	<fileset dir="${dist.dir}"/>  
+	</copy>  
+	</target> 
+	
+	<target name="war" depends="sign">  
+		<echo>Building ${dist.dir}/${project.name}.war</echo>  
+		<war destfile="${dist.dir}/${project.name}.war" webxml="${build.dir}/WEB-INF/web.xml">
+		<fileset dir="${build.dir}"/>  
+		</war>  
+	</target>
+	
+	<target name="sign" depends="jar">
+	<signjar
+	    alias="Pennington" keystore="CS2340KeyStore.jks"
+	    storepass="2394704137">
+	  <path>
+	    <fileset dir="${build.dir}" includes="**/*.jar" />
+	  </path>
+	</signjar>
+	</target>
+
+	<target name="jar" depends="copy">
+		<jar destfile="${build.dir}/Game.jar" basedir="${bin.dir}">
+		<manifest>
+		<attribute name="RisingSun" value="com.risingsun.game.RisingSun"/>
+		</manifest>
+		</jar>
+	</target>
+	
+	<target name="copy" depends="build-subprojects,build-project">
+		<copy todir="${build.dir}/WEB-INF">  
+		<fileset dir="${web.dir}/WEB-INF"/>  
+		</copy>
+		<copy todir="${build.dir}">  
+		<fileset dir="${web.dir}"/>  
+		</copy>
+		<copy todir="${bin.dir}/res/">  
+		<fileset dir="${res.dir}"/>  
+		</copy>
+		<copy todir="${build.dir}">  
+		<fileset dir="${lib.dir}/Jars">  
+		<exclude name="servlet-api.jar"/>  
+		</fileset>  
+		</copy>
+	</target>
+    
+	<target name="build-subprojects"/>
+    <target depends="init" name="build-project">
+        <echo message="${ant.project.name}: ${ant.file}"/>
+        <javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false" source="${source}" target="${target}">
+            <src path="src"/>
+            <classpath refid="RisingSun.classpath"/>
+        </javac>
+    </target>
+    <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
+    <target description="copy Eclipse compiler jars to ant lib directory" name="init-eclipse-compiler">
+        <copy todir="${ant.library.dir}">
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </copy>
+        <unzip dest="${ant.library.dir}">
+            <patternset includes="jdtCompilerAdapter.jar"/>
+            <fileset dir="${ECLIPSE_HOME}/plugins" includes="org.eclipse.jdt.core_*.jar"/>
+        </unzip>
+    </target>
+    <target description="compile project with Eclipse compiler" name="build-eclipse-compiler">
+        <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
+        <antcall target="build"/>
+    </target>
+    <target name="RisingSun">
+        <java classname="com.risingsun.game.RisingSun" failonerror="true" fork="yes">
+            <classpath refid="RisingSun.classpath"/>
+        </java>
+    </target>
+</project>
