@@ -13,8 +13,9 @@ public class Province {
 
 	private Shape area;
 	
-	private static final int width = 54;
-	private static final int height = 64;
+	public static final int width = 39;
+	public static final int height = 48;
+	public static final int choppedHeight = 36;
 	
 	private Color currentColor;
 	private Color neutral = new Color(0xc1c1c1);
@@ -22,19 +23,19 @@ public class Province {
 	
 	private boolean leftClickDownState = false;
 	
-	public Province () {
+	public Province (int x, int y) {
 		
 		float yMin = 0;
-		float yQuart = 16;
-		float yMost = 48;
-		float yMax = 64;
+		float yQuart = 12;
+		float yMost = 36;
+		float yMax = 48;
 		
-		float xHalf = 32;
+		float xHalf = 24;
 		float xMin = 5;
-		float xMax = 59;
+		float xMax = 43;
 		
 		area = new Polygon(new float[]{xHalf,yMin,xMax,yQuart,xMax,yMost,xHalf,yMax,xMin,yMost,xMin,yQuart});
-		area.setLocation(200, 150);
+		area.setLocation(x, y);
 		currentColor = neutral;
 	}
 	
@@ -60,6 +61,8 @@ public class Province {
 	}
 	
 	public void render(GameContainer gc, StateBasedGame sbg, Graphics g) throws SlickException {
+		g.setColor(Color.black);
+		g.draw(area);
 		g.setColor(currentColor);
 		g.fill(area);
 	}
