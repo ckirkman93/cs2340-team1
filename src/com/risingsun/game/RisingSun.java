@@ -35,16 +35,16 @@ public class RisingSun extends StateBasedGame {
 		this.getState(maingame).init(gc, this);
 		this.enterState(mainmenu);
 	}
-	/**
-	*public static void main(String[] args) {
-	*	AppGameContainer appgc;
-	*	try {
-	*		appgc = new AppGameContainer(new RisingSun(title));
-	*		appgc.setDisplayMode(640, 360, false);
-	*		appgc.setAlwaysRender(true);
-	*		appgc.start();
-	*	}
+	
+	public static void main(String[] args) {
+		AppGameContainer appgc;
+		try {
+			appgc = new AppGameContainer(new RisingSun(title));
+			appgc.setDisplayMode(640, 360, false);
+			appgc.setAlwaysRender(true);
+			appgc.start();
+		}
 		catch(SlickException e){e.printStackTrace();}
-	*} **/
+	}
 
 }
