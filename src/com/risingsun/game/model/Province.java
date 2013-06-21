@@ -79,7 +79,6 @@ public class Province {
 	}
 
 	public void render(GameContainer gc, StateBasedGame sbg, Graphics g) throws SlickException {
-		
 		g.setColor(currentColor);
 		g.fill(area);
 		g.setColor(Color.black);

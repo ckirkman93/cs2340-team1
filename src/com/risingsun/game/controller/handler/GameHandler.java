@@ -52,6 +52,5 @@ public class GameHandler {
 		if (xpos >= (gc.getWidth() - driftZone) && xDrift > -80) {xDrift-=driftSpeed;}
 		if (ypos <= driftZone && yDrift <= -driftSpeed) {yDrift+=driftSpeed;}
 		if (ypos >= (gc.getHeight() - driftZone) && yDrift > -240) {yDrift-=driftSpeed;}
-		
 	}
 }
