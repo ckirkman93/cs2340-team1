@@ -1,6 +1,5 @@
 package com.risingsun.game.states;
 
-import com.risingsun.game.model.Player;
 import com.risingsun.game.controller.GameController;
 
 import org.newdawn.slick.GameContainer;

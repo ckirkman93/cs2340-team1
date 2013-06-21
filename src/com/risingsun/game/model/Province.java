@@ -12,59 +12,90 @@ import org.newdawn.slick.state.StateBasedGame;
 public class Province {
 
 	private Shape area;
-	
+
 	public static final int width = 39;
 	public static final int height = 48;
 	public static final int choppedHeight = 36;
 	
+	private int xDefaultPosition;
+	private int yDefaultPosition;
+	
+	private int xDrift;
+	private int yDrift;
+	
+	private int numberOfArmies;
+
 	private Color currentColor;
-	private Color neutral = new Color(0xc1c1c1);
-	private Color highlighted = new Color(0xe1e1e1);
-	
+	private Color neutral = new Color(0xc0c0c0);
+	private Color highlighted = new Color(0xd0d0d0);
+	private Color clicked = new Color(0xf0f0f0);
+
 	private boolean leftClickDownState = false;
-	
+
 	public Province (int x, int y) {
+
+		xDefaultPosition = x;
+		yDefaultPosition = y;
 		
 		float yMin = 0;
 		float yQuart = 12;
 		float yMost = 36;
 		float yMax = 48;
-		
+
 		float xHalf = 24;
 		float xMin = 5;
 		float xMax = 43;
-		
+
 		area = new Polygon(new float[]{xHalf,yMin,xMax,yQuart,xMax,yMost,xHalf,yMax,xMin,yMost,xMin,yQuart});
-		area.setLocation(x, y);
+		area.setLocation(xDefaultPosition, yDefaultPosition);
 		currentColor = neutral;
+		
+		xDrift = 0;
+		yDrift = 0;
 	}
-	
+
 	public void update(GameContainer gc, StateBasedGame sbg, int delta, Player[] playerList) throws SlickException {
+		area.setLocation(xDefaultPosition + xDrift, yDefaultPosition + yDrift);
+		
 		Input input = gc.getInput();
 		int xpos = input.getMouseX();
 		int ypos = input.getMouseY();
-		
+
 		if (input.isMouseButtonDown(0)) {leftClickDownState = true;}
-		
+
 		if (area.contains(xpos, ypos)){
 			if (input.isMouseButtonDown(0)) {
-				currentColor = highlighted;
+				currentColor = clicked;
 				}
-			else {currentColor = neutral;}
-			
+			else {currentColor = highlighted;}
+
 			if ( !input.isMouseButtonDown(0) && leftClickDownState == true) {
-				
+
 			}
 		}
-		
+		else {currentColor = neutral;}
+
 		if (!input.isMouseButtonDown(0)) {leftClickDownState = false;}
 	}
-	
+
 	public void render(GameContainer gc, StateBasedGame sbg, Graphics g) throws SlickException {
-		g.setColor(Color.black);
-		g.draw(area);
 		g.setColor(currentColor);
 		g.fill(area);
+		g.setColor(Color.black);
+		g.draw(area);
+		if(numberOfArmies > 9)
+			g.drawString("" + numberOfArmies, 
+					xDefaultPosition + xDrift + width/2 - 10, 
+					yDefaultPosition + yDrift + height/2 - 8);
+		else if(numberOfArmies > 0)
+			g.drawString("" + numberOfArmies, 
+					xDefaultPosition + xDrift + width/2 - 6, 
+					yDefaultPosition + yDrift + height/2 - 8);
+	}
+	
+	public void setDrift(int xAmount, int yAmount){
+		xDrift = xAmount;
+		yDrift = yAmount;
 	}
 
 }
