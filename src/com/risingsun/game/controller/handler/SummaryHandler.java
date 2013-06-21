@@ -39,7 +39,7 @@ public class SummaryHandler {
 		int position = 0;
 		for (Player player : playerList){
 			if (player!=null){
-				g.setColor(player.getColor());
+				g.setColor(player.getColors()[0]);
 				g.drawString(player.getName() + ":",8,40+(position*48));
 				g.setColor(Color.darkGray);
 				g.drawString("Generals: " + player.getGenerals(),8,52+(position*48));

@@ -5,7 +5,9 @@ import org.newdawn.slick.Color;
 public class Player {
 	
 	private String name;
-	private Color color;
+	private Color[] colors;
+	
+	
 	private int infantry;
 	private int generals;
 	
@@ -15,8 +17,8 @@ public class Player {
 	public void setName (String value){
 		name = value;
 	}
-	public void setColor (Color value){
-		color = value;
+	public void setColors (Color[] values){
+		colors = values;
 	}
 	public void setInfantry (int value){
 		infantry = value;
@@ -33,17 +35,12 @@ public class Player {
 		this.name = name;
 	}
 	
-	public Player(String name, Color color){
-		this.name = name;
-		this.color = color;
-	}
-	
 	public String getName() {
 		return name;
 	}
 	
-	public Color getColor() {
-		return color;
+	public Color[] getColors() {
+		return colors;
 	}
 	
 	public int getInfantry() {
