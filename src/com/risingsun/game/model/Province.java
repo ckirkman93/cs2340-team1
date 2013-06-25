@@ -23,9 +23,12 @@ public class Province {
 	private int xDrift;
 	private int yDrift;
 	
+	private int ipos,jpos;
+	
 	private int numberOfArmies;
 
 	private Color currentColor;
+	
 	private Color neutral = new Color(0xc0c0c0);
 	private Color highlighted = new Color(0xd0d0d0);
 	private Color clicked = new Color(0xf0f0f0);
@@ -72,6 +75,11 @@ public class Province {
 			if ( !input.isMouseButtonDown(0) && leftClickDownState == true) {
 
 			}
+			
+			if (input.isMouseButtonDown(Input.MOUSE_RIGHT_BUTTON)) {
+				//this.setOwner(playerList[0]);
+				//numberOfArmies++;
+			}
 		}
 		else {currentColor = neutral;}
 
@@ -79,11 +87,14 @@ public class Province {
 	}
 
 	public void render(GameContainer gc, StateBasedGame sbg, Graphics g) throws SlickException {
-		
 		g.setColor(currentColor);
 		g.fill(area);
 		g.setColor(Color.black);
 		g.draw(area);
+		
+		//g.drawString("" + ipos,  xDefaultPosition +xDrift, yDefaultPosition + yDrift + height/2 - 16);
+		//g.drawString("" + jpos,  xDefaultPosition +xDrift, yDefaultPosition + yDrift + height/2 - 2);
+		
 		if(numberOfArmies > 9)
 			g.drawString("" + numberOfArmies, 
 					xDefaultPosition + xDrift + width/2 - 10, 
@@ -97,6 +108,17 @@ public class Province {
 	public void setDrift(int xAmount, int yAmount){
 		xDrift = xAmount;
 		yDrift = yAmount;
+	}
+	
+	public void setOwner(Player player){
+		neutral = player.getColors()[0];
+		highlighted = player.getColors()[1];
+		clicked = player.getColors()[2];
+	}
+	
+	public void setSeat(int ipos, int jpos){
+		this.ipos=ipos;
+		this.jpos=jpos;
 	}
 
 }

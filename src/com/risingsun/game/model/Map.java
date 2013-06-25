@@ -17,18 +17,23 @@ public class Map {
 	private final ArrayList<Point> blacklist = new ArrayList<Point>();
 
 	public Map() {
+	}
+	
+	public void init (){
 		xDrift = 0;
 		yDrift = 0;
 		fillBlackList();		
 		for(int i = 0; i < provinces.length; i++){
 			for(int j = 0; j < provinces[i].length; j++) {
 				if(!blacklist.contains(new Point(i, j))) {
-					if(i % 2 == 0)
+					if(i % 2 == 0){
 						provinces[i][j] = new Province(200 + j * Province.width, 
 								25 + i * Province.choppedHeight);
-					else provinces[i][j] = new Province(200 - Province.width / 2 
+					provinces[i][j].setSeat(i,j);}
+					else {provinces[i][j] = new Province(200 - Province.width / 2 
 							+ j * Province.width, 
 							25 + i * Province.choppedHeight);
+					provinces[i][j].setSeat(i,j);}
 				}
 			}
 		}
@@ -43,6 +48,116 @@ public class Map {
 		for(Province[] p : provinces)
 			for(Province province : p)
 				if(province != null) province.render(gc, sbg, g);
+	}
+	
+	public void configure3(Player[] playerList){
+		if (playerList[0]!=null){setupPosition1(playerList[0]);}
+		if (playerList[1]!=null){setupPosition2(playerList[1]);}
+		if (playerList[2]!=null){setupPosition3(playerList[2]);}
+		
+	}
+	public void configure4(Player[] playerList){
+		if (playerList[0]!=null){setupPosition1(playerList[0]);}
+		if (playerList[1]!=null){setupPosition3(playerList[1]);}
+		if (playerList[2]!=null){setupPosition5(playerList[2]);}
+		if (playerList[3]!=null){setupPosition6(playerList[3]);}
+	}
+	public void configure5(Player[] playerList){
+		configure3(playerList);
+		if (playerList[3]!=null){setupPosition5(playerList[3]);}
+		if (playerList[4]!=null){setupPosition6(playerList[4]);}
+	}
+	public void configure6(Player[] playerList){
+		configure5(playerList);
+		if (playerList[5]!=null){setupPosition4(playerList[5]);}
+	}
+	
+	public void setupPosition1(Player player){
+		provinces[10][9].setOwner(player);
+		provinces[11][5].setOwner(player);
+		provinces[11][6].setOwner(player);
+		provinces[11][8].setOwner(player);
+		provinces[11][9].setOwner(player);
+		provinces[12][4].setOwner(player);
+		provinces[12][5].setOwner(player);
+		provinces[12][6].setOwner(player);
+		provinces[12][7].setOwner(player);
+		provinces[12][8].setOwner(player);
+		provinces[13][6].setOwner(player);
+		provinces[13][7].setOwner(player);
+		provinces[13][8].setOwner(player);
+		provinces[14][6].setOwner(player);
+		provinces[14][7].setOwner(player);
+	}
+	public void setupPosition2(Player player){
+		provinces[6][8].setOwner(player);
+		provinces[7][8].setOwner(player);
+		provinces[7][9].setOwner(player);
+		provinces[8][7].setOwner(player);
+		provinces[8][8].setOwner(player);
+		provinces[9][7].setOwner(player);
+		provinces[9][8].setOwner(player);
+		provinces[10][6].setOwner(player);
+		provinces[10][7].setOwner(player);
+		provinces[10][8].setOwner(player);
+		provinces[11][7].setOwner(player);
+	}
+	public void setupPosition3(Player player){
+		provinces[5][9].setOwner(player);
+		provinces[5][10].setOwner(player);
+		provinces[6][9].setOwner(player);
+		provinces[6][10].setOwner(player);
+		provinces[7][10].setOwner(player);
+		provinces[7][11].setOwner(player);
+		provinces[8][9].setOwner(player);
+		provinces[8][10].setOwner(player);
+		provinces[8][11].setOwner(player);
+		provinces[9][9].setOwner(player);
+		provinces[9][10].setOwner(player);
+		provinces[9][11].setOwner(player);
+		provinces[9][12].setOwner(player);
+	}
+	public void setupPosition4(Player player){
+		provinces[0][8].setOwner(player);
+		provinces[0][9].setOwner(player);
+		provinces[1][8].setOwner(player);
+		provinces[1][10].setOwner(player);
+		provinces[2][7].setOwner(player);
+		provinces[2][9].setOwner(player);
+		provinces[3][8].setOwner(player);
+		provinces[3][9].setOwner(player);
+		provinces[3][10].setOwner(player);
+		provinces[4][8].setOwner(player);
+		provinces[4][9].setOwner(player);
+	}
+	public void setupPosition5(Player player){
+		provinces[3][1].setOwner(player);
+		provinces[3][2].setOwner(player);
+		provinces[4][0].setOwner(player);
+		provinces[4][1].setOwner(player);
+		provinces[4][2].setOwner(player);
+		provinces[4][3].setOwner(player);
+		provinces[5][0].setOwner(player);
+		provinces[5][1].setOwner(player);
+		provinces[5][2].setOwner(player);
+		provinces[5][3].setOwner(player);
+		provinces[5][4].setOwner(player);
+		provinces[6][2].setOwner(player);
+		provinces[6][3].setOwner(player);
+	}
+	public void setupPosition6(Player player){
+		provinces[0][0].setOwner(player);
+		provinces[0][1].setOwner(player);
+		provinces[0][2].setOwner(player);
+		provinces[1][1].setOwner(player);
+		provinces[1][2].setOwner(player);
+		provinces[1][3].setOwner(player);
+		provinces[2][1].setOwner(player);
+		provinces[2][2].setOwner(player);
+		provinces[2][3].setOwner(player);
+		provinces[2][4].setOwner(player);
+		provinces[3][3].setOwner(player);
+		provinces[3][4].setOwner(player);
 	}
 	
 	public void setDrift(int xAmount, int yAmount){
@@ -90,6 +205,7 @@ public class Map {
 		blacklist.add(new Point(8, 12));
 		blacklist.add(new Point(9, 0));
 		blacklist.add(new Point(9, 1));
+		blacklist.add(new Point(9, 2));
 		blacklist.add(new Point(9, 3));
 		blacklist.add(new Point(9, 4));
 		blacklist.add(new Point(10, 0));

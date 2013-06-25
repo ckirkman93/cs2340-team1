@@ -14,7 +14,7 @@ import com.risingsun.game.model.Map;
 
 public class GameHandler {
 
-	private Map map = new Map();
+	private Map map;
 	
 	private int xDrift;
 	private int yDrift;
@@ -23,13 +23,26 @@ public class GameHandler {
 	private static final int driftSpeed = 2;
 
 	public GameHandler () {
-
+		map = new Map();
 	}
 
-	public void init(GameContainer gc, StateBasedGame sbg, Player[] playerList) throws SlickException {
+	public void init(GameContainer gc, StateBasedGame sbg, Player[] playerList, int playerCount) throws SlickException {
 		
 		xDrift = 0;
 		yDrift = 0;
+		
+		map.init();
+		
+		if (playerCount>3){
+			if(playerCount>4){
+				if(playerCount>5){
+					map.configure6(playerList);
+				}
+				else {map.configure5(playerList);}
+			}
+			else {map.configure4(playerList);}
+		}
+		else {map.configure3(playerList);}
 
 	}
 	public void update(GameContainer gc, StateBasedGame sbg, int delta, Player[] playerList) throws SlickException {
@@ -52,6 +65,6 @@ public class GameHandler {
 		if (xpos >= (gc.getWidth() - driftZone) && xDrift > -80) {xDrift-=driftSpeed;}
 		if (ypos <= driftZone && yDrift <= -driftSpeed) {yDrift+=driftSpeed;}
 		if (ypos >= (gc.getHeight() - driftZone) && yDrift > -240) {yDrift-=driftSpeed;}
-		
 	}
+	
 }

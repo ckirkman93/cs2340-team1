@@ -121,12 +121,12 @@ public class SetupHandler {
 					playerList[newSlot].setInfantry(3);
 					playerList[newSlot].setGenerals(1);
 					
-					if (newSlot==0){playerList[newSlot].setColor(Color.red);}
-					else if (newSlot==1){playerList[newSlot].setColor(Color.blue);}
-					else if (newSlot==2){playerList[newSlot].setColor(Color.green);}
-					else if (newSlot==3){playerList[newSlot].setColor(Color.cyan);}
-					else if (newSlot==4){playerList[newSlot].setColor(Color.yellow);}
-					else if (newSlot==5){playerList[newSlot].setColor(Color.magenta);}
+					if (newSlot==0){playerList[newSlot].setColors( new Color[]{new Color(0xFF0000), new Color(0xFF2626), new Color(0xFF5757)} );}
+					else if (newSlot==1){playerList[newSlot].setColors(new Color[]{new Color(0xFFFF00), new Color(0xFFFF26), new Color(0xFFFF57)});}
+					else if (newSlot==2){playerList[newSlot].setColors(new Color[]{new Color(0x00FF00), new Color(0x26FF26), new Color(0x57FF57)});}
+					else if (newSlot==3){playerList[newSlot].setColors(new Color[]{new Color(0x0000FF), new Color(0x2626FF), new Color(0x5757FF)});}
+					else if (newSlot==4){playerList[newSlot].setColors(new Color[]{new Color(0xFF00FF), new Color(0xFF26FF), new Color(0xFF57FF)});}
+					else if (newSlot==5){playerList[newSlot].setColors(new Color[]{new Color(0x00FFFF), new Color(0x26FFFF), new Color(0x57FFFF)});}
 				}
 				
 				finished = true;
@@ -165,4 +165,5 @@ public class SetupHandler {
 	}
 	
 	public boolean isFinished(){ return finished; }
+	public int getCount() {return playerCount;}
 }
