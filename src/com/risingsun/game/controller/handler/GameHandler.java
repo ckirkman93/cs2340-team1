@@ -46,9 +46,7 @@ public class GameHandler {
 
 	}
 	public void update(GameContainer gc, StateBasedGame sbg, int delta, Player[] playerList) throws SlickException {
-		
 		calculateDrift(gc);
-		
 		map.setDrift(xDrift, yDrift);
 		map.update(gc, sbg, delta, playerList);
 	}
