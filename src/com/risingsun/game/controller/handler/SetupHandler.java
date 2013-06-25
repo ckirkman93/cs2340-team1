@@ -116,7 +116,7 @@ public class SetupHandler {
 					while (playerList[newSlot] != null){
 						newSlot = rand.nextInt(playerCount);
 					}
-					playerList[newSlot]=new Player(nameList[i]);
+					playerList[newSlot]=new Player(nameList[i], gc);
 					
 					playerList[newSlot].setInfantry(3);
 					playerList[newSlot].setGenerals(1);
