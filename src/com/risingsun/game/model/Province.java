@@ -12,6 +12,7 @@ import org.newdawn.slick.state.StateBasedGame;
 public class Province {
 
 	private Shape area;
+	private Player owner;
 
 	public static final int width = 39;
 	public static final int height = 48;
@@ -77,7 +78,10 @@ public class Province {
 			else {currentColor = highlighted;}
 
 			if ( !input.isMouseButtonDown(0) && leftClickDownState == true) {
-
+				if(owner != null && owner.hasTurn() && owner.getFreeArmies() > 0) {
+					numberOfArmies++;
+					owner.placeFreeArmy();
+				}
 			}
 			
 			if (input.isMouseButtonDown(Input.MOUSE_RIGHT_BUTTON)) {
@@ -115,6 +119,8 @@ public class Province {
 	}
 	
 	public void setOwner(Player player){
+		owner = player;
+		owner.addProvince(this);
 		neutral = player.getColors()[0];
 		highlighted = player.getColors()[1];
 		clicked = player.getColors()[2];

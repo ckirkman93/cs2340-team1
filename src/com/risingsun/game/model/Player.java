@@ -3,21 +3,20 @@ package com.risingsun.game.model;
 import java.util.ArrayList;
 
 import org.newdawn.slick.Color;
-import org.newdawn.slick.GameContainer;
-import org.newdawn.slick.Input;
-
 public class Player {
 	
 	private String name;
 	private Color[] colors;
-	
+	private boolean hasTurn;	
 	
 	private int infantry;
 	private int generals;
-	private GameContainer gc;
+	private int freeArmies = 3;
+	
 	private ArrayList<Province> provinces;
 	
-	public Player(){
+	public Player() {
+		provinces = new ArrayList<Province>();
 	}
 	
 	public void setName (String value){
@@ -37,9 +36,9 @@ public class Player {
 		return name;
 	}
 	
-	public Player(String name, GameContainer gc){
+	public Player(String name){
+		this();
 		this.name = name;
-		this.gc = gc;
 	}
 	
 	public String getName() {
@@ -58,14 +57,29 @@ public class Player {
 		return generals;
 	}
 	
-	private Province determineProvinceToAddArmy() {
-		while(true) {
-			Input input = gc.getInput();
-			for(Province p : provinces) {
-				if(p.getArea().contains(input.getMouseX(), input.getMouseY()));
-					return p;
-			}
-		}
+	public void addProvince(Province p) {
+		provinces.add(p);
 	}
 	
+	public void giveTurn() {
+		hasTurn = true;
+		freeArmies = provinces.size()/3 + 3;
+	}
+	
+	public int getFreeArmies() {
+		return freeArmies;
+	}
+	
+	public void placeFreeArmy() {
+		freeArmies--;
+		infantry++;
+	}
+	
+	public void takeTurn() {
+		hasTurn = false;
+	}
+	
+	public boolean hasTurn() {
+		return hasTurn;
+	}
 }

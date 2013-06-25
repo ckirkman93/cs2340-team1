@@ -30,7 +30,6 @@ public class GameController {
 		gameHandler = new GameHandler();
 		summaryHandler = new SummaryHandler();
 		setupHandler.init(gc , sbg);
-		
 	}
 	public void update(GameContainer gc, StateBasedGame sbg, int delta) throws SlickException {
 		if (!setupFinished) { 
