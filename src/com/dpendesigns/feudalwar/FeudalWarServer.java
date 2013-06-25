@@ -9,6 +9,8 @@ import javax.swing.JLabel;
 
 import com.dpendesigns.feudalwar.model.GameInstance;
 import com.dpendesigns.feudalwar.model.GameListPacket;
+import com.dpendesigns.feudalwar.model.JoinGamePacket;
+import com.dpendesigns.feudalwar.model.JoinGameRequest;
 import com.dpendesigns.feudalwar.model.User;
 import com.dpendesigns.feudalwar.model.UserListPacket;
 import com.esotericsoftware.kryo.Kryo;
@@ -34,6 +36,7 @@ public class FeudalWarServer {
 	private final int login = 11;
 	private final int postLogin = 12;
 	private final int mainMenu = 20;
+	private final int postMenu = 21;
 	private final int hostGame = 30;
 	private final int joinGame = 40;
 	private final int preGame = 50;
@@ -72,6 +75,7 @@ public class FeudalWarServer {
 			kryo.register(com.dpendesigns.feudalwar.model.UserListPacket.class);
 			kryo.register(com.dpendesigns.feudalwar.model.GameInstance.class);
 			kryo.register(com.dpendesigns.feudalwar.model.GameListPacket.class);
+			kryo.register(com.dpendesigns.feudalwar.model.JoinGameRequest.class);
 			kryo.register(java.util.Vector.class);
 			
 			server.start();
@@ -149,6 +153,26 @@ public class FeudalWarServer {
 				c.sendTCP(loginStatus);
 				server.sendToAllTCP(user_list);
 				server.sendToAllTCP(game_list);
+			} else if (o instanceof JoinGameRequest){
+				JoinGameRequest joinGameRequest = (JoinGameRequest)o;
+				String gameName = joinGameRequest.requestedGame;
+				User addedUser = new User();
+				for (User user : user_list){
+					if (user.getConnectionID() == c.getID()){
+						addedUser = user;
+					} 
+				}
+				for (GameInstance game : game_list){
+					if (game.getGameName().equals(gameName)){
+						boolean joinAccepted = game.addUser(addedUser);
+						if(!joinAccepted){
+							c.sendTCP(joinGameRequest);
+							stateHandler.command(addedUser, joinGame);
+						} else {stateHandler.command(addedUser, postMenu);}
+					}
+				}
+				server.sendToAllTCP(user_list);
+				server.sendToAllTCP(game_list);
 			}
 		}
 		public void disconnected (Connection c) {
@@ -156,9 +180,12 @@ public class FeudalWarServer {
 			for(User currentUser: user_list){if (currentUser.getName().equals(c.toString())){removedUser=currentUser;}}
 			
 			GameInstance droppedGame = new GameInstance();
-			for(GameInstance hostedGame: game_list){ if (hostedGame.getHost() == removedUser){ droppedGame = hostedGame; }}
-			for(User currentUser: user_list){ 
-				if(droppedGame.isActive()){
+			for(GameInstance activeGame: game_list){ 
+				if (activeGame.getUsers().contains(removedUser)){ activeGame.getUsers().remove(removedUser); }
+				if (activeGame.getHost() == removedUser){ droppedGame = activeGame; }
+			}
+			
+			for(User currentUser: user_list){ if(droppedGame.isActive()){
 					if (droppedGame.getUsers().contains(currentUser)){
 						stateHandler.command(currentUser, mainMenu);
 					}

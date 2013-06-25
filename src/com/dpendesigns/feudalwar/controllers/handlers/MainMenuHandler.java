@@ -37,8 +37,8 @@ public class MainMenuHandler {
 		gcMiddle = gc.getWidth()/2;
 		
 		mainMenuTitle = new Image("res/images/MainMenuTitle.png");
-		joinGameSpriteSheet = new SpriteSheet("res/images/NewGameButton.png",160,32);
-		hostGameSpriteSheet = new SpriteSheet("res/images/NewGameButton.png",160,32);
+		joinGameSpriteSheet = new SpriteSheet("res/images/JoinGameButtonSpriteSheet.png",160,32);
+		hostGameSpriteSheet = new SpriteSheet("res/images/HostGameButtonSpriteSheet.png",160,32);
 		exitSpriteSheet = new SpriteSheet("res/images/ExitButton.png",64,32);
 		
 		joinGame = joinGameSpriteSheet.getSubImage(0, 0);

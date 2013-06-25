@@ -56,11 +56,11 @@ public class SetupHandler {
 		playerNameInput.setTextColor(Color.black);
 		playerNameInput.setText(currentName);
 		
-		loginSpriteSheet = new SpriteSheet("res/images/AddPlayerButton.png",192,32);
+		loginSpriteSheet = new SpriteSheet("res/images/LoginButtonSpriteSheet.png",96,32);
 		
 		login = loginSpriteSheet.getSubImage(0, 0);
 		
-		loginLocation = new Rectangle(0,0,192,32);
+		loginLocation = new Rectangle(0,0,96,32);
 	}
 	
 	public boolean update(GameContainer gc) throws SlickException {

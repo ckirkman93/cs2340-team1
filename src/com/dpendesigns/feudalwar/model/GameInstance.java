@@ -29,4 +29,8 @@ public class GameInstance {
 	public UserListPacket getUsers(){return users;}
 	public String getGameName(){return gameName;}
 	public boolean isActive(){return active;}
+	public boolean addUser(User newUser){
+		if (users.size()<6){users.add(newUser); return true;}
+		else {return false;}
+	}
 }
