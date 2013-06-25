@@ -7,7 +7,10 @@ import java.util.Vector;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 
+import com.dpendesigns.feudalwar.model.GameInstance;
+import com.dpendesigns.feudalwar.model.GameListPacket;
 import com.dpendesigns.feudalwar.model.User;
+import com.dpendesigns.feudalwar.model.UserListPacket;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
@@ -17,7 +20,8 @@ public class FeudalWarServer {
 	public static Server server;
 	public static Kryo kryo;
 	
-	private Vector<User> user_list;
+	private UserListPacket user_list;
+	private GameListPacket game_list;
 	
 	private StateHandler stateHandler;
 	
@@ -34,11 +38,12 @@ public class FeudalWarServer {
 	private final int joinGame = 40;
 	private final int preGame = 50;
 	private final int mainGame = 51;
-	private final int postGame = 51;
+	private final int postGame = 52;
 	
 	public FeudalWarServer(){
 		System.out.println("Setting Up Server...");
-		user_list = new Vector<User>();
+		user_list = new UserListPacket();
+		game_list = new GameListPacket();
 		
 		stateHandler = new StateHandler();
 		
@@ -64,6 +69,9 @@ public class FeudalWarServer {
 			
 			kryo = server.getKryo();
 			kryo.register(com.dpendesigns.feudalwar.model.User.class);
+			kryo.register(com.dpendesigns.feudalwar.model.UserListPacket.class);
+			kryo.register(com.dpendesigns.feudalwar.model.GameInstance.class);
+			kryo.register(com.dpendesigns.feudalwar.model.GameListPacket.class);
 			kryo.register(java.util.Vector.class);
 			
 			server.start();
@@ -90,9 +98,18 @@ public class FeudalWarServer {
 			if (o instanceof Integer){
 				int newState = (Integer)o;
 				for(User user: user_list){
-					if (user.getConnectionID() == c.getID()){stateHandler.command(user, newState);}
+					if (user.getConnectionID() == c.getID()){
+						stateHandler.command(user, newState);
+						if (user.getCurrentState()==joinGame){
+							c.sendTCP(game_list); 
+						} else if (user.getCurrentState()==hostGame){
+							if (game_list.size() <= 2){game_list.add(new GameInstance(user));}
+							else { stateHandler.command(user, joinGame); c.sendTCP(game_list);}
+						}
+					}
 				}
 				server.sendToAllTCP(user_list);
+				server.sendToAllTCP(game_list);
 			} else if (o instanceof User) {
 				User newUser = (User)o;
 				newUser.init(c.toString(),c.getID());
@@ -105,6 +122,7 @@ public class FeudalWarServer {
 				c.sendTCP(newUser);
 
 				server.sendToAllTCP(user_list);
+				server.sendToAllTCP(game_list);
 			} else if (o instanceof String) {
 				String newUserName = (String)o;
 				
@@ -130,26 +148,32 @@ public class FeudalWarServer {
 				
 				c.sendTCP(loginStatus);
 				server.sendToAllTCP(user_list);
+				server.sendToAllTCP(game_list);
 			}
 		}
 		public void disconnected (Connection c) {
 			User removedUser = new User();
-			for(User currentUser: user_list){
-				if (currentUser.getName().equals(c.toString())){removedUser=currentUser;}
+			for(User currentUser: user_list){if (currentUser.getName().equals(c.toString())){removedUser=currentUser;}}
+			
+			GameInstance droppedGame = new GameInstance();
+			for(GameInstance hostedGame: game_list){ if (hostedGame.getHost() == removedUser){ droppedGame = hostedGame; }}
+			for(User currentUser: user_list){ 
+				if(droppedGame.isActive()){
+					if (droppedGame.getUsers().contains(currentUser)){
+						stateHandler.command(currentUser, mainMenu);
+					}
+				}	
 			}
+			game_list.remove(droppedGame);
 			user_list.remove(removedUser);
 			
 			serverUserCount.setText("Number of Users: " + user_list.size());
 			
 			server.sendToAllTCP(user_list);
+			server.sendToAllTCP(game_list);
 		}
 	}
 	public class StateHandler{
-		
-		private final int moveStateFoward = 1;
-		private final int keepStateStill = 0;
-		private final int moveStateBack = -1;
-		
 		public StateHandler(){}
 		
 		public void command(User user, int newState) {

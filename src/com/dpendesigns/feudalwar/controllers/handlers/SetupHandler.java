@@ -18,10 +18,6 @@ import org.newdawn.slick.gui.ComponentListener;
 import org.newdawn.slick.gui.TextField;
 import org.newdawn.slick.state.StateBasedGame;
 
-import com.dpendesigns.feudalwar.model.Player;
-
-
-
 public class SetupHandler {
 	
 	private TextField playerNameInput;
@@ -39,9 +35,7 @@ public class SetupHandler {
 	
 	private int gcMiddle;
 	
-	public SetupHandler () {
-		
-	}
+	public SetupHandler () {}
 	
 	public void init(GameContainer gc, String oldName) throws SlickException {
 		
