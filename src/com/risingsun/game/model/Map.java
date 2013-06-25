@@ -12,6 +12,7 @@ public class Map {
 
 	private int xDrift,yDrift;
 	private final Province[][] provinces = new Province[15][13];
+	private Player[] playerList;
 
 	//blacklist is list of spaces intended to be empty on the board
 	private final ArrayList<Point> blacklist = new ArrayList<Point>();
@@ -54,7 +55,7 @@ public class Map {
 		if (playerList[0]!=null){setupPosition1(playerList[0]);}
 		if (playerList[1]!=null){setupPosition2(playerList[1]);}
 		if (playerList[2]!=null){setupPosition3(playerList[2]);}
-		
+		this.playerList = playerList;
 	}
 	public void configure4(Player[] playerList){
 		if (playerList[0]!=null){setupPosition1(playerList[0]);}
