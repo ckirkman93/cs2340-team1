@@ -1,6 +1,10 @@
 package com.risingsun.game.model;
 
+import java.util.ArrayList;
+
 import org.newdawn.slick.Color;
+import org.newdawn.slick.GameContainer;
+import org.newdawn.slick.Input;
 
 public class Player {
 	
@@ -8,6 +12,9 @@ public class Player {
 	private Color color;
 	private int infantry;
 	private int generals;
+	private GameContainer gc;
+	private Map map;
+	private ArrayList<Province> provinces;
 	
 	public Player(){
 	}
@@ -29,8 +36,9 @@ public class Player {
 		return name;
 	}
 	
-	public Player(String name){
+	public Player(String name, GameContainer gc){
 		this.name = name;
+		this.gc = gc;
 	}
 	
 	public Player(String name, Color color){
@@ -52,6 +60,16 @@ public class Player {
 	
 	public int getGenerals() {
 		return generals;
+	}
+	
+	private Province determineProvinceToAddArmy() {
+		while(true) {
+			Input input = gc.getInput();
+			for(Province p : provinces) {
+				if(p.getArea().contains(input.getMouseX(), input.getMouseY()));
+					return p;
+			}
+		}
 	}
 	
 }

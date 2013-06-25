@@ -49,6 +49,10 @@ public class Map {
 		xDrift = xAmount;
 		yDrift = yAmount;
 	}
+	
+	public Province[][] getProvinces() {
+		return provinces;
+	}
 
 	private void fillBlackList() {
 		blacklist.add(new Point(0, 4));

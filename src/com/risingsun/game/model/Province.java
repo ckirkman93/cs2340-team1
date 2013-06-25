@@ -98,5 +98,9 @@ public class Province {
 		xDrift = xAmount;
 		yDrift = yAmount;
 	}
+	
+	public Shape getArea() {
+		return area;
+	}
 
 }

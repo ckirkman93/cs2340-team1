@@ -41,12 +41,14 @@ public class SetupHandler {
 	private String fullList = "Allowed player amount is full, please begin the game.";
 	
 	private int gcMiddle;
+	private GameContainer gc;
 	
 	public SetupHandler () {
 		
 	}
 	
 	public void init(GameContainer gc, StateBasedGame sbg) throws SlickException {
+		this.gc = gc;
 		gcMiddle = gc.getWidth()/2;
 		
 		Font font = new Font("Arial", Font.PLAIN, 30);
@@ -116,7 +118,7 @@ public class SetupHandler {
 					while (playerList[newSlot] != null){
 						newSlot = rand.nextInt(playerCount);
 					}
-					playerList[newSlot]=new Player(nameList[i]);
+					playerList[newSlot]=new Player(nameList[i], gc);
 					
 					playerList[newSlot].setInfantry(3);
 					playerList[newSlot].setGenerals(1);
