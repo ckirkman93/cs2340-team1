@@ -37,11 +37,11 @@ public class GameController {
 			setupHandler.update(gc , sbg , delta , playerList); 
 			setupFinished = setupHandler.isFinished();
 			if (setupFinished){
-				gameHandler.init(gc, sbg, playerList);
+				gameHandler.init(gc, sbg, playerList, setupHandler.getCount());
 				summaryHandler.init(gc, sbg, playerList);
 			}
 		}
-		else if (!gameStarted){gameStarted = true;}
+		else if (!gameStarted){ gameStarted = true;}
 		else if (!gameFinished && gameStarted){
 			gameHandler.update(gc, sbg, delta, playerList);
 		}
