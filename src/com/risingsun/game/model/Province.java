@@ -56,6 +56,10 @@ public class Province {
 		xDrift = 0;
 		yDrift = 0;
 	}
+	
+	public Shape getArea() {
+		return area;
+	}
 
 	public void update(GameContainer gc, StateBasedGame sbg, int delta, Player[] playerList) throws SlickException {
 		area.setLocation(xDefaultPosition + xDrift, yDefaultPosition + yDrift);
