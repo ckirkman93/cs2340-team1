@@ -15,6 +15,12 @@ public class RisingSun extends StateBasedGame {
 	
 	public Player[] playerList;
 	
+	public RisingSun(){
+		super(title);
+		this.addState(new MainMenu(mainmenu));
+		this.addState(new MainGame(maingame));
+	}
+	
 	public RisingSun(String title){
 		super(title);
 		this.addState(new MainMenu(mainmenu));
@@ -35,6 +41,7 @@ public class RisingSun extends StateBasedGame {
 		try {
 			appgc = new AppGameContainer(new RisingSun(title));
 			appgc.setDisplayMode(640, 360, false);
+			appgc.setAlwaysRender(true);
 			appgc.start();
 		}
 		catch(SlickException e){e.printStackTrace();}

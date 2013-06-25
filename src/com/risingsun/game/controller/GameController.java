@@ -37,11 +37,11 @@ public class GameController {
 			setupHandler.update(gc , sbg , delta , playerList); 
 			setupFinished = setupHandler.isFinished();
 			if (setupFinished){
-				gameHandler.init(gc, sbg, playerList);
+				gameHandler.init(gc, sbg, playerList, setupHandler.getCount());
 				summaryHandler.init(gc, sbg, playerList);
 			}
 		}
-		else if (!gameStarted){gameStarted = true;}
+		else if (!gameStarted){ gameStarted = true;}
 		else if (!gameFinished && gameStarted){
 			gameHandler.update(gc, sbg, delta, playerList);
 		}
@@ -50,8 +50,8 @@ public class GameController {
 	public void render(GameContainer gc, StateBasedGame sbg, Graphics g) throws SlickException {
 		if (!setupFinished) { setupHandler.render(gc, sbg, g); }
 		else if (!gameFinished && gameStarted){
-			summaryHandler.render(gc, sbg, g, playerList);
 			gameHandler.render(gc, sbg, g);
+			summaryHandler.render(gc, sbg, g, playerList);
 		}
 	}
 }
