@@ -153,25 +153,24 @@ public class FeudalWarClient extends BasicGame {
 						setupHandler.loginRejected(true);
 					} else {}
 				} else if (self.getCurrentState() == mainMenu){
+					joinGameHandler = new JoinGameHandler(client);
+					hostGameHandler = new HostGameHandler();
+					hostGameHandler.init(gc);
 					int menuStatus = mainMenuHandler.update(gc);
 					if (menuStatus == 1){
 						waitForUserList = true;
 						waitForGameList = true;
 						client.sendTCP(joinGame);
-						joinGameHandler = new JoinGameHandler();
 					} else if (menuStatus == 2){
 						waitForUserList = true;
 						waitForGameList = true;
 						client.sendTCP(hostGame);
-						hostGameHandler = new HostGameHandler();
-						hostGameHandler.init(gc);
 					} else if (menuStatus == 0){}//Do Nothing
 				} else if (self.getCurrentState() == postMenu){
 					waitForUserList = true;
 					waitForGameList = true;
 					client.sendTCP(preGame);
-					preGameHandler = new PreGameHandler();
-					preGameHandler.init(gc, my_game);
+					preGameHandler = new PreGameHandler(client, my_game);
 				} else if (self.getCurrentState() == joinGame){
 					String joinGameName = joinGameHandler.update(gc, game_list, joinGameBounced);
 					if (joinGameName!="null"){
@@ -186,7 +185,11 @@ public class FeudalWarClient extends BasicGame {
 					waitForGameList = true;
 					client.sendTCP(postMenu);
 				} else if (self.getCurrentState() == preGame){
-					preGameHandler.update(gc, my_game);
+					if (preGameHandler.update(gc, my_game)){
+						waitForUserList = true;
+						waitForGameList = true;
+						client.sendTCP(mainMenu);
+					}
 				} 
 			}
 		}

@@ -16,9 +16,18 @@ import org.newdawn.slick.geom.Shape;
 
 import com.dpendesigns.feudalwar.model.GameInstance;
 import com.dpendesigns.feudalwar.model.GameListPacket;
+import com.esotericsoftware.kryonet.Client;
 
 public class JoinGameHandler {
 	Vector<JoinGameData> joinGameData;
+	
+	private Client client;
+	
+	private SpriteSheet backSpriteSheet;
+	private Image back;
+	private Shape backLocation;
+	
+	private final int mainMenu = 20;
 	
 	private boolean joinGameBounced = false;
 	
@@ -27,16 +36,40 @@ public class JoinGameHandler {
 	Font font = new Font("Arial", Font.PLAIN, 30);
 	TrueTypeFont ttf = new TrueTypeFont(font, true);
 	
-	public JoinGameHandler() {joinGameData = new Vector<JoinGameData>();}
+	public JoinGameHandler(Client client) throws SlickException {
+		this.client = client;
+		
+		joinGameData = new Vector<JoinGameData>();
+		backSpriteSheet = new SpriteSheet("res/images/BackButtonSpriteSheet.png",96,32);
+		back = backSpriteSheet.getSubImage(0, 0);
+		backLocation = new Rectangle(0,0,96,32);
+	}
 	
 	public String update(GameContainer gc, GameListPacket game_list, boolean joinGameBounced) throws SlickException {
+		Input input = gc.getInput();
+		int mouseX = input.getMouseX();
+		int mouseY = input.getMouseY();
+		
 		String joinGame = "null";
 		this.joinGameBounced = joinGameBounced;
 		joinGameData = new Vector<JoinGameData>();
 		
+		backLocation.setLocation(gc.getWidth()-8-96, gc.getHeight()-8-32);
+		
+		if (backLocation.contains(mouseX,mouseY)){
+			if (input.isMouseButtonDown(0)) {
+				back = backSpriteSheet.getSubImage(2, 0);
+			}
+			else {back = backSpriteSheet.getSubImage(1, 0);}
+				
+			if ( !input.isMouseButtonDown(0) && leftClickDownState == true) {
+				client.sendTCP(mainMenu);
+			}
+		} else {back = backSpriteSheet.getSubImage(0, 0);}
+		
 		for (int i = 0; i < game_list.size(); i++){
 			joinGameData.add(i, new JoinGameData());
-			String joinChoice = joinGameData.get(i).update(game_list.get(i), gc.getInput(), 8, 42 + (i*32), leftClickDownState);
+			String joinChoice = joinGameData.get(i).update(game_list.get(i), input, 8, 42 + (i*32), leftClickDownState);
 			if (joinChoice!="null"){ joinGame = joinChoice; }
 		}
 		
@@ -52,6 +85,7 @@ public class JoinGameHandler {
 		for (JoinGameData joinOption: joinGameData){
 			joinOption.render(g);
 		}
+		back.draw(gc.getWidth()-8-96, gc.getHeight()-8-32);
 	}
 	
 	private class JoinGameData {

@@ -103,6 +103,9 @@ public class FeudalWarServer {
 				int newState = (Integer)o;
 				for(User user: user_list){
 					if (user.getConnectionID() == c.getID()){
+						if (user.getCurrentState() == preGame && newState == mainMenu){
+							dropUser(user);
+						}
 						stateHandler.command(user, newState);
 						if (user.getCurrentState()==joinGame){
 							c.sendTCP(game_list); 
@@ -199,6 +202,22 @@ public class FeudalWarServer {
 			server.sendToAllTCP(user_list);
 			server.sendToAllTCP(game_list);
 		}
+	}
+	
+	private void dropUser(User user){
+		GameInstance droppedGame = new GameInstance();
+		for(GameInstance activeGame: game_list){ 
+			if (activeGame.getUsers().contains(user)){ activeGame.getUsers().remove(user); }
+			if (activeGame.getHost() == user){ droppedGame = activeGame; }
+		}
+		
+		for(User currentUser: user_list){ if(droppedGame.isActive()){
+				if (droppedGame.getUsers().contains(currentUser)){
+					stateHandler.command(currentUser, mainMenu);
+				}
+			}	
+		}
+		game_list.remove(droppedGame);
 	}
 	public class StateHandler{
 		public StateHandler(){}
