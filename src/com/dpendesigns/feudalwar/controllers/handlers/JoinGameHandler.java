@@ -69,9 +69,11 @@ public class JoinGameHandler {
 		} else {back = backSpriteSheet.getSubImage(0, 0);}
 		
 		for (int i = 0; i < game_list.size(); i++){
-			joinGameData.add(i, new JoinGameData());
-			String joinChoice = joinGameData.get(i).update(game_list.get(i), input, 8, 42 + (i*32), leftClickDownState);
-			if (joinChoice!="null"){ joinGame = joinChoice; }
+			if (game_list.get(i).getUsers().size() < 6){
+				joinGameData.add(i, new JoinGameData());
+				String joinChoice = joinGameData.get(i).update(game_list.get(i), input, 8, 42 + (i*32), leftClickDownState);
+				if (joinChoice!="null"){ joinGame = joinChoice; }
+			}
 		}
 		
 		if (gc.getInput().isMouseButtonDown(0)) {leftClickDownState = true;}

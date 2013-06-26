@@ -12,7 +12,6 @@ import com.dpendesigns.feudalwar.controllers.handlers.PreGameHandler;
 import com.dpendesigns.feudalwar.controllers.handlers.SetupHandler;
 import com.dpendesigns.feudalwar.model.GameInstance;
 import com.dpendesigns.feudalwar.model.GameListPacket;
-import com.dpendesigns.feudalwar.model.JoinGamePacket;
 import com.dpendesigns.feudalwar.model.JoinGameRequest;
 import com.dpendesigns.feudalwar.model.User;
 import com.dpendesigns.feudalwar.model.UserListPacket;
@@ -257,7 +256,7 @@ public class FeudalWarClient extends BasicGame {
 			} else if (o instanceof Integer) {
 				loginStatus = (Integer)o;
 				waitForResponse = false;
-			} else if (o instanceof JoinGamePacket){
+			} else if (o instanceof JoinGameRequest){
 				joinGameBounced = true;
 				waitForResponse = false;
 			}

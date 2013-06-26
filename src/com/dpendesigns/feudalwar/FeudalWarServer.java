@@ -9,7 +9,6 @@ import javax.swing.JLabel;
 
 import com.dpendesigns.feudalwar.model.GameInstance;
 import com.dpendesigns.feudalwar.model.GameListPacket;
-import com.dpendesigns.feudalwar.model.JoinGamePacket;
 import com.dpendesigns.feudalwar.model.JoinGameRequest;
 import com.dpendesigns.feudalwar.model.User;
 import com.dpendesigns.feudalwar.model.UserListPacket;

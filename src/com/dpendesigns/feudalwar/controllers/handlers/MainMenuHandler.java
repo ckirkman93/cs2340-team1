@@ -109,7 +109,7 @@ public class MainMenuHandler {
 	}
 	
 	public void render(GameContainer gc, Graphics g) throws SlickException{
-		g.drawString("X: "+gc.getInput().getMouseX()+", Y: "+gc.getInput().getMouseY(), 8, 8);
+		//g.drawString("X: "+gc.getInput().getMouseX()+", Y: "+gc.getInput().getMouseY(), 8, 8);
 		
 		mainMenuTitle.draw(gcMiddle - 128, 28);
 		joinGame.draw(gcMiddle - 80,120);
