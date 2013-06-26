@@ -30,12 +30,22 @@ public class SummaryHandler {
 		Font font = new Font("Arial", Font.BOLD, 14);
 		ttf = new TrueTypeFont(font, true);
 	}
+	public void update(GameContainer gc, StateBasedGame sbg, int delta, Player[] playerList) throws SlickException {
+		
+	}
 	public void render(GameContainer gc, StateBasedGame sbg, Graphics g, Player[] playerList) throws SlickException {
 		background.draw(0,0);
 		g.setColor(Color.black);
 		g.setFont(ttf);
 		
 		g.drawString("Game Summary:", 8, 16);
+		
+		for (Player player: playerList) {
+			if (player != null && player.hasTurn()) {
+				g.setColor(player.getColors()[0]);
+				g.drawString(player.getName() + ": " + player.getFreeArmies(), 8, 28);
+			}
+		}
 		int position = 0;
 		for (Player player : playerList){
 			if (player!=null){

@@ -32,7 +32,7 @@ public class GameController {
 		setupHandler.init(gc , sbg);
 	}
 	public void update(GameContainer gc, StateBasedGame sbg, int delta) throws SlickException {
-		if (!setupFinished) { 
+		if (!setupFinished) {
 			setupHandler.update(gc , sbg , delta , playerList); 
 			setupFinished = setupHandler.isFinished();
 			if (setupFinished){
@@ -43,6 +43,7 @@ public class GameController {
 		else if (!gameStarted){ gameStarted = true;}
 		else if (!gameFinished && gameStarted){
 			gameHandler.update(gc, sbg, delta, playerList);
+			summaryHandler.update(gc, sbg, delta, playerList);
 		}
 	}
 

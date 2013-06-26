@@ -17,6 +17,12 @@ public class Player {
 	
 	public Player() {
 		provinces = new ArrayList<Province>();
+		hasTurn = false;
+	}
+	
+	public Player(String name){
+		this();
+		this.name = name;
 	}
 	
 	public void setName (String value){
@@ -34,11 +40,6 @@ public class Player {
 	
 	public String toString(){
 		return name;
-	}
-	
-	public Player(String name){
-		this();
-		this.name = name;
 	}
 	
 	public String getName() {
@@ -61,11 +62,6 @@ public class Player {
 		provinces.add(p);
 	}
 	
-	public void giveTurn() {
-		hasTurn = true;
-		freeArmies = provinces.size()/3 + 3;
-	}
-	
 	public int getFreeArmies() {
 		return freeArmies;
 	}
@@ -76,6 +72,11 @@ public class Player {
 	}
 	
 	public void takeTurn() {
+		hasTurn = true;
+		freeArmies = provinces.size()/3 + 3;
+	}
+	
+	public void endTurn() {
 		hasTurn = false;
 	}
 	

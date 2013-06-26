@@ -14,6 +14,10 @@ import com.risingsun.game.model.Map;
 
 public class GameHandler {
 
+	private int turnCount;
+	private Player currentPlayer;
+	private int numPlayers = 0;
+	
 	private Map map;
 	
 	private int xDrift;
@@ -43,12 +47,26 @@ public class GameHandler {
 			else {map.configure4(playerList);}
 		}
 		else {map.configure3(playerList);}
+		
+		turnCount = 0;
+		currentPlayer = playerList[0];		
+		for (Player p: playerList) {
+			if (p != null) {numPlayers++;}
+		}		
+		currentPlayer.takeTurn();
 
 	}
 	public void update(GameContainer gc, StateBasedGame sbg, int delta, Player[] playerList) throws SlickException {
 		calculateDrift(gc);
 		map.setDrift(xDrift, yDrift);
 		map.update(gc, sbg, delta, playerList);
+		
+		// change turns
+		if (playerList[0] != null && currentPlayer.getFreeArmies() <= 0) {
+				currentPlayer.endTurn();
+				currentPlayer = playerList[++turnCount % numPlayers];
+				currentPlayer.takeTurn();
+		}
 	}
 	public void render(GameContainer gc, StateBasedGame sbg, Graphics g) throws SlickException {
 		map.render(gc, sbg, g);
