@@ -2,7 +2,7 @@
 <project basedir="." default="deploy" name="FeudalWar">
     	
 	<property environment="env"/>
-	<property name="tomcat.dir" value="${env.CATALINA_HOME}webapps"/>
+	<property name="tomcat.dir" value="${env.CATALINA_HOME}/webapps"/>
 	<property name="project.name" value="FeudalWar"/>
 	<property name="lib.dir" value="lib"/>
 	<property name="res.dir" value="res"/>
