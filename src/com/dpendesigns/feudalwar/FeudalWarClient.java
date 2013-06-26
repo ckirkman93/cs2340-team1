@@ -118,6 +118,7 @@ public class FeudalWarClient extends BasicGame {
 			kryo.register(float[].class);
 			kryo.register(String[].class);
 			kryo.register(com.dpendesigns.feudalwar.model.Player.class);
+			kryo.register(int[].class);
 			
 			client.start();
 			client.connect(5000, "127.0.0.1", 54555, 54777);
@@ -143,7 +144,7 @@ public class FeudalWarClient extends BasicGame {
 		
 		
 		if (client.isConnected()){
-			if(!waitForUserList && !waitForGameList){
+			if(!waitForUserList && !waitForGameList && !waitForGameUpdate){
 				if (self.getCurrentState() == preLogin){
 					setupHandler = new SetupHandler();
 					setupHandler.init(gc, self.getName());
@@ -215,21 +216,21 @@ public class FeudalWarClient extends BasicGame {
 						//waitForResponse = true;
 						waitForUserList = true;
 						waitForGameList = true;
+						waitForGameUpdate = true;
 						client.sendTCP(begin);
 					}
 				} else if (self.getCurrentState() == loadGame){
-					mainGameHandler = new MainGameHandler();
+					mainGameHandler = new MainGameHandler(my_game);
 					waitForUserList = true;
-					waitForGameUpdate = true;
+					waitForGameList = true;
 					client.sendTCP(mainGame);
 				} else if (self.getCurrentState() == mainGame){
-					
+					mainGameHandler.update(gc);
 				}
 			}
 		}
 	}
 	public void render(GameContainer gc, Graphics g) throws SlickException {
-		g.drawString("Current State is: " + self.getCurrentState(), 8, 360-18-8);
 		
 		if (self.getCurrentState() == boot){
 			

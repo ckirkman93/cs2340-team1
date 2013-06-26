@@ -26,19 +26,25 @@ public class Province {
 	private int ipos,jpos;
 	
 	private int numberOfArmies;
+	
+	private Player owner;
 
 	private Color currentColor;
-	
-	private Color neutral = new Color(0xc0c0c0);
-	private Color highlighted = new Color(0xd0d0d0);
-	private Color clicked = new Color(0xf0f0f0);
 
 	private boolean leftClickDownState = false;
-
-	public Province (int x, int y) {
-
-		xDefaultPosition = x;
-		yDefaultPosition = y;
+	
+	public Province (ProvinceData data){
+		owner = data.getOwner();
+		xDefaultPosition = data.getXDefault();
+		yDefaultPosition = data.getYDefault();
+		
+		ipos = data.iPos();
+		jpos = data.jPos();	
+		
+		xDrift = data.getXDrift();
+		yDrift = data.getYDrift();
+		
+		numberOfArmies = data.getInfantry();
 		
 		float yMin = 0;
 		float yQuart = 12;
@@ -51,10 +57,7 @@ public class Province {
 
 		area = new Polygon(new float[]{xHalf,yMin,xMax,yQuart,xMax,yMost,xHalf,yMax,xMin,yMost,xMin,yQuart});
 		area.setLocation(xDefaultPosition, yDefaultPosition);
-		currentColor = neutral;
-		
-		xDrift = 0;
-		yDrift = 0;
+		currentColor = new Color(owner.getColors()[0]);
 	}
 
 	public void update(GameContainer gc) throws SlickException {
@@ -68,9 +71,9 @@ public class Province {
 
 		if (area.contains(xpos, ypos)){
 			if (input.isMouseButtonDown(0)) {
-				currentColor = clicked;
-				}
-			else {currentColor = highlighted;}
+				currentColor = new Color(owner.getColors()[2]);
+			}
+			else {currentColor = new Color(owner.getColors()[1]);}
 
 			if ( !input.isMouseButtonDown(0) && leftClickDownState == true) {
 
@@ -81,7 +84,7 @@ public class Province {
 				//numberOfArmies++;
 			}
 		}
-		else {currentColor = neutral;}
+		else {currentColor = new Color(owner.getColors()[0]);}
 
 		if (!input.isMouseButtonDown(0)) {leftClickDownState = false;}
 	}

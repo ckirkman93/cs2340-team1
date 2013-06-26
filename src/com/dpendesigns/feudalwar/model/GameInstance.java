@@ -127,4 +127,8 @@ public class GameInstance {
 		if (ypos >= (gc.getHeight() - driftZone) && yDrift > -240) {yDrift-=driftSpeed;}
 	}
 	
+	public Map getMap(){ return map; }
+	
+	public Vector<Player> getPlayers(){ return players; }
+	
 }

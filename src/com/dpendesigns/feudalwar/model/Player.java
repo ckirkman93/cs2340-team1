@@ -5,7 +5,7 @@ import org.newdawn.slick.Color;
 public class Player {
 	private String playerName;
 	private int connection_ID;
-	private String[] colors;
+	private int[] colors = new int[]{0xc0c0c0, 0xd0d0d0, 0xf0f0f0};
 	
 	private int infantry;
 	private int generals;
@@ -18,12 +18,12 @@ public class Player {
 	}
 	
 	
-	public void setColors (String[] values){ colors = values; }
+	public void setColors (int[] values){ colors = values; }
 	public void setInfantry (int value){ infantry = value; }
 	public void setGenerals (int value){ generals = value; }
 	
 	public String toString(){ return playerName; }
-	public String[] getColors() { return colors; }
+	public int[] getColors() { return colors; }
 	public int getConnectionID() { return connection_ID; }
 	
 	public int getInfantry() { return infantry; }

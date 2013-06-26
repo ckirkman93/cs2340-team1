@@ -17,7 +17,8 @@ public class ProvinceData {
 	
 	private int ipos,jpos;
 
-	private Player owner;
+	private Player owner = new Player();
+	private int infantry = 0;
 	
 	public ProvinceData(){}
 	
@@ -43,4 +44,17 @@ public class ProvinceData {
 		this.ipos=ipos;
 		this.jpos=jpos;
 	}
+	
+	public void addInfantry(int amount){
+		infantry+=amount;
+	}
+	
+	public int getXDefault(){ return xDefaultPosition; }
+	public int getYDefault(){ return yDefaultPosition; }
+	public Player getOwner(){ return owner; }
+	public int iPos(){ return ipos; }
+	public int jPos(){ return jpos; }
+	public int getXDrift(){ return xDrift; }
+	public int getYDrift(){ return yDrift; }
+	public int getInfantry(){ return infantry; }
 }

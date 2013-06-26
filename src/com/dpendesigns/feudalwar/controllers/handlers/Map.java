@@ -14,8 +14,11 @@ import com.dpendesigns.feudalwar.model.ProvinceData;
 
 public class Map {
 
+	public final int height = 15;
+	public final int width = 13;
+	
 	private int xDrift,yDrift;
-	private final ProvinceData[][] provinceDatas = new ProvinceData[15][13];
+	private final ProvinceData[][] provinceDatas = new ProvinceData[height][width];
 
 	//blacklist is list of spaces intended to be empty on the board
 	private final ArrayList<Point> blacklist = new ArrayList<Point>();
@@ -76,16 +79,16 @@ public class Map {
 	}
 	
 	public void setupPosition1(Player player){
-		provinceDatas[10][9].setOwner(player);
-		provinceDatas[11][5].setOwner(player);
-		provinceDatas[11][6].setOwner(player);
-		provinceDatas[11][8].setOwner(player);
+		provinceDatas[10][9].setOwner(player); provinceDatas[10][9].addInfantry(1);
+		provinceDatas[11][5].setOwner(player); provinceDatas[11][5].addInfantry(1);
+		provinceDatas[11][6].setOwner(player); 
+		provinceDatas[11][8].setOwner(player); 
 		provinceDatas[11][9].setOwner(player);
 		provinceDatas[12][4].setOwner(player);
 		provinceDatas[12][5].setOwner(player);
 		provinceDatas[12][6].setOwner(player);
 		provinceDatas[12][7].setOwner(player);
-		provinceDatas[12][8].setOwner(player);
+		provinceDatas[12][8].setOwner(player); provinceDatas[12][8].addInfantry(1);
 		provinceDatas[13][6].setOwner(player);
 		provinceDatas[13][7].setOwner(player);
 		provinceDatas[13][8].setOwner(player);
@@ -95,51 +98,51 @@ public class Map {
 	public void setupPosition2(Player player){
 		provinceDatas[6][8].setOwner(player);
 		provinceDatas[7][8].setOwner(player);
-		provinceDatas[7][9].setOwner(player);
+		provinceDatas[7][9].setOwner(player); provinceDatas[7][9].addInfantry(1);
 		provinceDatas[8][7].setOwner(player);
 		provinceDatas[8][8].setOwner(player);
 		provinceDatas[9][7].setOwner(player);
-		provinceDatas[9][8].setOwner(player);
+		provinceDatas[9][8].setOwner(player); provinceDatas[9][8].addInfantry(1);
 		provinceDatas[10][6].setOwner(player);
 		provinceDatas[10][7].setOwner(player);
 		provinceDatas[10][8].setOwner(player);
-		provinceDatas[11][7].setOwner(player);
+		provinceDatas[11][7].setOwner(player); provinceDatas[11][7].addInfantry(1);
 	}
 	public void setupPosition3(Player player){
 		provinceDatas[5][9].setOwner(player);
 		provinceDatas[5][10].setOwner(player);
-		provinceDatas[6][9].setOwner(player);
+		provinceDatas[6][9].setOwner(player);  provinceDatas[6][9].addInfantry(1);
 		provinceDatas[6][10].setOwner(player);
 		provinceDatas[7][10].setOwner(player);
 		provinceDatas[7][11].setOwner(player);
-		provinceDatas[8][9].setOwner(player);
+		provinceDatas[8][9].setOwner(player); provinceDatas[8][9].addInfantry(1);
 		provinceDatas[8][10].setOwner(player);
 		provinceDatas[8][11].setOwner(player);
 		provinceDatas[9][9].setOwner(player);
 		provinceDatas[9][10].setOwner(player);
 		provinceDatas[9][11].setOwner(player);
-		provinceDatas[9][12].setOwner(player);
+		provinceDatas[9][12].setOwner(player); provinceDatas[9][10].addInfantry(1);
 	}
 	public void setupPosition4(Player player){
 		provinceDatas[0][8].setOwner(player);
-		provinceDatas[0][9].setOwner(player);
+		provinceDatas[0][9].setOwner(player); 
 		provinceDatas[1][8].setOwner(player);
-		provinceDatas[1][10].setOwner(player);
+		provinceDatas[1][10].setOwner(player); 
 		provinceDatas[2][7].setOwner(player);
 		provinceDatas[2][9].setOwner(player);
-		provinceDatas[3][8].setOwner(player);
+		provinceDatas[3][8].setOwner(player); provinceDatas[3][8].addInfantry(1);
 		provinceDatas[3][9].setOwner(player);
 		provinceDatas[3][10].setOwner(player);
-		provinceDatas[4][8].setOwner(player);
-		provinceDatas[4][9].setOwner(player);
+		provinceDatas[4][8].setOwner(player); provinceDatas[4][8].addInfantry(1);
+		provinceDatas[4][9].setOwner(player); provinceDatas[4][9].addInfantry(1);
 	}
 	public void setupPosition5(Player player){
 		provinceDatas[3][1].setOwner(player);
-		provinceDatas[3][2].setOwner(player);
+		provinceDatas[3][2].setOwner(player); provinceDatas[3][1].addInfantry(1);
 		provinceDatas[4][0].setOwner(player);
-		provinceDatas[4][1].setOwner(player);
+		provinceDatas[4][1].setOwner(player); provinceDatas[4][1].addInfantry(1);
 		provinceDatas[4][2].setOwner(player);
-		provinceDatas[4][3].setOwner(player);
+		provinceDatas[4][3].setOwner(player); provinceDatas[4][3].addInfantry(1);
 		provinceDatas[5][0].setOwner(player);
 		provinceDatas[5][1].setOwner(player);
 		provinceDatas[5][2].setOwner(player);
@@ -155,18 +158,20 @@ public class Map {
 		provinceDatas[1][1].setOwner(player);
 		provinceDatas[1][2].setOwner(player);
 		provinceDatas[1][3].setOwner(player);
-		provinceDatas[2][1].setOwner(player);
+		provinceDatas[2][1].setOwner(player); provinceDatas[2][1].addInfantry(1);
 		provinceDatas[2][2].setOwner(player);
-		provinceDatas[2][3].setOwner(player);
-		provinceDatas[2][4].setOwner(player);
+		provinceDatas[2][3].setOwner(player); provinceDatas[2][3].addInfantry(1);
+		provinceDatas[2][4].setOwner(player); 
 		provinceDatas[3][3].setOwner(player);
-		provinceDatas[3][4].setOwner(player);
+		provinceDatas[3][4].setOwner(player); provinceDatas[3][4].addInfantry(1);
 	}
 	
 	public void setDrift(int xAmount, int yAmount){
 		xDrift = xAmount;
 		yDrift = yAmount;
 	}
+	
+	public ProvinceData[][] getProvinces(){ return provinceDatas; }
 
 	private void fillBlackList() {
 		blacklist.add(new Point(0, 4));

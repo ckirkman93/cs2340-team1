@@ -97,6 +97,7 @@ public class FeudalWarServer {
 			kryo.register(float[].class);
 			kryo.register(String[].class);
 			kryo.register(com.dpendesigns.feudalwar.model.Player.class);
+			kryo.register(int[].class);
 			
 			server.start();
 			server.bind(54555, 54777);
@@ -243,6 +244,10 @@ public class FeudalWarServer {
 				if (activeGame.getUsers().contains(removedUser)){ activeGame.getUsers().remove(removedUser); }
 				if (activeGame.getHost() == removedUser){ droppedGame = activeGame; }
 			}
+			for(GameInstance activeGame: games_in_session){ 
+				if (activeGame.getUsers().contains(removedUser)){ activeGame.getUsers().remove(removedUser); }
+				if (activeGame.getHost() == removedUser){ droppedGame = activeGame; }
+			}
 			
 			for(User currentUser: user_list){ if(droppedGame.isActive()){
 					if (droppedGame.getUsers().contains(currentUser)){
@@ -251,6 +256,7 @@ public class FeudalWarServer {
 				}	
 			}
 			game_list.remove(droppedGame);
+			games_in_session.remove(droppedGame);
 			user_list.remove(removedUser);
 			
 			serverUserCount.setText("Number of Users: " + user_list.size());
@@ -299,12 +305,12 @@ public class FeudalWarServer {
 			Vector<Player> players = new Vector<Player>();
 			
 			for (int i = 0; i < game.getUsers().size(); i++){
-				if (i==0){players.add(new Player(game.getUsers().get(i))); players.get(i).setColors( new String[]{"0xFF0000", "0xFF2626", "0xFF5757"} );}
-				else if (i==1){players.add(new Player(game.getUsers().get(i))); players.get(i).setColors(new String[]{"0xFFFF00)", "0xFFFF26", "0xFFFF57"});}
-				else if (i==2){players.add(new Player(game.getUsers().get(i))); players.get(i).setColors(new String[]{"0x00FF00)", "0x26FF26", "0x57FF57"});}
-				else if (i==3){players.add(new Player(game.getUsers().get(i))); players.get(i).setColors(new String[]{"0x0000FF)", "0x2626FF", "0x5757FF"});}
-				else if (i==4){players.add(new Player(game.getUsers().get(i))); players.get(i).setColors(new String[]{"0xFF00FF)", "0xFF26FF", "0xFF57FF"});}
-				else if (i==5){players.add(new Player(game.getUsers().get(i))); players.get(i).setColors(new String[]{"0x00FFFF)", "0x26FFFF", "0x57FFFF"});}
+				if (i==0){players.add(new Player(game.getUsers().get(i))); players.get(i).setColors( new int[]{0xFF0000, 0xFF2626, 0xFF5757} );}
+				else if (i==1){players.add(new Player(game.getUsers().get(i))); players.get(i).setColors(new int[]{0xFFFF00, 0xFFFF26, 0xFFFF57});}
+				else if (i==2){players.add(new Player(game.getUsers().get(i))); players.get(i).setColors(new int[]{0x00FF00, 0x26FF26, 0x57FF57});}
+				else if (i==3){players.add(new Player(game.getUsers().get(i))); players.get(i).setColors(new int[]{0x0000FF, 0x2626FF, 0x5757FF});}
+				else if (i==4){players.add(new Player(game.getUsers().get(i))); players.get(i).setColors(new int[]{0xFF00FF, 0xFF26FF, 0xFF57FF});}
+				else if (i==5){players.add(new Player(game.getUsers().get(i))); players.get(i).setColors(new int[]{0x00FFFF, 0x26FFFF, 0x57FFFF});}
 			}
 			
 			game.init(players);
