@@ -170,7 +170,7 @@ public class FeudalWarClient extends BasicGame {
 					waitForUserList = true;
 					waitForGameList = true;
 					client.sendTCP(preGame);
-					preGameHandler = new PreGameHandler(client, my_game);
+					preGameHandler = new PreGameHandler(my_connection, my_game);
 				} else if (self.getCurrentState() == joinGame){
 					String joinGameName = joinGameHandler.update(gc, game_list, joinGameBounced);
 					if (joinGameName!="null"){

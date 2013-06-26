@@ -10,26 +10,36 @@ import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Shape;
 
 import com.dpendesigns.feudalwar.model.GameInstance;
-import com.esotericsoftware.kryonet.Client;
+import com.dpendesigns.feudalwar.model.User;
 
 public class PreGameHandler {
 	
-	private Client client;
 	private GameInstance my_game = null;
+	private int my_connection;
+	
+	private boolean isHost = false;
 	
 	private SpriteSheet backSpriteSheet;
 	private Image back;
 	private Shape backLocation;
 	
-	private final int mainMenu = 20;
+	private SpriteSheet beginSpriteSheet;
+	private Image begin;
+	private Shape beginLocation;
 	
 	private boolean leftClickDownState = false;
 	
-	public PreGameHandler(Client client, GameInstance game) throws SlickException{
+	public PreGameHandler(int connection_ID, GameInstance game) throws SlickException{
+		my_connection = connection_ID;
 		my_game = game;
+		
 		backSpriteSheet = new SpriteSheet("res/images/BackButtonSpriteSheet.png",96,32);
 		back = backSpriteSheet.getSubImage(0, 0);
 		backLocation = new Rectangle(0,0,96,32);
+		
+		beginSpriteSheet = new SpriteSheet("res/images/BeginButtonSpriteSheet.png",96,32);
+		begin = beginSpriteSheet.getSubImage(0, 0);
+		beginLocation = new Rectangle(0,0,96,32);
 	}
 	public boolean update(GameContainer gc, GameInstance game) throws SlickException {
 		Input input = gc.getInput();
@@ -39,6 +49,8 @@ public class PreGameHandler {
 		boolean main_menu = false;
 		
 		my_game = game;
+		if (my_game.getHost().getConnectionID() == my_connection){isHost = true;}
+		else {isHost = false;}
 		
 		backLocation.setLocation(gc.getWidth()-8-96, gc.getHeight()-8-32);
 		
@@ -52,6 +64,20 @@ public class PreGameHandler {
 				main_menu = true;
 			}
 		} else {back = backSpriteSheet.getSubImage(0, 0);}
+		
+		beginLocation.setLocation(gc.getWidth()-8-96, gc.getHeight()-16-64);
+		
+		if (beginLocation.contains(mouseX,mouseY) && my_game.getUsers().size() >=3 && isHost){
+			if (input.isMouseButtonDown(0)) {
+				begin = beginSpriteSheet.getSubImage(2, 0);
+			}
+			else {begin = beginSpriteSheet.getSubImage(1, 0);}
+				
+			if ( !input.isMouseButtonDown(0) && leftClickDownState == true) {
+				//MAY THE ODDS BE EVER IN YOUR FAVOR
+				//LET THE GAMES BEGIN!
+			}
+		} else {begin = beginSpriteSheet.getSubImage(0, 0);}
 		
 		if (gc.getInput().isMouseButtonDown(0)) {leftClickDownState = true;}
 		else {leftClickDownState = false;}
@@ -68,5 +94,6 @@ public class PreGameHandler {
 		}
 		
 		back.draw(gc.getWidth()-8-96, gc.getHeight()-8-32);
+		if (my_game.getUsers().size() >=3 && isHost){ begin.draw(gc.getWidth()-8-96, gc.getHeight()-16-64); }
 	}
 }

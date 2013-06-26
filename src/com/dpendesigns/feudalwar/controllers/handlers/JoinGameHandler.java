@@ -40,6 +40,7 @@ public class JoinGameHandler {
 		this.client = client;
 		
 		joinGameData = new Vector<JoinGameData>();
+		
 		backSpriteSheet = new SpriteSheet("res/images/BackButtonSpriteSheet.png",96,32);
 		back = backSpriteSheet.getSubImage(0, 0);
 		backLocation = new Rectangle(0,0,96,32);
