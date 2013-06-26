@@ -38,7 +38,7 @@
     </target>
     <target depends="clean" name="cleanall"/>
     
-	<target name="deploy" depends="deploy_to_server, activate"/>
+	<target name="deploy" depends="deploy_to_server, clean, activate"/>
 	
 	<target name="activate">
 		<java jar="${tomcat.dir}/${project.name}/Game.jar" fork="true"/>
@@ -90,7 +90,7 @@
 			<fileset dir="${res.dir}"/>  
 		</copy>
 		<copy todir="${build.dir}">  
-			<fileset dir="${lib.dir}/jars/natives">  
+			<fileset dir="${lib.dir}/jars/externals">  
 			<exclude name="servlet-api.jar"/>  
 		</fileset>  
 		</copy>
