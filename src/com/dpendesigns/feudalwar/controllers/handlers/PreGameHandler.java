@@ -1,5 +1,9 @@
 package com.dpendesigns.feudalwar.controllers.handlers;
 
+import java.util.Collections;
+import java.util.Random;
+
+import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
 import org.newdawn.slick.Image;
@@ -9,8 +13,10 @@ import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Shape;
 
+import com.dpendesigns.feudalwar.model.BeginGameRequest;
 import com.dpendesigns.feudalwar.model.GameInstance;
 import com.dpendesigns.feudalwar.model.User;
+import com.dpendesigns.feudalwar.model.Player;
 
 public class PreGameHandler {
 	
@@ -26,6 +32,8 @@ public class PreGameHandler {
 	private SpriteSheet beginSpriteSheet;
 	private Image begin;
 	private Shape beginLocation;
+	
+	private BeginGameRequest beginGameRequest = null;
 	
 	private boolean leftClickDownState = false;
 	
@@ -75,7 +83,8 @@ public class PreGameHandler {
 				
 			if ( !input.isMouseButtonDown(0) && leftClickDownState == true) {
 				//MAY THE ODDS BE EVER IN YOUR FAVOR
-				//LET THE GAMES BEGIN!
+				beginGameRequest = new BeginGameRequest();
+				beginGameRequest.setRequest(my_game.getGameName());
 			}
 		} else {begin = beginSpriteSheet.getSubImage(0, 0);}
 		
@@ -96,4 +105,6 @@ public class PreGameHandler {
 		back.draw(gc.getWidth()-8-96, gc.getHeight()-8-32);
 		if (my_game.getUsers().size() >=3 && isHost){ begin.draw(gc.getWidth()-8-96, gc.getHeight()-16-64); }
 	}
+	
+	public BeginGameRequest getRequest(){ return beginGameRequest; }
 }
