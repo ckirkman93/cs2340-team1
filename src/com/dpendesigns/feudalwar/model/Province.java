@@ -24,17 +24,15 @@ public class Province {
 	private int yDrift;
 	
 	private int ipos,jpos;
-	
-	private int numberOfArmies;
-	
-	private Player owner;
 
 	private Color currentColor;
+	
+	private ProvinceData data;
 
 	private boolean leftClickDownState = false;
 	
 	public Province (ProvinceData data){
-		owner = data.getOwner();
+		this.data = data;
 		xDefaultPosition = data.getXDefault();
 		yDefaultPosition = data.getYDefault();
 		
@@ -43,8 +41,6 @@ public class Province {
 		
 		xDrift = data.getXDrift();
 		yDrift = data.getYDrift();
-		
-		numberOfArmies = data.getInfantry();
 		
 		float yMin = 0;
 		float yQuart = 12;
@@ -57,7 +53,7 @@ public class Province {
 
 		area = new Polygon(new float[]{xHalf,yMin,xMax,yQuart,xMax,yMost,xHalf,yMax,xMin,yMost,xMin,yQuart});
 		area.setLocation(xDefaultPosition, yDefaultPosition);
-		currentColor = new Color(owner.getColors()[0]);
+		currentColor = new Color(data.getOwner().getColors()[0]);
 	}
 
 	public void update(GameContainer gc) throws SlickException {
@@ -71,9 +67,9 @@ public class Province {
 
 		if (area.contains(xpos, ypos)){
 			if (input.isMouseButtonDown(0)) {
-				currentColor = new Color(owner.getColors()[2]);
+				currentColor = new Color(data.getOwner().getColors()[2]);
 			}
-			else {currentColor = new Color(owner.getColors()[1]);}
+			else {currentColor = new Color(data.getOwner().getColors()[1]);}
 
 			if ( !input.isMouseButtonDown(0) && leftClickDownState == true) {
 
@@ -81,10 +77,10 @@ public class Province {
 			
 			if (input.isMouseButtonDown(Input.MOUSE_RIGHT_BUTTON)) {
 				//this.setOwner(playerList[0]);
-				//numberOfArmies++;
+				//data.getInfantry()++;
 			}
 		}
-		else {currentColor = new Color(owner.getColors()[0]);}
+		else {currentColor = new Color(data.getOwner().getColors()[0]);}
 
 		if (!input.isMouseButtonDown(0)) {leftClickDownState = false;}
 	}
@@ -98,12 +94,12 @@ public class Province {
 		//g.drawString("" + ipos,  xDefaultPosition +xDrift, yDefaultPosition + yDrift + height/2 - 16);
 		//g.drawString("" + jpos,  xDefaultPosition +xDrift, yDefaultPosition + yDrift + height/2 - 2);
 		
-		if(numberOfArmies > 9)
-			g.drawString("" + numberOfArmies, 
+		if(data.getInfantry() > 9)
+			g.drawString("" + data.getInfantry(), 
 					xDefaultPosition + xDrift + width/2 - 10, 
 					yDefaultPosition + yDrift + height/2 - 8);
-		else if(numberOfArmies > 0)
-			g.drawString("" + numberOfArmies, 
+		else if(data.getInfantry() > 0)
+			g.drawString("" + data.getInfantry(), 
 					xDefaultPosition + xDrift + width/2 - 6, 
 					yDefaultPosition + yDrift + height/2 - 8);
 	}
