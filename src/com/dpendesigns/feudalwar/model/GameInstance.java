@@ -13,6 +13,7 @@ import org.newdawn.slick.TrueTypeFont;
 
 import com.dpendesigns.feudalwar.controllers.handlers.Map;
 import com.dpendesigns.feudalwar.model.Player;
+import com.dpendesigns.network.data.UserList;
 
 public class GameInstance {
 	private String gameName;
@@ -47,7 +48,7 @@ public class GameInstance {
 		this.host = host;
 		this.host_connection = host.getConnectionID();
 		
-		this.users=new UserListPacket();
+		this.users=new UserList();
 		users.add(host);
 		
 		active = true;

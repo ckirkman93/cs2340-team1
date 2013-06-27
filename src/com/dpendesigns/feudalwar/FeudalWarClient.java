@@ -11,12 +11,16 @@ import com.dpendesigns.feudalwar.controllers.handlers.MainGameHandler;
 import com.dpendesigns.feudalwar.controllers.handlers.MainMenuHandler;
 import com.dpendesigns.feudalwar.controllers.handlers.PreGameHandler;
 import com.dpendesigns.feudalwar.controllers.handlers.SetupHandler;
-import com.dpendesigns.feudalwar.model.BeginGameRequest;
 import com.dpendesigns.feudalwar.model.GameInstance;
-import com.dpendesigns.feudalwar.model.GameListPacket;
-import com.dpendesigns.feudalwar.model.JoinGameRequest;
 import com.dpendesigns.feudalwar.model.User;
-import com.dpendesigns.feudalwar.model.UserListPacket;
+import com.dpendesigns.network.data.GameList;
+import com.dpendesigns.network.data.UserList;
+import com.dpendesigns.network.requests.BeginGameRequest;
+import com.dpendesigns.network.requests.ChangeStateRequest;
+import com.dpendesigns.network.requests.ConnectRequest;
+import com.dpendesigns.network.requests.JoinGameRequest;
+import com.dpendesigns.network.requests.LoginRequest;
+import com.dpendesigns.network.responses.LoginResponse;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
@@ -27,12 +31,12 @@ public class FeudalWarClient extends BasicGame {
 	public static final String title = "Feudal War: Sengoku Jidai";
 	private boolean connected = false;
 	
-	private UserListPacket user_list = new UserListPacket();
-	private GameListPacket game_list = new GameListPacket();
+	private UserList user_list = new UserList();
+	private GameList game_list = new GameList();
 	
 	private boolean game_in_session = false;
 	
-	private User self;
+	private User self = new User();
 	private int my_connection;
 	private GameInstance my_game = null;
 	
@@ -47,6 +51,7 @@ public class FeudalWarClient extends BasicGame {
 	private int port = 54555;
 	
 	private boolean waitForResponse = false;
+	private boolean waitForLoginResponse = false;
 	private boolean waitForUserList = false;
 	private boolean waitForGameList = false;
 	private boolean waitForGameUpdate = false;
@@ -78,7 +83,7 @@ public class FeudalWarClient extends BasicGame {
 	private final int loadGame = 51;
 	private final int mainGame = 52;
 	private final int postGame = 53;
-	
+
 	public FeudalWarClient(){
 		super(title);
 		
@@ -99,12 +104,20 @@ public class FeudalWarClient extends BasicGame {
 			client = new Client(8192,8192);
 			
 			kryo = client.getKryo();
-			kryo.register(com.dpendesigns.feudalwar.model.User.class);
-			kryo.register(com.dpendesigns.feudalwar.model.UserListPacket.class);
-			kryo.register(com.dpendesigns.feudalwar.model.GameInstance.class);
-			kryo.register(com.dpendesigns.feudalwar.model.GameListPacket.class);
-			kryo.register(com.dpendesigns.feudalwar.model.JoinGameRequest.class);
-			kryo.register(com.dpendesigns.feudalwar.model.BeginGameRequest.class);
+			kryo.register(User.class);
+			kryo.register(UserList.class);
+			kryo.register(GameInstance.class);
+			kryo.register(GameList.class);
+			
+			// Register the request classes for serialization
+			kryo.register(ConnectRequest.class);
+			kryo.register(ChangeStateRequest.class);
+			kryo.register(LoginRequest.class);
+			kryo.register(JoinGameRequest.class);
+			kryo.register(BeginGameRequest.class);
+			
+			// Register the response classes for serialization
+			kryo.register(com.dpendesigns.network.responses.LoginResponse.class);
 			
 			kryo.register(com.dpendesigns.feudalwar.controllers.handlers.Map.class);
 			kryo.register(java.util.Vector.class);
@@ -125,12 +138,10 @@ public class FeudalWarClient extends BasicGame {
 			client.setTimeout(0);
 			
 			connected = true;
-			
-			self = new User();
 			my_connection = client.getID();
 			
-			client.sendTCP(self);
 			client.addListener(new ClientListener());
+			client.sendTCP(new ConnectRequest());
 		
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -150,26 +161,27 @@ public class FeudalWarClient extends BasicGame {
 					setupHandler.init(gc, self.getName());
 					waitForUserList = true;
 					waitForGameList = true;
-					client.sendTCP(login);
+					client.sendTCP(new ChangeStateRequest(login));
 				} else if (self.getCurrentState() == login){
 					if (setupHandler.update(gc)){
 						waitForUserList = true;
 						waitForGameList = true;
-						client.sendTCP(postLogin);
-						client.sendTCP(setupHandler.getNewName());
+						//waitForLoginResponse = true;
+						client.sendTCP(new ChangeStateRequest(postLogin));
+						client.sendTCP(new LoginRequest(setupHandler.getNewName()));
 						loginStatus = loginWaiting;
 						}
 				} else if (self.getCurrentState() == postLogin){
 					if (loginStatus == loginAccepted){
 						waitForUserList = true;
 						waitForGameList = true;
-						client.sendTCP(mainMenu);
+						client.sendTCP(new ChangeStateRequest(mainMenu));
 						mainMenuHandler = new MainMenuHandler();
 						mainMenuHandler.init(gc);
 					} else if (loginStatus == loginRejected){
 						waitForUserList = true;
 						waitForGameList = true;
-						client.sendTCP(login);
+						client.sendTCP(new ChangeStateRequest(login));
 						setupHandler.loginRejected(true);
 					} else {}
 				} else if (self.getCurrentState() == mainMenu){
@@ -180,22 +192,21 @@ public class FeudalWarClient extends BasicGame {
 					if (menuStatus == 1){
 						waitForUserList = true;
 						waitForGameList = true;
-						client.sendTCP(joinGame);
+						client.sendTCP(new ChangeStateRequest(joinGame));
 					} else if (menuStatus == 2){
 						waitForUserList = true;
 						waitForGameList = true;
-						client.sendTCP(hostGame);
+						client.sendTCP(new ChangeStateRequest(hostGame));
 					} else if (menuStatus == 0){}//Do Nothing
 				} else if (self.getCurrentState() == postMenu){
 					waitForUserList = true;
 					waitForGameList = true;
-					client.sendTCP(preGame);
+					client.sendTCP(new ChangeStateRequest(preGame));
 					preGameHandler = new PreGameHandler(my_connection, my_game);
 				} else if (self.getCurrentState() == joinGame){
 					String joinGameName = joinGameHandler.update(gc, game_list, joinGameBounced);
 					if (joinGameName!="null"){
-						JoinGameRequest joinGameRequest = new JoinGameRequest();
-						joinGameRequest.setRequest(joinGameName);
+						JoinGameRequest joinGameRequest = new JoinGameRequest(joinGameName);
 						waitForUserList = true;
 						waitForGameList = true;
 						client.sendTCP(joinGameRequest);
@@ -203,12 +214,12 @@ public class FeudalWarClient extends BasicGame {
 				} else if (self.getCurrentState() == hostGame){
 					waitForUserList = true;
 					waitForGameList = true;
-					client.sendTCP(postMenu);
+					client.sendTCP(new ChangeStateRequest(postMenu));
 				} else if (self.getCurrentState() == preGame){
 					if (preGameHandler.update(gc, my_game)){
 						waitForUserList = true;
 						waitForGameList = true;
-						client.sendTCP(mainMenu);
+						client.sendTCP(new ChangeStateRequest(mainMenu));
 					} 
 					BeginGameRequest begin = preGameHandler.getRequest();
 					
@@ -223,7 +234,7 @@ public class FeudalWarClient extends BasicGame {
 					mainGameHandler = new MainGameHandler(my_game);
 					waitForUserList = true;
 					waitForGameList = true;
-					client.sendTCP(mainGame);
+					client.sendTCP(new ChangeStateRequest(mainGame));
 				} else if (self.getCurrentState() == mainGame){
 					mainGameHandler.update(gc);
 				}
@@ -231,34 +242,33 @@ public class FeudalWarClient extends BasicGame {
 		}
 	}
 	public void render(GameContainer gc, Graphics g) throws SlickException {
-		
-		if (self.getCurrentState() == boot){
+			if (self.getCurrentState() == boot){
+				
+				g.drawString("X: "+gc.getInput().getMouseX()+", Y: "+gc.getInput().getMouseY(), 8, 8);
+				g.drawString("Waiting for response: " + waitForResponse, 8, 22);
+		   
+				g.drawString("Connected: " + connected, 240, 60);
+				g.drawString("Current State: " + self.getCurrentState(), 240, 76);
+				g.drawString("User Count: " + user_list.size(), 240, 92);
 			
-			g.drawString("X: "+gc.getInput().getMouseX()+", Y: "+gc.getInput().getMouseY(), 8, 8);
-			g.drawString("Waiting for response: " + waitForResponse, 8, 22);
-	   
-			g.drawString("Connected: " + connected, 240, 60);
-			g.drawString("Current State: " + self.getCurrentState(), 240, 76);
-			g.drawString("User Count: " + user_list.size(), 240, 92);
-		
-			g.drawString("User: " + self.getName(), 240, 164);
-			g.drawString("User ID: " + self.getUserID(), 240, 180);
-			g.drawString("Connection ID: " + client.getID(), 240, 196);
-			g.drawString("Local Connection ID: " + my_connection, 240, 212);
-			
-		} else if (self.getCurrentState() == login){
-			setupHandler.render(gc, g); 
-		} else if (self.getCurrentState() == mainMenu){
-			mainMenuHandler.render(gc, g); 
-		} else if (self.getCurrentState() == joinGame){
-			joinGameHandler.render(gc, g);
-		} else if (self.getCurrentState() == hostGame){
-			hostGameHandler.render(gc, g);
-		} else if (self.getCurrentState() == preGame){
-			preGameHandler.render(gc, g);
-		} else if (self.getCurrentState() == mainGame){
-			mainGameHandler.render(gc, g);
-		}
+				g.drawString("User: " + self.getName(), 240, 164);
+				g.drawString("User ID: " + self.getUserID(), 240, 180);
+				g.drawString("Connection ID: " + client.getID(), 240, 196);
+				g.drawString("Local Connection ID: " + my_connection, 240, 212);
+				
+			} else if (self.getCurrentState() == login){
+				setupHandler.render(gc, g); 
+			} else if (self.getCurrentState() == mainMenu){
+				mainMenuHandler.render(gc, g); 
+			} else if (self.getCurrentState() == joinGame){
+				joinGameHandler.render(gc, g);
+			} else if (self.getCurrentState() == hostGame){
+				hostGameHandler.render(gc, g);
+			} else if (self.getCurrentState() == preGame){
+				preGameHandler.render(gc, g);
+			} else if (self.getCurrentState() == mainGame){
+				mainGameHandler.render(gc, g);
+			}
 	}
 	
 	public static void main(String[] args) {
@@ -276,16 +286,16 @@ public class FeudalWarClient extends BasicGame {
 			if (o instanceof User) {
 				self = (User)o;
 				waitForResponse = false;
-			} else if (o instanceof UserListPacket) {
-				user_list = (UserListPacket)o;
+			} else if (o instanceof UserList) {
+				user_list = (UserList)o;
 				for (User user : user_list){
 					if (user.getConnectionID() == my_connection){
 						self = user;
 					}
 				}
 				waitForUserList = false;
-			} else if (o instanceof GameListPacket) {
-				game_list = (GameListPacket)o;
+			} else if (o instanceof GameList) {
+				game_list = (GameList)o;
 				if(!game_in_session){
 					for (GameInstance game : game_list){
 						for (User user : game.getUsers()){ 
@@ -300,9 +310,11 @@ public class FeudalWarClient extends BasicGame {
 					if (user.getConnectionID() == my_connection){ my_game = sentGame; game_in_session = true; }
 				}
 				waitForGameUpdate = false;
-			} else if (o instanceof Integer) {
-				loginStatus = (Integer)o;
-				waitForResponse = false;
+			} else if (o instanceof LoginResponse) {
+				LoginResponse response = (LoginResponse)o;
+				loginStatus = response.getLoginResponse();
+				System.out.println(loginStatus);
+				waitForLoginResponse = false;
 			} else if (o instanceof JoinGameRequest){
 				joinGameBounced = true;
 				waitForResponse = false;

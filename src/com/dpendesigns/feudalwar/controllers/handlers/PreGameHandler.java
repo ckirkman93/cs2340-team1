@@ -13,10 +13,10 @@ import org.newdawn.slick.SpriteSheet;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Shape;
 
-import com.dpendesigns.feudalwar.model.BeginGameRequest;
 import com.dpendesigns.feudalwar.model.GameInstance;
 import com.dpendesigns.feudalwar.model.User;
 import com.dpendesigns.feudalwar.model.Player;
+import com.dpendesigns.network.requests.BeginGameRequest;
 
 public class PreGameHandler {
 	
@@ -83,8 +83,7 @@ public class PreGameHandler {
 				
 			if ( !input.isMouseButtonDown(0) && leftClickDownState == true) {
 				//MAY THE ODDS BE EVER IN YOUR FAVOR
-				beginGameRequest = new BeginGameRequest();
-				beginGameRequest.setRequest(my_game.getGameName());
+				beginGameRequest = new BeginGameRequest(my_game.getGameName());
 			}
 		} else {begin = beginSpriteSheet.getSubImage(0, 0);}
 		
