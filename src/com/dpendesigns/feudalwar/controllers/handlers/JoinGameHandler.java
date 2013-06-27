@@ -15,7 +15,7 @@ import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Shape;
 
 import com.dpendesigns.feudalwar.model.GameInstance;
-import com.dpendesigns.feudalwar.model.GameListPacket;
+import com.dpendesigns.network.data.GameList;
 import com.esotericsoftware.kryonet.Client;
 
 public class JoinGameHandler {
@@ -46,7 +46,7 @@ public class JoinGameHandler {
 		backLocation = new Rectangle(0,0,96,32);
 	}
 	
-	public String update(GameContainer gc, GameListPacket game_list, boolean joinGameBounced) throws SlickException {
+	public String update(GameContainer gc, GameList game_list, boolean joinGameBounced) throws SlickException {
 		Input input = gc.getInput();
 		int mouseX = input.getMouseX();
 		int mouseY = input.getMouseY();
