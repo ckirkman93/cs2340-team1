@@ -34,11 +34,11 @@ public class Map {
 				if(!blacklist.contains(new Point(i, j))) {
 					if(i % 2 == 0){
 						provinceDatas[i][j] = new ProvinceData(200 + j * ProvinceData.width, 
-								25 + i * ProvinceData.choppedHeight);
+								25 + i * ProvinceData.choppedHeight, i ,j);
 					provinceDatas[i][j].setSeat(i,j);}
 					else {provinceDatas[i][j] = new ProvinceData(200 - ProvinceData.width / 2 
 							+ j * ProvinceData.width, 
-							25 + i * ProvinceData.choppedHeight);
+							25 + i * ProvinceData.choppedHeight, i, j);
 					provinceDatas[i][j].setSeat(i,j);}
 				}
 			}

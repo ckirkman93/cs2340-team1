@@ -14,6 +14,7 @@ import com.dpendesigns.feudalwar.model.GameInstance;
 import com.dpendesigns.feudalwar.model.Player;
 import com.dpendesigns.feudalwar.model.Province;
 import com.dpendesigns.feudalwar.model.ProvinceData;
+import com.dpendesigns.network.requests.AddArmyRequest;
 
 public class MainGameHandler {
 	private GameInstance my_game;
@@ -58,7 +59,10 @@ public class MainGameHandler {
 		
 	}
 
-	public void update(GameContainer gc) throws SlickException {
+	public Object update(GameContainer gc, GameInstance game) throws SlickException {
+		if(game.getGameName().equals(my_game.getGameName()))
+			my_game = game;
+		else System.out.println("Received different game");
 		mouseX = gc.getInput().getMouseX();
 		mouseY = gc.getInput().getMouseY();
 		
@@ -66,9 +70,20 @@ public class MainGameHandler {
 			
 		my_game.getMap().setDrift(xDrift, yDrift);
 		
-		for(Province[] p : my_map)
-			for(Province province : p)
-				if(province != null) {province.setDrift(xDrift,yDrift); province.update(gc);}
+		for(Province[] p : my_map) {
+			for(Province province : p) {
+				if(province != null) {
+					province.setData(my_game.getMap().getProvinces()[province.getI()][province.getJ()]);
+					province.setDrift(xDrift,yDrift); 
+					Object addArmyRequest = province.update(gc);
+					if(addArmyRequest instanceof AddArmyRequest) {
+						((AddArmyRequest)addArmyRequest).setGameName(my_game.getGameName());
+						return addArmyRequest;
+					}
+				}
+			}
+		}
+		return null;
 	}
 	public void render(GameContainer gc, Graphics g) throws SlickException {
 		

@@ -6,9 +6,11 @@ import org.newdawn.slick.SlickException;
 
 import com.dpendesigns.feudalwar.controllers.handlers.BeginGameHandler;
 import com.dpendesigns.feudalwar.model.GameInstance;
+import com.dpendesigns.feudalwar.model.ProvinceData;
 import com.dpendesigns.feudalwar.model.User;
 import com.dpendesigns.network.data.GameList;
 import com.dpendesigns.network.data.UserList;
+import com.dpendesigns.network.requests.AddArmyRequest;
 import com.dpendesigns.network.requests.BeginGameRequest;
 import com.dpendesigns.network.requests.ChangeStateRequest;
 import com.dpendesigns.network.requests.JoinGameRequest;
@@ -235,6 +237,17 @@ public class ServerListenerParser {
 		}
 	}
 	
+	protected void parseAddArmyRequest(Object o) {
+		System.out.println("Begin parsing");
+		AddArmyRequest addArmyRequest = (AddArmyRequest) o;
+		for(GameInstance game : games_in_session)
+			if(game.getGameName().equals(addArmyRequest.getGameName())) {
+				game.getMap().getProvinces()[addArmyRequest.i()][addArmyRequest.j()].addInfantry(1);
+				for(User user : game.getUsers())
+					server.sendToTCP(user.getConnectionID(), game);
+			}
+	}
+	
 	protected void dropUser(User user){
 		GameInstance droppedGame = new GameInstance();
 		for(GameInstance activeGame: game_list){ 
@@ -250,4 +263,5 @@ public class ServerListenerParser {
 		}
 		game_list.remove(droppedGame);
 	}
+	
 }
