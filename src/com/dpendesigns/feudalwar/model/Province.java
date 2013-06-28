@@ -9,6 +9,8 @@ import org.newdawn.slick.geom.Polygon;
 import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.state.StateBasedGame;
 
+import com.dpendesigns.network.requests.AddArmyRequest;
+
 public class Province {
 
 	private Shape area;
@@ -23,16 +25,19 @@ public class Province {
 	private int xDrift;
 	private int yDrift;
 	
-	private int ipos,jpos;
-
-	private Color currentColor;
+	private int infantry;
 	
-	private ProvinceData data;
+	private int ipos,jpos;
+	private Player owner;
+	
+	private Color currentColor;
 
 	private boolean leftClickDownState = false;
 	
 	public Province (ProvinceData data){
-		this.data = data;
+		this.infantry = data.getInfantry();
+		this.owner = data.getOwner();
+		
 		xDefaultPosition = data.getXDefault();
 		yDefaultPosition = data.getYDefault();
 		
@@ -55,10 +60,25 @@ public class Province {
 		area.setLocation(xDefaultPosition, yDefaultPosition);
 		currentColor = new Color(data.getOwner().getColors()[0]);
 	}
+	
+	public int getI() {
+		return ipos;
+	}
+	
+	public int getJ() {
+		return jpos;
+	}
 
-	public void update(GameContainer gc) throws SlickException {
+	public void setData(ProvinceData data) {
+		this.infantry = data.getInfantry();
+		this.owner = data.getOwner();		
+		this.ipos = data.getI();
+		this.jpos = data.getJ();
+	}
+	
+	public Object update(GameContainer gc) throws SlickException {
 		area.setLocation(xDefaultPosition + xDrift, yDefaultPosition + yDrift);
-		
+		AddArmyRequest addArmyRequest = null;
 		Input input = gc.getInput();
 		int xpos = input.getMouseX();
 		int ypos = input.getMouseY();
@@ -67,12 +87,12 @@ public class Province {
 
 		if (area.contains(xpos, ypos)){
 			if (input.isMouseButtonDown(0)) {
-				currentColor = new Color(data.getOwner().getColors()[2]);
+				currentColor = new Color(owner.getColors()[2]);
 			}
-			else {currentColor = new Color(data.getOwner().getColors()[1]);}
+			else {currentColor = new Color(owner.getColors()[1]);}
 
 			if ( !input.isMouseButtonDown(0) && leftClickDownState == true) {
-
+				addArmyRequest = new AddArmyRequest(null, ipos, jpos);
 			}
 			
 			if (input.isMouseButtonDown(Input.MOUSE_RIGHT_BUTTON)) {
@@ -80,9 +100,11 @@ public class Province {
 				//data.getInfantry()++;
 			}
 		}
-		else {currentColor = new Color(data.getOwner().getColors()[0]);}
+		else {currentColor = new Color(owner.getColors()[0]);}
 
 		if (!input.isMouseButtonDown(0)) {leftClickDownState = false;}
+		
+		return addArmyRequest;
 	}
 
 	public void render(GameContainer gc, Graphics g) throws SlickException {
@@ -94,12 +116,12 @@ public class Province {
 		//g.drawString("" + ipos,  xDefaultPosition +xDrift, yDefaultPosition + yDrift + height/2 - 16);
 		//g.drawString("" + jpos,  xDefaultPosition +xDrift, yDefaultPosition + yDrift + height/2 - 2);
 		
-		if(data.getInfantry() > 9)
-			g.drawString("" + data.getInfantry(), 
+		if(infantry > 9)
+			g.drawString("" + infantry, 
 					xDefaultPosition + xDrift + width/2 - 10, 
 					yDefaultPosition + yDrift + height/2 - 8);
-		else if(data.getInfantry() > 0)
-			g.drawString("" + data.getInfantry(), 
+		else if(infantry > 0)
+			g.drawString("" + infantry, 
 					xDefaultPosition + xDrift + width/2 - 6, 
 					yDefaultPosition + yDrift + height/2 - 8);
 	}

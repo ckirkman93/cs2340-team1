@@ -4,6 +4,7 @@ import com.dpendesigns.feudalwar.model.GameInstance;
 import com.dpendesigns.feudalwar.model.User;
 import com.dpendesigns.network.data.GameList;
 import com.dpendesigns.network.data.UserList;
+import com.dpendesigns.network.requests.AddArmyRequest;
 import com.dpendesigns.network.requests.BeginGameRequest;
 import com.dpendesigns.network.requests.ChangeStateRequest;
 import com.dpendesigns.network.requests.ConnectRequest;
@@ -48,16 +49,18 @@ public class ServerListener extends Listener{
 	}
 	
 	public void received (Connection c, Object o) {
+		System.out.println(System.currentTimeMillis() + " " + o);
 		if (o instanceof ConnectRequest){ requestParser.parseConnectRequest(c); }
 		else if (o instanceof ChangeStateRequest){ requestParser.parseChangeStateRequest(c, o); }
 		else if (o instanceof LoginRequest) { requestParser.parseLoginRequest(c, o);}
-		else if (o instanceof JoinGameRequest){ requestParser.parseJoinGameRequest(c, o);
-		} else if (o instanceof BeginGameRequest){ requestParser.parseBeginGameRequest(c, o);
-		}
+		else if (o instanceof JoinGameRequest){ requestParser.parseJoinGameRequest(c, o);}
+		else if (o instanceof BeginGameRequest){ requestParser.parseBeginGameRequest(c, o);}
+		else if (o instanceof AddArmyRequest){ requestParser.parseAddArmyRequest(o);}
 		
 		server.sendToAllTCP(user_list);
 		server.sendToAllTCP(game_list);
 	}
+	
 	public void disconnected (Connection c) {
 		User removedUser = new User();
 		for(User currentUser: user_list){if (currentUser.getName().equals(c.toString())){removedUser=currentUser;}}

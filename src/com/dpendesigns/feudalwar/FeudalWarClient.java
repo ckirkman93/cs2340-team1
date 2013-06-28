@@ -15,6 +15,7 @@ import com.dpendesigns.feudalwar.model.GameInstance;
 import com.dpendesigns.feudalwar.model.User;
 import com.dpendesigns.network.data.GameList;
 import com.dpendesigns.network.data.UserList;
+import com.dpendesigns.network.requests.AddArmyRequest;
 import com.dpendesigns.network.requests.BeginGameRequest;
 import com.dpendesigns.network.requests.ChangeStateRequest;
 import com.dpendesigns.network.requests.ConnectRequest;
@@ -115,6 +116,7 @@ public class FeudalWarClient extends BasicGame {
 			kryo.register(LoginRequest.class);
 			kryo.register(JoinGameRequest.class);
 			kryo.register(BeginGameRequest.class);
+			kryo.register(AddArmyRequest.class);
 			
 			// Register the response classes for serialization
 			kryo.register(com.dpendesigns.network.responses.LoginResponse.class);
@@ -236,7 +238,8 @@ public class FeudalWarClient extends BasicGame {
 					waitForGameList = true;
 					client.sendTCP(new ChangeStateRequest(mainGame));
 				} else if (self.getCurrentState() == mainGame){
-					mainGameHandler.update(gc);
+					Object o = mainGameHandler.update(gc, my_game);
+					if(o != null) client.sendTCP(o);
 				}
 			}
 		}

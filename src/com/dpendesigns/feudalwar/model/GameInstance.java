@@ -115,8 +115,7 @@ public class GameInstance {
 				position++;
 			}
 		}
-	}*/
-	
+	}*/	
 	public void calculateDrift(GameContainer gc){
 		Input input = gc.getInput();
 		int xpos = input.getMouseX();

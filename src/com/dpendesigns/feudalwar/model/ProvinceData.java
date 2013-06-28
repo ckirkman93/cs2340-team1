@@ -14,6 +14,8 @@ public class ProvinceData {
 	
 	private int xDrift;
 	private int yDrift;
+	private int i;
+	private int j;
 	
 	private int ipos,jpos;
 
@@ -22,8 +24,10 @@ public class ProvinceData {
 	
 	public ProvinceData(){}
 	
-	public ProvinceData (int x, int y) {
-
+	public ProvinceData (int x, int y, int i, int j) {
+		this.i = i;
+		this.j = j;
+		
 		xDefaultPosition = x;
 		yDefaultPosition = y;
 		
@@ -34,6 +38,14 @@ public class ProvinceData {
 	public void setDrift(int xAmount, int yAmount){
 		xDrift = xAmount;
 		yDrift = yAmount;
+	}
+	
+	public int getI() {
+		return i;
+	}
+	
+	public int getJ() {
+		return j;
 	}
 	
 	public void setOwner(Player player){
