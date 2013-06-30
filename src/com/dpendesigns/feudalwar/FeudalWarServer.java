@@ -24,6 +24,8 @@ import com.dpendesigns.network.requests.ChangeStateRequest;
 import com.dpendesigns.network.requests.ConnectRequest;
 import com.dpendesigns.network.requests.JoinGameRequest;
 import com.dpendesigns.network.requests.LoginRequest;
+import com.dpendesigns.network.requests.MovementPhaseRequest;
+import com.dpendesigns.network.requests.PlacementPhaseRequest;
 import com.dpendesigns.network.responses.LoginResponse;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Connection;
@@ -76,7 +78,7 @@ public class FeudalWarServer {
 		System.out.println("Booting Server...");
 		try{
 			
-			server = new Server(16384,8192);
+			server = new Server(16384,16384);
 			
 			kryo = server.getKryo();
 			kryo.register(User.class);
@@ -90,23 +92,29 @@ public class FeudalWarServer {
 			kryo.register(LoginRequest.class);
 			kryo.register(JoinGameRequest.class);
 			kryo.register(BeginGameRequest.class);
-			kryo.register(AddArmyRequest.class);
+			kryo.register(PlacementPhaseRequest.class);
+			kryo.register(MovementPhaseRequest.class);
 			
 			// Register the response classes for serialization
 			kryo.register(com.dpendesigns.network.responses.LoginResponse.class);
+			kryo.register(com.dpendesigns.network.responses.PlacementPhaseResponse.class);
 			
 			kryo.register(com.dpendesigns.feudalwar.controllers.handlers.Map.class);
 			kryo.register(java.util.Vector.class);
 			kryo.register(java.util.ArrayList.class);
-			kryo.register(com.dpendesigns.feudalwar.model.ProvinceData[][].class);
-			kryo.register(com.dpendesigns.feudalwar.model.ProvinceData[].class);
-			kryo.register(com.dpendesigns.feudalwar.model.ProvinceData.class);
+			kryo.register(com.dpendesigns.network.data.ProvinceData[][].class);
+			kryo.register(com.dpendesigns.network.data.ProvinceData[].class);
+			kryo.register(com.dpendesigns.network.data.ProvinceData.class);
 			kryo.register(org.newdawn.slick.geom.Polygon.class);
 			kryo.register(java.awt.Point.class);
 			kryo.register(float[].class);
 			kryo.register(String[].class);
 			kryo.register(com.dpendesigns.feudalwar.model.Player.class);
 			kryo.register(int[].class);
+			
+			kryo.register(com.dpendesigns.feudalwar.model.Infantry.class);
+			kryo.register(com.dpendesigns.feudalwar.model.General.class);
+			kryo.register(com.dpendesigns.feudalwar.model.MilitaryUnit.class);
 			
 			server.start();
 			server.bind(54555, 54777);

@@ -52,9 +52,10 @@ public class SetupHandler {
 				playerNameInput.setFocus(true);
 			}
 		});
+		playerNameInput.setMaxLength(10);
 		playerNameInput.setBackgroundColor(Color.white);
 		playerNameInput.setTextColor(Color.black);
-		playerNameInput.setText(currentName);
+		playerNameInput.setText("Enter Name");
 		
 		loginSpriteSheet = new SpriteSheet("res/images/LoginButtonSpriteSheet.png",96,32);
 		
@@ -114,7 +115,7 @@ public class SetupHandler {
 		//g.setBackground(Color.white);
 		playerNameInput.render(gc, g);
 		login.draw(gcMiddle + 76, 66); 
-		if (nameTaken){g.drawString("Username already taken, please try again...", gcMiddle - 260, 48);}
+		if (nameTaken){g.drawString("Username already taken, please try again...", gcMiddle - 260, 46);}
 		else {g.drawString("Please enter your desired username:", gcMiddle - 260, 48);}
 		g.drawString("Current Name: " + currentName, gcMiddle - 260, 128);
 		g.drawString("New Name: " + newName, gcMiddle - 260, 144);

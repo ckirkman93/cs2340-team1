@@ -21,7 +21,10 @@ import com.dpendesigns.network.requests.ChangeStateRequest;
 import com.dpendesigns.network.requests.ConnectRequest;
 import com.dpendesigns.network.requests.JoinGameRequest;
 import com.dpendesigns.network.requests.LoginRequest;
+import com.dpendesigns.network.requests.MovementPhaseRequest;
+import com.dpendesigns.network.requests.PlacementPhaseRequest;
 import com.dpendesigns.network.responses.LoginResponse;
+import com.dpendesigns.network.responses.PlacementPhaseResponse;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
 import com.esotericsoftware.kryonet.Connection;
@@ -102,7 +105,7 @@ public class FeudalWarClient extends BasicGame {
 		gc.setShowFPS(false);
 		
 		try {
-			client = new Client(8192,8192);
+			client = new Client(16384,16384);
 			
 			kryo = client.getKryo();
 			kryo.register(User.class);
@@ -116,24 +119,30 @@ public class FeudalWarClient extends BasicGame {
 			kryo.register(LoginRequest.class);
 			kryo.register(JoinGameRequest.class);
 			kryo.register(BeginGameRequest.class);
-			kryo.register(AddArmyRequest.class);
+			kryo.register(PlacementPhaseRequest.class);
+			kryo.register(MovementPhaseRequest.class);
 			
 			// Register the response classes for serialization
 			kryo.register(com.dpendesigns.network.responses.LoginResponse.class);
+			kryo.register(com.dpendesigns.network.responses.PlacementPhaseResponse.class);
 			
 			kryo.register(com.dpendesigns.feudalwar.controllers.handlers.Map.class);
 			kryo.register(java.util.Vector.class);
 			kryo.register(java.util.ArrayList.class);
 			
-			kryo.register(com.dpendesigns.feudalwar.model.ProvinceData[][].class);
-			kryo.register(com.dpendesigns.feudalwar.model.ProvinceData[].class);
-			kryo.register(com.dpendesigns.feudalwar.model.ProvinceData.class);
+			kryo.register(com.dpendesigns.network.data.ProvinceData[][].class);
+			kryo.register(com.dpendesigns.network.data.ProvinceData[].class);
+			kryo.register(com.dpendesigns.network.data.ProvinceData.class);
 			kryo.register(org.newdawn.slick.geom.Polygon.class);
 			kryo.register(java.awt.Point.class);
 			kryo.register(float[].class);
 			kryo.register(String[].class);
 			kryo.register(com.dpendesigns.feudalwar.model.Player.class);
 			kryo.register(int[].class);
+			
+			kryo.register(com.dpendesigns.feudalwar.model.Infantry.class);
+			kryo.register(com.dpendesigns.feudalwar.model.General.class);
+			kryo.register(com.dpendesigns.feudalwar.model.MilitaryUnit.class);
 			
 			client.start();
 			client.connect(5000, "127.0.0.1", 54555, 54777);
@@ -226,20 +235,29 @@ public class FeudalWarClient extends BasicGame {
 					BeginGameRequest begin = preGameHandler.getRequest();
 					
 					if(begin!=null){
-						//waitForResponse = true;
 						waitForUserList = true;
 						waitForGameList = true;
 						waitForGameUpdate = true;
 						client.sendTCP(begin);
 					}
 				} else if (self.getCurrentState() == loadGame){
-					mainGameHandler = new MainGameHandler(my_game);
+					mainGameHandler = new MainGameHandler(my_game, self.getName());
 					waitForUserList = true;
 					waitForGameList = true;
 					client.sendTCP(new ChangeStateRequest(mainGame));
 				} else if (self.getCurrentState() == mainGame){
-					Object o = mainGameHandler.update(gc, my_game);
-					if(o != null) client.sendTCP(o);
+					mainGameHandler.update(gc);
+					boolean turnPhaseFinished = mainGameHandler.getTurnPhaseStatus();
+					if (turnPhaseFinished){
+						if (my_game.getTurnPhase() == 0){ 
+							waitForUserList = true;
+							waitForGameList = true;
+							client.sendTCP(new PlacementPhaseRequest(my_game.getGameName(), self.getName(),mainGameHandler.getInfantryPlacements(),mainGameHandler.getGeneralPlacements()));
+							mainGameHandler.clearPlacementChoices();
+							System.out.println("Request Sent");
+							}
+						else if (my_game.getTurnPhase() == 2){client.sendTCP(new MovementPhaseRequest());}
+					}
 				}
 			}
 		}
@@ -316,11 +334,15 @@ public class FeudalWarClient extends BasicGame {
 			} else if (o instanceof LoginResponse) {
 				LoginResponse response = (LoginResponse)o;
 				loginStatus = response.getLoginResponse();
-				System.out.println(loginStatus);
 				waitForLoginResponse = false;
 			} else if (o instanceof JoinGameRequest){
 				joinGameBounced = true;
 				waitForResponse = false;
+			} else if (o instanceof PlacementPhaseResponse){
+				if (mainGameHandler!=null){
+					mainGameHandler.updateMap(my_game);
+					}
+				System.out.println("Repsonse Received");
 			}
 		}
 	}

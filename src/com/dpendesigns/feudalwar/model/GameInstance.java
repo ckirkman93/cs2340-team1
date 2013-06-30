@@ -20,7 +20,12 @@ public class GameInstance {
 	private User host;
 	private Vector<User> users;
 	private Vector<Player> players;
+	
+	private Vector<String> waitingForPlayers = new Vector<String>();
+	
 	private int host_connection;
+	
+	private int turnPhase = 0;
 	
 	private boolean active=false;
 	private boolean inSession=false;
@@ -87,6 +92,10 @@ public class GameInstance {
 			else {map.configure4(players);}
 		}
 		else {map.configure3(players);}
+		
+		for (Player player: players){
+			waitingForPlayers.add(player.getName());
+		}
 	}
 	//public void update(GameContainer gc) throws SlickException {
 	//	
@@ -130,5 +139,15 @@ public class GameInstance {
 	public Map getMap(){ return map; }
 	
 	public Vector<Player> getPlayers(){ return players; }
-	
+	public int getTurnPhase() {return turnPhase;}
+	public void enterNextPhase(){
+		waitingForPlayers = new Vector<String>();
+		if (turnPhase == 0){turnPhase = 2;}
+		else if (turnPhase == 2){turnPhase =0;}
+		for (Player player: players){
+			waitingForPlayers.add(player.getName());
+		}
+	}
+	public int remainingWait(){return waitingForPlayers.size();}
+	public void removePlayerFromWaiting(String playerName){waitingForPlayers.remove(playerName);}
 }
