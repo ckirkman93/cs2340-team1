@@ -10,6 +10,7 @@ import com.dpendesigns.network.requests.ChangeStateRequest;
 import com.dpendesigns.network.requests.ConnectRequest;
 import com.dpendesigns.network.requests.JoinGameRequest;
 import com.dpendesigns.network.requests.LoginRequest;
+import com.dpendesigns.network.requests.PlacementPhaseRequest;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
@@ -55,7 +56,7 @@ public class ServerListener extends Listener{
 		else if (o instanceof LoginRequest) { requestParser.parseLoginRequest(c, o);}
 		else if (o instanceof JoinGameRequest){ requestParser.parseJoinGameRequest(c, o);}
 		else if (o instanceof BeginGameRequest){ requestParser.parseBeginGameRequest(c, o);}
-		else if (o instanceof AddArmyRequest){ requestParser.parseAddArmyRequest(o);}
+		else if (o instanceof PlacementPhaseRequest){ requestParser.parsePlacementPhaseRequest(c, o);}
 		
 		server.sendToAllTCP(user_list);
 		server.sendToAllTCP(game_list);

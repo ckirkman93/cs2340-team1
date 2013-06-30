@@ -9,102 +9,96 @@ import org.newdawn.slick.geom.Polygon;
 import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.state.StateBasedGame;
 
+import com.dpendesigns.network.data.ProvinceData;
 import com.dpendesigns.network.requests.AddArmyRequest;
 
 public class Province {
 
 	private Shape area;
 
-	public static final int width = 39;
+	public static final int width = 43;
 	public static final int height = 48;
 	public static final int choppedHeight = 36;
 	
-	private int xDefaultPosition;
-	private int yDefaultPosition;
+	private int xDefaultPosition, yDefaultPosition;
+	private int iPosition, jPosition;
+	
+	private int[] thisLocation;
 	
 	private int xDrift;
 	private int yDrift;
 	
-	private int infantry;
-	
-	private int ipos,jpos;
-	private Player owner;
+	private Player lastOwner;
+	private MilitaryUnit occupyingUnit;
 	
 	private Color currentColor;
-
-	private boolean leftClickDownState = false;
+	
+	//private AddArmyRequest addArmyRequest;
 	
 	public Province (ProvinceData data){
-		this.infantry = data.getInfantry();
-		this.owner = data.getOwner();
+		
+		lastOwner = data.getLastOwner();
+		occupyingUnit = data.getOccupyingUnit();
 		
 		xDefaultPosition = data.getXDefault();
 		yDefaultPosition = data.getYDefault();
 		
-		ipos = data.iPos();
-		jpos = data.jPos();	
+		iPosition = data.iPosition();
+		jPosition = data.jPosition();	
+		
+		thisLocation = data.getThisLocation();
 		
 		xDrift = data.getXDrift();
 		yDrift = data.getYDrift();
 		
 		float yMin = 0;
-		float yQuart = 12;
-		float yMost = 36;
-		float yMax = 48;
+		float yQuart = height/4;
+		float yMost = 3*yQuart;
+		float yMax = height;
 
-		float xHalf = 24;
-		float xMin = 5;
-		float xMax = 43;
+		float xHalf = height/2;
+		float xMin = height-width;
+		float xMax = width;
 
 		area = new Polygon(new float[]{xHalf,yMin,xMax,yQuart,xMax,yMost,xHalf,yMax,xMin,yMost,xMin,yQuart});
 		area.setLocation(xDefaultPosition, yDefaultPosition);
-		currentColor = new Color(data.getOwner().getColors()[0]);
-	}
-	
-	public int getI() {
-		return ipos;
-	}
-	
-	public int getJ() {
-		return jpos;
+		currentColor = new Color(data.getLastOwner().getColors()[0]);
 	}
 
 	public void setData(ProvinceData data) {
-		this.infantry = data.getInfantry();
-		this.owner = data.getOwner();		
-		this.ipos = data.getI();
-		this.jpos = data.getJ();
+		lastOwner = data.getLastOwner();
+		occupyingUnit = data.getOccupyingUnit();
 	}
 	
-	public Object update(GameContainer gc) throws SlickException {
+	public int update(GameContainer gc, String observer, boolean leftClickDownState, boolean rightClickDownState) throws SlickException {
+		int clickStatus = 0;
+		
 		area.setLocation(xDefaultPosition + xDrift, yDefaultPosition + yDrift);
-		AddArmyRequest addArmyRequest = null;
+		
 		Input input = gc.getInput();
 		int xpos = input.getMouseX();
 		int ypos = input.getMouseY();
 
-		if (input.isMouseButtonDown(0)) {leftClickDownState = true;}
-
-		if (area.contains(xpos, ypos)){
-			if (input.isMouseButtonDown(0)) {
-				currentColor = new Color(owner.getColors()[2]);
+		if (area.contains(xpos, ypos) && lastOwner.getName().equals(observer)){
+			if (input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
+				currentColor = new Color(lastOwner.getColors()[2]);
 			}
-			else {currentColor = new Color(owner.getColors()[1]);}
+			else {currentColor = new Color(lastOwner.getColors()[1]);}
 
-			if ( !input.isMouseButtonDown(0) && leftClickDownState == true) {
-				addArmyRequest = new AddArmyRequest(null, ipos, jpos);
+			if ( !input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON) && leftClickDownState == true) {
+				currentColor = new Color(lastOwner.getColors()[0]);
+				clickStatus = 1;
+				
 			}
 			
-			if (input.isMouseButtonDown(Input.MOUSE_RIGHT_BUTTON)) {
-				//this.setOwner(playerList[0]);
-				//data.getInfantry()++;
+			if (!input.isMouseButtonDown(Input.MOUSE_RIGHT_BUTTON) && rightClickDownState == true) {
+				currentColor = new Color(lastOwner.getColors()[2]);
+				clickStatus = 2;
 			}
 		}
-		else {currentColor = new Color(owner.getColors()[0]);}
-
-		if (!input.isMouseButtonDown(0)) {leftClickDownState = false;}
+		else {currentColor = new Color(lastOwner.getColors()[0]);}
 		
-		return addArmyRequest;
+		return clickStatus;
 	}
 
 	public void render(GameContainer gc, Graphics g) throws SlickException {
@@ -116,14 +110,17 @@ public class Province {
 		//g.drawString("" + ipos,  xDefaultPosition +xDrift, yDefaultPosition + yDrift + height/2 - 16);
 		//g.drawString("" + jpos,  xDefaultPosition +xDrift, yDefaultPosition + yDrift + height/2 - 2);
 		
-		if(infantry > 9)
-			g.drawString("" + infantry, 
-					xDefaultPosition + xDrift + width/2 - 10, 
+		if (occupyingUnit instanceof Infantry){
+		g.drawString("INF", 
+					xDefaultPosition + xDrift + width/2 - 16, 
 					yDefaultPosition + yDrift + height/2 - 8);
-		else if(infantry > 0)
-			g.drawString("" + infantry, 
-					xDefaultPosition + xDrift + width/2 - 6, 
+		}
+		
+		if (occupyingUnit instanceof General){
+			g.drawString("GEN", 
+					xDefaultPosition + xDrift + width/2 - 16, 
 					yDefaultPosition + yDrift + height/2 - 8);
+		}
 	}
 	
 	public void setDrift(int xAmount, int yAmount){
@@ -131,15 +128,23 @@ public class Province {
 		yDrift = yAmount;
 	}
 	
-	//public void setOwner(Player player){
-	//	neutral = player.getColors()[0];
-	//	highlighted = player.getColors()[1];
-	//	clicked = player.getColors()[2];
-	//}
-	//
-	public void setSeat(int ipos, int jpos){
-		this.ipos=ipos;
-		this.jpos=jpos;
+	public int iPosition(){ return iPosition; }
+	public int jPosition(){ return jPosition; }
+	
+	public int[] getThisLocation(){return thisLocation;}
+	
+	public boolean isOccupied(){
+		if (occupyingUnit!=null){return true;}
+		else {return false;}
 	}
-
+	
+	public void addOccupyingUnit(MilitaryUnit unit){ 
+		occupyingUnit = unit; 
+		if (unit.isActive()){
+			lastOwner = unit.getOwner();
+			if(!lastOwner.getProvinces().contains(thisLocation)){
+				lastOwner.getProvinces().add(thisLocation);
+			}
+		}
+	}
 }
