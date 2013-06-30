@@ -124,9 +124,4 @@
         <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
         <antcall target="build"/>
     </target>
-    <target name="FeudalWar">
-        <java classname="com.dpendesigns.feudalwar.Client" failonerror="true" fork="yes">
-            <classpath refid="FeudalWar.classpath"/>
-        </java>
-    </target>
 </project>

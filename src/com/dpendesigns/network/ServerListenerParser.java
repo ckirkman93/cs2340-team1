@@ -6,16 +6,21 @@ import org.newdawn.slick.SlickException;
 
 import com.dpendesigns.feudalwar.controllers.handlers.BeginGameHandler;
 import com.dpendesigns.feudalwar.model.GameInstance;
-import com.dpendesigns.feudalwar.model.ProvinceData;
+import com.dpendesigns.feudalwar.model.General;
+import com.dpendesigns.feudalwar.model.Infantry;
+import com.dpendesigns.feudalwar.model.Player;
 import com.dpendesigns.feudalwar.model.User;
 import com.dpendesigns.network.data.GameList;
+import com.dpendesigns.network.data.ProvinceData;
 import com.dpendesigns.network.data.UserList;
 import com.dpendesigns.network.requests.AddArmyRequest;
 import com.dpendesigns.network.requests.BeginGameRequest;
 import com.dpendesigns.network.requests.ChangeStateRequest;
 import com.dpendesigns.network.requests.JoinGameRequest;
 import com.dpendesigns.network.requests.LoginRequest;
+import com.dpendesigns.network.requests.PlacementPhaseRequest;
 import com.dpendesigns.network.responses.LoginResponse;
+import com.dpendesigns.network.responses.PlacementPhaseResponse;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Server;
 
@@ -132,10 +137,12 @@ public class ServerListenerParser {
 		final int loginAccepted = 1;
 		final int loginRejected = -1;
 		
+		//System.out.println("The Same: " + newUserName.equals("Enter Name"));
+		
 		int loginStatus = loginAccepted;
 		
 		for(User user: user_list){
-			if (user.getName().equals(newUserName) && user.getConnectionID()!=c.getID()){
+			if ( (user.getName().equals(newUserName) && user.getConnectionID()!=c.getID()) || newUserName.equals("Enter Name") || newUserName.equals("default_player")){
 				loginStatus = loginRejected;
 			}
 		}
@@ -236,16 +243,39 @@ public class ServerListenerParser {
 			}
 		}
 	}
-	
-	protected void parseAddArmyRequest(Object o) {
-		System.out.println("Begin parsing");
-		AddArmyRequest addArmyRequest = (AddArmyRequest) o;
-		for(GameInstance game : games_in_session)
-			if(game.getGameName().equals(addArmyRequest.getGameName())) {
-				game.getMap().getProvinces()[addArmyRequest.i()][addArmyRequest.j()].addInfantry(1);
-				for(User user : game.getUsers())
-					server.sendToTCP(user.getConnectionID(), game);
+	protected void parsePlacementPhaseRequest(Connection c, Object o){
+		PlacementPhaseRequest placementPhaseRequest = (PlacementPhaseRequest)o;
+		System.out.println("Request Received");
+		for (GameInstance game : games_in_session){
+			System.out.println(game.getGameName());
+			System.out.println(placementPhaseRequest.getGameName());
+			System.out.println("");
+			if (game.getGameName().equals(placementPhaseRequest.getGameName())){
+				//System.out.println("Found the game");
+				for (Player player: game.getPlayers()){
+					if (player.getName().equals(placementPhaseRequest.getUserName())){
+						//System.out.println("Found the player");
+						for (int[] position : placementPhaseRequest.getPlacedInfantry()){
+							game.getMap().getProvinces()[position[0]][position[1]].addOccupyingUnit(new Infantry(player));
+						}
+						for (int[] position : placementPhaseRequest.getPlacedGenerals()){
+							game.getMap().getProvinces()[position[0]][position[1]].addOccupyingUnit(new General(player));
+						}
+						game.removePlayerFromWaiting(placementPhaseRequest.getUserName());
+					}
+				}
+				System.out.println(game.remainingWait());
+				if (game.remainingWait() == 0){
+					game.enterNextPhase();
+					game.enterNextPhase();
+					for (User user : game.getUsers()){
+						user.setState(loadGame);
+						server.sendToTCP(user.getConnectionID(), game);
+						server.sendToTCP(user.getConnectionID(), new PlacementPhaseResponse());
+					}
+				}
 			}
+		}
 	}
 	
 	protected void dropUser(User user){
@@ -263,5 +293,4 @@ public class ServerListenerParser {
 		}
 		game_list.remove(droppedGame);
 	}
-	
 }
