@@ -147,7 +147,7 @@ public class MainGameHandler {
 					if (provinceClickedStatus == 1 && availableInfantry > 0 && !province.isOccupied()){
 						placedInfantry.add(province.getThisLocation());
 						availableInfantry--;
-						province.addOccupyingUnit(new Infantry());
+						province.addOccupyingUnit(new Infantry(), true);
 						System.out.println("Left Clicked");
 					}
 					else if (provinceClickedStatus == 2 && availableGenerals > 0  && !province.isOccupied()){
