@@ -256,10 +256,10 @@ public class ServerListenerParser {
 					if (player.getName().equals(placementPhaseRequest.getUserName())){
 						//System.out.println("Found the player");
 						for (int[] position : placementPhaseRequest.getPlacedInfantry()){
-							game.getMap().getProvinces()[position[0]][position[1]].addOccupyingUnit(new Infantry(player));
+							game.getMap().getProvinces()[position[0]][position[1]].addOccupyingUnit(new Infantry(player), true);
 						}
 						for (int[] position : placementPhaseRequest.getPlacedGenerals()){
-							game.getMap().getProvinces()[position[0]][position[1]].addOccupyingUnit(new General(player));
+							game.getMap().getProvinces()[position[0]][position[1]].addOccupyingUnit(new General(player), true);
 						}
 						game.removePlayerFromWaiting(placementPhaseRequest.getUserName());
 					}
