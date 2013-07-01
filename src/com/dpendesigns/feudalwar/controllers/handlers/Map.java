@@ -77,8 +77,8 @@ public class Map {
 	}
 	
 	public void setupPosition1(Player player){
-		provinceDatas[10][9].addOccupyingUnit(new Infantry(player));
-		provinceDatas[11][5].addOccupyingUnit(new Infantry(player));
+		provinceDatas[10][9].addOccupyingUnit(new Infantry(player), true);
+		provinceDatas[11][5].addOccupyingUnit(new Infantry(player), true);
 		provinceDatas[11][6].setLastOwner(player); 
 		provinceDatas[11][8].setLastOwner(player); 
 		provinceDatas[11][9].setLastOwner(player);
@@ -86,43 +86,40 @@ public class Map {
 		provinceDatas[12][5].setLastOwner(player);
 		provinceDatas[12][6].setLastOwner(player);
 		provinceDatas[12][7].setLastOwner(player);
-		provinceDatas[12][8].addOccupyingUnit(new Infantry(player));
+		provinceDatas[12][8].addOccupyingUnit(new Infantry(player), true);
 		provinceDatas[13][6].setLastOwner(player);
 		provinceDatas[13][7].setLastOwner(player);
 		provinceDatas[13][8].setLastOwner(player);
 		provinceDatas[14][6].setLastOwner(player);
 		provinceDatas[14][7].setLastOwner(player);
-		player.addInfantry(3);
 	}
 	public void setupPosition2(Player player){
 		provinceDatas[6][8].setLastOwner(player);
 		provinceDatas[7][8].setLastOwner(player);
-		provinceDatas[7][9].addOccupyingUnit(new Infantry(player));
+		provinceDatas[7][9].addOccupyingUnit(new Infantry(player), true);
 		provinceDatas[8][7].setLastOwner(player);
 		provinceDatas[8][8].setLastOwner(player);
 		provinceDatas[9][7].setLastOwner(player);
-		provinceDatas[9][8].addOccupyingUnit(new Infantry(player));
+		provinceDatas[9][8].addOccupyingUnit(new Infantry(player), true);
 		provinceDatas[10][6].setLastOwner(player);
 		provinceDatas[10][7].setLastOwner(player);
 		provinceDatas[10][8].setLastOwner(player);
-		provinceDatas[11][7].addOccupyingUnit(new Infantry(player));
-		player.addInfantry(3);
+		provinceDatas[11][7].addOccupyingUnit(new Infantry(player), true);
 	}
 	public void setupPosition3(Player player){
 		provinceDatas[5][9].setLastOwner(player);
 		provinceDatas[5][10].setLastOwner(player);
-		provinceDatas[6][9].addOccupyingUnit(new Infantry(player));
+		provinceDatas[6][9].addOccupyingUnit(new Infantry(player), true);
 		provinceDatas[6][10].setLastOwner(player);
 		provinceDatas[7][10].setLastOwner(player);
 		provinceDatas[7][11].setLastOwner(player);
-		provinceDatas[8][9].addOccupyingUnit(new Infantry(player));
+		provinceDatas[8][9].addOccupyingUnit(new Infantry(player), true);
 		provinceDatas[8][10].setLastOwner(player);
 		provinceDatas[8][11].setLastOwner(player);
 		provinceDatas[9][9].setLastOwner(player);
 		provinceDatas[9][10].setLastOwner(player);
 		provinceDatas[9][11].setLastOwner(player);
-		provinceDatas[9][10].addOccupyingUnit(new Infantry(player));
-		player.addInfantry(3);
+		provinceDatas[9][10].addOccupyingUnit(new Infantry(player), true);
 	}
 	public void setupPosition4(Player player){
 		provinceDatas[0][8].setLastOwner(player);
@@ -131,20 +128,19 @@ public class Map {
 		provinceDatas[1][10].setLastOwner(player); 
 		provinceDatas[2][7].setLastOwner(player);
 		provinceDatas[2][9].setLastOwner(player);
-		provinceDatas[3][8].addOccupyingUnit(new Infantry(player));
+		provinceDatas[3][8].addOccupyingUnit(new Infantry(player), true);
 		provinceDatas[3][9].setLastOwner(player);
 		provinceDatas[3][10].setLastOwner(player);
-		provinceDatas[4][8].addOccupyingUnit(new Infantry(player));
-		provinceDatas[4][9].addOccupyingUnit(new Infantry(player));
-		player.addInfantry(3);
+		provinceDatas[4][8].addOccupyingUnit(new Infantry(player), true);
+		provinceDatas[4][9].addOccupyingUnit(new Infantry(player), true);
 	}
 	public void setupPosition5(Player player){
 		provinceDatas[3][1].setLastOwner(player);
-		provinceDatas[3][1].addOccupyingUnit(new Infantry(player));
+		provinceDatas[3][1].addOccupyingUnit(new Infantry(player), true);
 		provinceDatas[4][0].setLastOwner(player);
-		provinceDatas[4][1].addOccupyingUnit(new Infantry(player));
+		provinceDatas[4][1].addOccupyingUnit(new Infantry(player), true);
 		provinceDatas[4][2].setLastOwner(player);
-		provinceDatas[4][3].addOccupyingUnit(new Infantry(player));
+		provinceDatas[4][3].addOccupyingUnit(new Infantry(player), true);
 		provinceDatas[5][0].setLastOwner(player);
 		provinceDatas[5][1].setLastOwner(player);
 		provinceDatas[5][2].setLastOwner(player);
@@ -152,7 +148,6 @@ public class Map {
 		provinceDatas[5][4].setLastOwner(player);
 		provinceDatas[6][2].setLastOwner(player);
 		provinceDatas[6][3].setLastOwner(player);
-		player.addInfantry(3);
 	}
 	public void setupPosition6(Player player){
 		provinceDatas[0][0].setLastOwner(player);
@@ -161,13 +156,12 @@ public class Map {
 		provinceDatas[1][1].setLastOwner(player);
 		provinceDatas[1][2].setLastOwner(player);
 		provinceDatas[1][3].setLastOwner(player);
-		provinceDatas[2][1].addOccupyingUnit(new Infantry(player));
+		provinceDatas[2][1].addOccupyingUnit(new Infantry(player), true);
 		provinceDatas[2][2].setLastOwner(player);
-		provinceDatas[2][3].addOccupyingUnit(new Infantry(player));
+		provinceDatas[2][3].addOccupyingUnit(new Infantry(player), true);
 		provinceDatas[2][4].setLastOwner(player); 
 		provinceDatas[3][3].setLastOwner(player);
-		provinceDatas[3][4].addOccupyingUnit(new Infantry(player));
-		player.addInfantry(3);
+		provinceDatas[3][4].addOccupyingUnit(new Infantry(player), true);
 	}
 	
 	public ProvinceData[][] getProvinces(){ return provinceDatas; }
