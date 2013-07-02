@@ -37,7 +37,7 @@
 	<target name="deploy" depends="war">  
 	<echo>Deploying .war to ${tomcat.dir}</echo>
 	<echo>From: ${dist.dir}</echo>
-	<copy todir="${tomcat.dir}">  
+	<copy todir="${tomcat.dir}"/>
 	<fileset dir="${dist.dir}"/>  
 	</copy>  
 	</target> 
