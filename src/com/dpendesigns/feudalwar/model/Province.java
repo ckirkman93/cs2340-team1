@@ -138,13 +138,17 @@ public class Province {
 		else {return false;}
 	}
 	
-	public void addOccupyingUnit(MilitaryUnit unit){ 
+	public void addOccupyingUnit(MilitaryUnit unit, boolean created){ 
 		occupyingUnit = unit; 
 		if (unit.isActive()){
 			lastOwner = unit.getOwner();
 			if(!lastOwner.getProvinces().contains(thisLocation)){
 				lastOwner.getProvinces().add(thisLocation);
 			}
+		}
+		if (created){
+			if (unit instanceof Infantry){lastOwner.addInfantry(1);}
+			else if (unit instanceof General){lastOwner.addGeneral(1);}
 		}
 	}
 }
