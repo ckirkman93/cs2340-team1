@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<project basedir="." default="deploy" name="RisingSun">
-    <property environment="env"/>
-	<property name="tomcat.dir" value="${env.CATALINA_HOME}webapps"/>
-	<property name="project.name" value="RisingSun"/>
+<project basedir="." default="deploy" name="FeudalWar">
+    	
+	<property environment="env"/>
+	<property name="tomcat.dir" value="${env.CATALINA_HOME}/webapps"/>
+	<property name="project.name" value="FeudalWar"/>
 	<property name="lib.dir" value="lib"/>
 	<property name="res.dir" value="res"/>
-	<property name="src.dir" value="src"/>
+	<property name="src.dir" value="src/RMI"/>
 	<property name="web.dir" value="web"/>
 	<property name="bin.dir" value="bin"/>
 	<property name="build.dir" value="build"/>
@@ -15,14 +16,15 @@
     <property name="debuglevel" value="source,lines,vars"/>
     <property name="target" value="1.7"/>
     <property name="source" value="1.7"/>
-    <path id="RisingSun.classpath">
-        <pathelement location="bin"/>
+    <path id="FeudalWar.classpath">
+        <pathelement location="${bin.dir}"/>
         <pathelement location="lib/jars/lwjgl.jar"/>
         <pathelement location="lib/jars/slick.jar"/>
+    	<pathelement location="lib/jars/kryonet-2.18-all.jar"/>
     </path>
     <target name="init">
-        <mkdir dir="bin"/>
-        <copy includeemptydirs="false" todir="bin">
+        <mkdir dir="${bin.dir}"/>
+        <copy includeemptydirs="false" todir="${bin.dir}">
             <fileset dir="src">
                 <exclude name="**/*.launch"/>
                 <exclude name="**/*.java"/>
@@ -30,17 +32,27 @@
         </copy>
     </target>
     <target name="clean">
-        <delete dir="bin"/>
+        <delete dir="${bin.dir}"/>
+    	<delete dir="${build.dir}"/>
+        <delete dir="${dist.dir}"/>
     </target>
     <target depends="clean" name="cleanall"/>
     
-	<target name="deploy" depends="war">  
-	<echo>Deploying .war to ${tomcat.dir}</echo>
+	<target name="deploy" depends="deploy_to_server, clean, activate"/>
+	
+	<target name="activate">
+		<java jar="${tomcat.dir}/${project.name}/Game.jar" fork="true"/>
+	</target>
+	
+	<target name="deploy_to_server" depends="scrub_server, war">  
+	<echo>Unzipping .war to ${tomcat.dir}</echo>
 	<echo>From: ${dist.dir}</echo>
-	<copy todir="${tomcat.dir}">  
-	<fileset dir="${dist.dir}"/>  
-	</copy>  
+	<unwar src="${dist.dir}/${project.name}.war" dest="${tomcat.dir}/${project.name}"/>  
 	</target> 
+	
+	 <target name="scrub_server">
+	 	<delete dir="${tomcat.dir}/${project.name}"/>
+	 </target>
 	
 	<target name="war" depends="sign">  
 		<echo>Building ${dist.dir}/${project.name}.war</echo>  
@@ -59,29 +71,35 @@
 	</signjar>
 	</target>
 
-	<target name="jar" depends="copy">
+	<target name="jar" depends="distribute,copy">
 		<jar destfile="${build.dir}/Game.jar" basedir="${bin.dir}">
-		<manifest>
-		<attribute name="RisingSun" value="com.risingsun.game.RisingSun"/>
-		</manifest>
+			<manifest>
+				<attribute name="Main-Class" value="com.dpendesigns.feudalwar.FeudalWarServer"/>
+			</manifest>
 		</jar>
 	</target>
 	
 	<target name="copy" depends="build-subprojects,build-project">
 		<copy todir="${build.dir}/WEB-INF">  
-		<fileset dir="${web.dir}/WEB-INF"/>  
+			<fileset dir="${web.dir}/WEB-INF"/>  
 		</copy>
 		<copy todir="${build.dir}">  
-		<fileset dir="${web.dir}"/>  
+			<fileset dir="${web.dir}"/>  
 		</copy>
 		<copy todir="${bin.dir}/res/">  
-		<fileset dir="${res.dir}"/>  
+			<fileset dir="${res.dir}"/>  
 		</copy>
 		<copy todir="${build.dir}">  
-		<fileset dir="${lib.dir}/jars">  
-		<exclude name="servlet-api.jar"/>  
+			<fileset dir="${lib.dir}/jars/externals">  
+			<exclude name="servlet-api.jar"/>  
 		</fileset>  
 		</copy>
+	</target>
+	
+	<target name="distribute">
+		<unjar src="lib/jars/lwjgl.jar" dest="bin/" />
+		<unjar src="lib/jars/slick.jar" dest="bin/" />
+		<unjar src="lib/jars/kryonet-2.18-all.jar" dest="bin/" />
 	</target>
     
 	<target name="build-subprojects"/>
@@ -89,7 +107,7 @@
         <echo message="${ant.project.name}: ${ant.file}"/>
         <javac debug="true" debuglevel="${debuglevel}" destdir="bin" includeantruntime="false" source="${source}" target="${target}">
             <src path="src"/>
-            <classpath refid="RisingSun.classpath"/>
+            <classpath refid="FeudalWar.classpath"/>
         </javac>
     </target>
     <target description="Build all projects which reference this project. Useful to propagate changes." name="build-refprojects"/>
@@ -105,10 +123,5 @@
     <target description="compile project with Eclipse compiler" name="build-eclipse-compiler">
         <property name="build.compiler" value="org.eclipse.jdt.core.JDTCompilerAdapter"/>
         <antcall target="build"/>
-    </target>
-    <target name="RisingSun">
-        <java classname="com.risingsun.game.RisingSun" failonerror="true" fork="yes">
-            <classpath refid="RisingSun.classpath"/>
-        </java>
     </target>
 </project>
