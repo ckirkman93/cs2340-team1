@@ -12,6 +12,7 @@ import org.newdawn.slick.geom.Polygon;
 import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.state.StateBasedGame;
 
+import com.dpendesigns.feudalwar.controllers.handlers.ActionMenu;
 import com.dpendesigns.network.data.ProvinceData;
 import com.dpendesigns.network.requests.AddArmyRequest;
 
@@ -136,7 +137,12 @@ public class Province {
 	public int iPosition(){ return iPosition; }
 	public int jPosition(){ return jPosition; }
 	
+	public int xDefaultPosition() { return xDefaultPosition; }
+	public int yDefaultPosition() { return yDefaultPosition; }		
+	
 	public int[] getThisLocation(){return thisLocation;}
+	
+	public Player getLastOwner() { return lastOwner; }
 	
 	public boolean isOccupied(){
 		if (occupyingUnit!=null){return true;}

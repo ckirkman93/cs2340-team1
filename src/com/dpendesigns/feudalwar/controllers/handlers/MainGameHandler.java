@@ -29,6 +29,8 @@ public class MainGameHandler {
 	
 	private Province[][] my_map;
 	
+	private ActionMenu actionMenu;
+	
 	private int myTurnPhase;
 	
 	private int availableInfantry = 0;
@@ -45,6 +47,7 @@ public class MainGameHandler {
 	private TrueTypeFont h1, h2, p1;
 	private boolean leftClickDownState = false;
 	private boolean rightClickDownState = false;
+	private boolean actionMenuDisplayed = false;
 	private boolean turnPhaseFinished = false;
 	
 	private Image mainGameBackground, mainGameBorder, selfSummaryBackground, gameSummaryBackground;
@@ -58,6 +61,9 @@ public class MainGameHandler {
 	
 	private int mouseX;
 	private int mouseY;
+	
+	private int actionMenuX;
+	private int actionMenuY;
 	
 	//private AddArmyRequest addArmyRequest;
 	
@@ -155,6 +161,12 @@ public class MainGameHandler {
 						availableGenerals--;
 						System.out.println("Right Clicked");
 					}
+					if (provinceClickedStatus == 2) {
+						actionMenuX = province.xDefaultPosition();
+						actionMenuY = province.yDefaultPosition();
+						actionMenu = new ActionMenu(actionMenuX, actionMenuY, province.getLastOwner().getColors()[0]);
+						actionMenuDisplayed = true;
+					}
 					
 				}
 			}
@@ -229,6 +241,9 @@ public class MainGameHandler {
 		
 		endTurn.draw(4, gc.getHeight()-68);
 		mainGameBorder.draw(0,0);
+		if (actionMenuDisplayed) { 
+			actionMenu.render(gc, g, actionMenuX+xDrift, actionMenuY+yDrift);
+		}
 	}
 	
 	public void calculateDrift(GameContainer gc){
