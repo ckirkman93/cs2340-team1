@@ -1,5 +1,8 @@
 package com.dpendesigns.network.data;
 
+import java.awt.Point;
+import java.util.Vector;
+
 import com.dpendesigns.feudalwar.model.General;
 import com.dpendesigns.feudalwar.model.Infantry;
 import com.dpendesigns.feudalwar.model.MilitaryUnit;
@@ -17,6 +20,7 @@ public class ProvinceData {
 	
 	private int xDrift;
 	private int yDrift;
+	private Vector<Point> adjacents;
 
 	private Player lastOwner = new Player();
 	
@@ -35,6 +39,14 @@ public class ProvinceData {
 		
 		xDrift = 0;
 		yDrift = 0;
+	}
+	
+	public void addAdjacent(Point adjacent) {
+		adjacents.add(adjacent);
+	}
+	
+	public Vector<Point> getAdjacents() {
+		return adjacents;
 	}
 	
 	public void setDrift(int xAmount, int yAmount){

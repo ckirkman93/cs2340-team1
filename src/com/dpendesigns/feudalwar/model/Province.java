@@ -1,5 +1,8 @@
 package com.dpendesigns.feudalwar.model;
 
+import java.awt.Point;
+import java.util.Vector;
+
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
@@ -28,6 +31,8 @@ public class Province {
 	private int xDrift;
 	private int yDrift;
 	
+	private Vector<Point> adjacents;
+	
 	private Player lastOwner;
 	private MilitaryUnit occupyingUnit;
 	
@@ -36,7 +41,7 @@ public class Province {
 	//private AddArmyRequest addArmyRequest;
 	
 	public Province (ProvinceData data){
-		
+		adjacents = data.getAdjacents();		
 		lastOwner = data.getLastOwner();
 		occupyingUnit = data.getOccupyingUnit();
 		
@@ -136,6 +141,10 @@ public class Province {
 	public boolean isOccupied(){
 		if (occupyingUnit!=null){return true;}
 		else {return false;}
+	}
+	
+	public boolean isAdjacent(Point selectedProvince) {
+		return adjacents.contains(selectedProvince);
 	}
 	
 	public void addOccupyingUnit(MilitaryUnit unit, boolean created){ 
