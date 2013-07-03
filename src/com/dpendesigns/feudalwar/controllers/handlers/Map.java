@@ -28,16 +28,67 @@ public class Map {
 	
 	public void init (){
 		fillBlackList();		
-		for(int i = 0; i < provinceDatas.length; i++){
+		for(int i = 0; i < provinceDatas.length; i++) {
 			for(int j = 0; j < provinceDatas[i].length; j++) {
 				if(!blacklist.contains(new Point(i, j))) {
-					if(i % 2 == 0){
+					if(i % 2 == 0) {
 						provinceDatas[i][j] = new ProvinceData(200 + j * ProvinceData.width, 
 								25 + i * ProvinceData.choppedHeight, i ,j);
+						
 					} else {provinceDatas[i][j] = new ProvinceData(200 - ProvinceData.width / 2 
 							+ j * ProvinceData.width, 
 							25 + i * ProvinceData.choppedHeight, i, j);
 					}
+				}
+			}
+		}
+		//setting adjacent provinces
+		for(int i = 0; i < provinceDatas.length; i++) {
+			for(int j = 0; j < provinceDatas[i].length; j++) {
+				try {
+					if(i % 2 == 0) {
+						provinceDatas[i][j].addAdjacent(new Point(
+								provinceDatas[i - 1][j - 1].iPosition(),
+								provinceDatas[i - 1][j - 1].jPosition()));
+						provinceDatas[i][j].addAdjacent(new Point(
+								provinceDatas[i - 1][j].iPosition(),
+								provinceDatas[i - 1][j].jPosition()));
+						provinceDatas[i][j].addAdjacent(new Point(
+								provinceDatas[i][j - 1].iPosition(),
+								provinceDatas[i][j - 1].jPosition()));
+						provinceDatas[i][j].addAdjacent(new Point(
+								provinceDatas[i][j + 1].iPosition(),
+								provinceDatas[i][j + 1].jPosition()));
+						provinceDatas[i][j].addAdjacent(new Point(
+								provinceDatas[i + 1][j - 1].iPosition(),
+								provinceDatas[i + 1][j - 1].jPosition()));
+						provinceDatas[i][j].addAdjacent(new Point(
+								provinceDatas[i + 1][j].iPosition(),
+								provinceDatas[i + 1][j].jPosition()));
+					} else {
+						provinceDatas[i][j].addAdjacent(new Point(
+								provinceDatas[i - 1][j + 1].iPosition(),
+								provinceDatas[i - 1][j + 1].jPosition()));
+						provinceDatas[i][j].addAdjacent(new Point(
+								provinceDatas[i - 1][j].iPosition(),
+								provinceDatas[i - 1][j].iPosition()));
+						provinceDatas[i][j].addAdjacent(new Point(
+								provinceDatas[i][j - 1].iPosition(),
+								provinceDatas[i][j - 1].jPosition()));
+						provinceDatas[i][j].addAdjacent(new Point(
+								provinceDatas[i][j + 1].iPosition(),
+								provinceDatas[i][j + 1].jPosition()));
+						provinceDatas[i][j].addAdjacent(new Point(
+								provinceDatas[i + 1][j + 1].iPosition(),
+								provinceDatas[i + 1][j + 1].jPosition()));
+						provinceDatas[i][j].addAdjacent(new Point(
+								provinceDatas[i + 1][j].iPosition(),
+								provinceDatas[i + 1][j].jPosition()));
+					}
+				} catch (NullPointerException npe) {
+					//empty space
+				} catch (IndexOutOfBoundsException ioobe) {
+					//province on edge
 				}
 			}
 		}
