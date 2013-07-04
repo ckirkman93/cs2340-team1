@@ -21,7 +21,7 @@ public class ActionMenu {
 	private Color color;
 	
 	private Shape holdLocation;	
-	private final String hold = "Hold";
+	private final String hold = " Hold";
 	
 	private int currentStatus;
 	private final int doNothingStatus = 0;
@@ -59,7 +59,7 @@ public class ActionMenu {
 	
 	public void render(GameContainer gc, Graphics g, int x, int y) {
 		((Rectangle) holdLocation).setBounds(x, y, 100, 18);
-		g.setColor(Color.darkGray);
+		g.setColor(Color.lightGray);
 		g.fill(holdLocation);
 		g.setColor(color);
 		g.draw(holdLocation);

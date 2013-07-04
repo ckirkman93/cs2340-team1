@@ -162,8 +162,8 @@ public class MainGameHandler {
 						System.out.println("Right Clicked");
 					}
 					if (provinceClickedStatus == 2) {
-						actionMenuX = province.xDefaultPosition();
-						actionMenuY = province.yDefaultPosition();
+						actionMenuX = province.xDefaultPosition() + 39;
+						actionMenuY = province.yDefaultPosition() + 36;
 						actionMenu = new ActionMenu(actionMenuX, actionMenuY, province.getLastOwner().getColors()[0]);
 						actionMenuDisplayed = true;
 					}
