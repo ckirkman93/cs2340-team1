@@ -20,24 +20,31 @@ public class ActionMenu {
 	
 	private Color color;
 	
-	private Shape holdLocation;	
+	private Shape holdLocation;
+	private Shape supportLocation;
+	private Shape moveLocation;
+	
 	private final String hold = " Hold";
+	private final String support = " Support";
+	private final String move = " Move";
 	
 	private int currentStatus;
-	private final int doNothingStatus = 0;
-	private final int holdStatus = 1;
-	private final int supportStatus = 2;
-	private final int moveStatus = 3;
+	public static final int DO_NOTHING_STATUS = 0;
+	public static final int HOLD_STATUS = 1;
+	public static final int SUPPORT_STATUS = 2;
+	public static final int MOVE_STATUS = 3;
 	
 	public ActionMenu(int x, int y, int color) {
 		xPos = x;
 		yPos = y;
 		this.color = new Color(color);
-		holdLocation = new Rectangle(xPos, yPos, 100, 20);		
+		moveLocation = new Rectangle(xPos, yPos, 100, 18);
+		supportLocation = new Rectangle(xPos, yPos+18, 100, 18);
+		holdLocation = new Rectangle(xPos, yPos+36, 100, 18);		
 	}
 	
 	public int update(GameContainer gc) throws SlickException {
-		currentStatus = doNothingStatus;
+		currentStatus = DO_NOTHING_STATUS;
 		
 		Input input = gc.getInput();
 		int xpos = input.getMouseX();
@@ -49,17 +56,43 @@ public class ActionMenu {
 			leftClickDownState = false;
 		}
 		
+		if (moveLocation.contains(xpos, ypos)) {
+			if (!input.isMouseButtonDown(0) && leftClickDownState) {
+				currentStatus = MOVE_STATUS;
+			}
+		}
+		
+		if (supportLocation.contains(xpos, ypos)) {
+			if (!input.isMouseButtonDown(0) && leftClickDownState) {
+				currentStatus = SUPPORT_STATUS;
+			}
+		}
+		
 		if (holdLocation.contains(xpos, ypos)) {
 			if (!input.isMouseButtonDown(0) && leftClickDownState) {
-				currentStatus = holdStatus;
+				currentStatus = HOLD_STATUS;
 			}
 		}
 		return currentStatus;
 	}
 	
-	public void render(GameContainer gc, Graphics g, int x, int y) {
-		((Rectangle) holdLocation).setBounds(x, y, 100, 18);
-		g.setColor(Color.lightGray);
+	public void render(GameContainer gc, Graphics g, int x, int y) {		
+		((Rectangle) moveLocation).setBounds(x, y, 100, 18);
+		g.setColor(Color.darkGray);
+		g.fill(moveLocation);
+		g.setColor(color);
+		g.draw(moveLocation);
+		g.drawString(move, moveLocation.getX(), moveLocation.getY());
+		
+		((Rectangle) supportLocation).setBounds(x, y+18, 100, 18);
+		g.setColor(Color.darkGray);
+		g.fill(supportLocation);
+		g.setColor(color);
+		g.draw(supportLocation);
+		g.drawString(support, supportLocation.getX(), supportLocation.getY());
+		
+		((Rectangle) holdLocation).setBounds(x, y+36, 100, 18);
+		g.setColor(Color.darkGray);
 		g.fill(holdLocation);
 		g.setColor(color);
 		g.draw(holdLocation);
