@@ -1,5 +1,6 @@
 package com.dpendesigns.feudalwar;
 
+import java.awt.Point;
 import java.io.IOException;
 import java.util.Vector;
 
@@ -15,14 +16,12 @@ import com.dpendesigns.feudalwar.model.GameInstance;
 import com.dpendesigns.feudalwar.model.User;
 import com.dpendesigns.network.data.GameList;
 import com.dpendesigns.network.data.UserList;
-import com.dpendesigns.network.requests.AddArmyRequest;
-import com.dpendesigns.network.requests.CombatPhaseRequest;
+import com.dpendesigns.network.requests.MovementPhaseRequest;
 import com.dpendesigns.network.requests.BeginGameRequest;
 import com.dpendesigns.network.requests.ChangeStateRequest;
 import com.dpendesigns.network.requests.ConnectRequest;
 import com.dpendesigns.network.requests.JoinGameRequest;
 import com.dpendesigns.network.requests.LoginRequest;
-import com.dpendesigns.network.requests.MovementPhaseRequest;
 import com.dpendesigns.network.requests.PlacementPhaseRequest;
 import com.dpendesigns.network.responses.LoginResponse;
 import com.dpendesigns.network.responses.PlacementPhaseResponse;
@@ -122,7 +121,6 @@ public class FeudalWarClient extends BasicGame {
 			kryo.register(BeginGameRequest.class);
 			kryo.register(PlacementPhaseRequest.class);
 			kryo.register(MovementPhaseRequest.class);
-			kryo.register(CombatPhaseRequest.class);
 			
 			// Register the response classes for serialization
 			kryo.register(com.dpendesigns.network.responses.LoginResponse.class);
@@ -258,7 +256,15 @@ public class FeudalWarClient extends BasicGame {
 							mainGameHandler.clearPlacementChoices();
 							System.out.println("Request Sent");
 							}
-						else if (my_game.getTurnPhase() == 2){client.sendTCP(new MovementPhaseRequest());}
+						else if (my_game.getTurnPhase() == 2) {
+							Vector<Vector<Point>> locations = new Vector<Vector<Point>>();
+							locations.add(mainGameHandler.getAttackerDepartingLocations());
+							locations.add(mainGameHandler.getAttackerDestinations());
+							locations.add(mainGameHandler.getSupporterBaseLocations());
+							locations.add(mainGameHandler.getSupporterSupportLocations());
+							client.sendTCP(new MovementPhaseRequest());
+							mainGameHandler.clearMovementPhaseInfo();
+						}
 					}
 				}
 			}

@@ -20,8 +20,6 @@ import com.dpendesigns.feudalwar.model.Infantry;
 import com.dpendesigns.feudalwar.model.Player;
 import com.dpendesigns.feudalwar.model.Province;
 import com.dpendesigns.network.data.ProvinceData;
-import com.dpendesigns.network.requests.AddArmyRequest;
-import com.dpendesigns.network.requests.CombatPhaseRequest;
 
 public class MainGameHandler {
 	private GameInstance my_game;
@@ -33,6 +31,7 @@ public class MainGameHandler {
 	
 	private ActionMenu actionMenu;
 	private int actionMenuStatus = 0;
+	private Point selectedProvince;
 	
 	private int myTurnPhase;
 	
@@ -41,10 +40,11 @@ public class MainGameHandler {
 	
 	private Vector<int[]> placedInfantry = new Vector<int[]>(); 
 	private Vector<int[]> placedGenerals = new Vector<int[]>();
+	
 	private Vector<Point> attackerDepartingLocations = new Vector<Point>();
 	private Vector<Point> attackerDestinations = new Vector<Point>();
 	private Vector<Point> supporterBaseLocations = new Vector<Point>();
-	private Vector<Point> supporterDefenseLocations = new Vector<Point>();
+	private Vector<Point> supporterSupportLocations = new Vector<Point>();
 	
 	private static final int driftZone = 20;
 	private static final int driftSpeed = 2;
@@ -163,14 +163,29 @@ public class MainGameHandler {
 						province.addOccupyingUnit(new Infantry(), true);
 						System.out.println("Left Clicked");
 					}
+					else if (provinceClickedStatus == 1 && selectedProvince != null && my_game.getTurnPhase() == 2) {
+						Point targetPosition = new Point(province.iPosition(), province.jPosition());
+						if(this.actionMenuStatus == ActionMenu.MOVE_STATUS) {
+							if(province.isAdjacent(targetPosition)) {
+								this.attackerDepartingLocations.add(selectedProvince);
+								this.attackerDestinations.add(targetPosition);
+							}
+						} else if(this.actionMenuStatus == ActionMenu.SUPPORT_STATUS) {
+							if(province.isAdjacent(targetPosition)) {
+								this.supporterBaseLocations.add(selectedProvince);
+								this.supporterSupportLocations.add(targetPosition);
+							}
+						}
+					}
 					else if (provinceClickedStatus == 2 && availableGenerals > 0  && !province.isOccupied()){
 						placedGenerals.add(province.getThisLocation());
 						availableGenerals--;
 						System.out.println("Right Clicked");
 					}
-					if (provinceClickedStatus == 2) {
+					if (provinceClickedStatus == 2 && my_game.getTurnPhase() == 2) {
 						actionMenuX = province.xDefaultPosition() + 39;
 						actionMenuY = province.yDefaultPosition() + 36;
+						selectedProvince = new Point(province.iPosition(), province.jPosition());
 						actionMenu = new ActionMenu(actionMenuX, actionMenuY, province.getLastOwner().getColors()[0]);
 						actionMenuDisplayed = true;
 					}
@@ -282,6 +297,33 @@ public class MainGameHandler {
 	public Vector<int[]> getGeneralPlacements() {
 		return placedGenerals;
 	}
+	
+	public Vector<Point> getAttackerDepartingLocations() {
+		return attackerDepartingLocations;
+	}
+
+	public Vector<Point> getAttackerDestinations() {
+		return attackerDestinations;
+	}
+
+	public Vector<Point> getSupporterBaseLocations() {
+		return supporterBaseLocations;
+	}
+
+	public Vector<Point> getSupporterSupportLocations() {
+		return supporterSupportLocations;
+	}
+	
+	public void clearMovementPhaseInfo() {
+		this.attackerDepartingLocations.clear();
+		this.attackerDestinations.clear();
+		this.supporterBaseLocations.clear();
+		this.supporterSupportLocations.clear();
+		this.selectedProvince = null;
+		this.actionMenuStatus = 0;
+	}
+	
+	
 
 	public void clearPlacementChoices() {
 		placedInfantry = new Vector<int[]>(); 
