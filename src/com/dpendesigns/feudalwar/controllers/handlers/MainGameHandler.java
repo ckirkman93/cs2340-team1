@@ -32,6 +32,7 @@ public class MainGameHandler {
 	private Province[][] my_map;
 	
 	private ActionMenu actionMenu;
+	private int actionMenuStatus = 0;
 	
 	private int myTurnPhase;
 	
@@ -184,12 +185,16 @@ public class MainGameHandler {
 			}
 			else {endTurn = endTurnSpriteSheet.getSubImage(1, 0);}
 			
-			if ( !input.isMouseButtonDown(0) && leftClickDownState == true) {
+			if (!input.isMouseButtonDown(0) && leftClickDownState == true) {
 				turnPhaseFinished = true;
 				setTurnPhase(1);
 			}
 		}
 		else {endTurn = endTurnSpriteSheet.getSubImage(0, 0);}
+		
+		if (actionMenuDisplayed) {
+			actionMenuStatus = actionMenu.update(gc);
+		}
 		
 		if (!input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {leftClickDownState = false;}
 		else {leftClickDownState = true;}
