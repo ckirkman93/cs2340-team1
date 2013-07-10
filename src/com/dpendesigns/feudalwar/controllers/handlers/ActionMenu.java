@@ -1,7 +1,5 @@
 package com.dpendesigns.feudalwar.controllers.handlers;
 
-import java.awt.Point;
-
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
@@ -50,12 +48,6 @@ public class ActionMenu {
 		int xpos = input.getMouseX();
 		int ypos = input.getMouseY();
 		
-		if (input.isMouseButtonDown(0)) {
-			leftClickDownState = true;
-		} else {
-			leftClickDownState = false;
-		}
-		
 		if (moveLocation.contains(xpos, ypos)) {
 			if (!input.isMouseButtonDown(0) && leftClickDownState) {
 				currentStatus = MOVE_STATUS;
@@ -73,6 +65,13 @@ public class ActionMenu {
 				currentStatus = HOLD_STATUS;
 			}
 		}
+		
+		if (input.isMouseButtonDown(0)) {
+			leftClickDownState = true;
+		} else {
+			leftClickDownState = false;
+		}
+		
 		return currentStatus;
 	}
 	

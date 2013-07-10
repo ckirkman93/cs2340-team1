@@ -196,6 +196,10 @@ public class MainGameHandler {
 			actionMenuStatus = actionMenu.update(gc);
 		}
 		
+		if (actionMenuStatus == ActionMenu.HOLD_STATUS) {
+			actionMenuDisplayed = false;
+		}
+		
 		if (!input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {leftClickDownState = false;}
 		else {leftClickDownState = true;}
 		
@@ -252,7 +256,7 @@ public class MainGameHandler {
 		
 		endTurn.draw(4, gc.getHeight()-68);
 		mainGameBorder.draw(0,0);
-		if (actionMenuDisplayed) { 
+		if (actionMenuDisplayed) {
 			actionMenu.render(gc, g, actionMenuX+xDrift, actionMenuY+yDrift);
 		}
 	}
