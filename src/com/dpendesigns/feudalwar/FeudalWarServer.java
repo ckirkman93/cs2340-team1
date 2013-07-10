@@ -19,6 +19,7 @@ import com.dpendesigns.network.ServerListener;
 import com.dpendesigns.network.data.GameList;
 import com.dpendesigns.network.data.UserList;
 import com.dpendesigns.network.requests.AddArmyRequest;
+import com.dpendesigns.network.requests.CombatPhaseRequest;
 import com.dpendesigns.network.requests.BeginGameRequest;
 import com.dpendesigns.network.requests.ChangeStateRequest;
 import com.dpendesigns.network.requests.ConnectRequest;
@@ -94,7 +95,8 @@ public class FeudalWarServer {
 			kryo.register(BeginGameRequest.class);
 			kryo.register(PlacementPhaseRequest.class);
 			kryo.register(MovementPhaseRequest.class);
-			
+			kryo.register(CombatPhaseRequest.class);
+
 			// Register the response classes for serialization
 			kryo.register(com.dpendesigns.network.responses.LoginResponse.class);
 			kryo.register(com.dpendesigns.network.responses.PlacementPhaseResponse.class);

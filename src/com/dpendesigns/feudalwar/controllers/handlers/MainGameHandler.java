@@ -1,6 +1,7 @@
 package com.dpendesigns.feudalwar.controllers.handlers;
 
 import java.awt.Font;
+import java.awt.Point;
 import java.util.Vector;
 
 import org.newdawn.slick.Color;
@@ -20,6 +21,7 @@ import com.dpendesigns.feudalwar.model.Player;
 import com.dpendesigns.feudalwar.model.Province;
 import com.dpendesigns.network.data.ProvinceData;
 import com.dpendesigns.network.requests.AddArmyRequest;
+import com.dpendesigns.network.requests.CombatPhaseRequest;
 
 public class MainGameHandler {
 	private GameInstance my_game;
@@ -38,6 +40,10 @@ public class MainGameHandler {
 	
 	private Vector<int[]> placedInfantry = new Vector<int[]>(); 
 	private Vector<int[]> placedGenerals = new Vector<int[]>();
+	private Vector<Point> attackerDepartingLocations = new Vector<Point>();
+	private Vector<Point> attackerDestinations = new Vector<Point>();
+	private Vector<Point> supporterBaseLocations = new Vector<Point>();
+	private Vector<Point> supporterDefenseLocations = new Vector<Point>();
 	
 	private static final int driftZone = 20;
 	private static final int driftSpeed = 2;
