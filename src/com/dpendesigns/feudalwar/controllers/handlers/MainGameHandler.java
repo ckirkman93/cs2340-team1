@@ -164,7 +164,7 @@ public class MainGameHandler {
 						System.out.println("Left Clicked");
 					}
 					else if (provinceClickedStatus == 1 && selectedProvince != null 
-							&& my_game.getTurnPhase() == 2) {
+							&& my_game.getTurnPhase() == 2 && province != null) {
 						Point targetPosition = new Point(province.iPosition(), province.jPosition());
 						if(this.actionMenuStatus == ActionMenu.MOVE_STATUS) {
 							if(province.isAdjacent(targetPosition)) {
