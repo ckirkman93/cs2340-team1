@@ -1,5 +1,8 @@
 package com.dpendesigns.feudalwar.model;
 
+import java.awt.Point;
+import java.util.Vector;
+
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
@@ -9,6 +12,7 @@ import org.newdawn.slick.geom.Polygon;
 import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.state.StateBasedGame;
 
+import com.dpendesigns.feudalwar.controllers.handlers.ActionMenu;
 import com.dpendesigns.network.data.ProvinceData;
 import com.dpendesigns.network.requests.AddArmyRequest;
 
@@ -28,6 +32,8 @@ public class Province {
 	private int xDrift;
 	private int yDrift;
 	
+	private Vector<Point> adjacents;
+	
 	private Player lastOwner;
 	private MilitaryUnit occupyingUnit;
 	
@@ -36,7 +42,7 @@ public class Province {
 	//private AddArmyRequest addArmyRequest;
 	
 	public Province (ProvinceData data){
-		
+		adjacents = data.getAdjacents();		
 		lastOwner = data.getLastOwner();
 		occupyingUnit = data.getOccupyingUnit();
 		
@@ -96,6 +102,12 @@ public class Province {
 				clickStatus = 2;
 			}
 		}
+		else if (area.contains(xpos, ypos) && !lastOwner.getName().equals(observer)) {
+			if (!input.isMouseButtonDown(Input.MOUSE_RIGHT_BUTTON) && rightClickDownState == true) {
+				currentColor = new Color(lastOwner.getColors()[2]);
+				clickStatus = 2;
+			}
+		}
 		else {currentColor = new Color(lastOwner.getColors()[0]);}
 		
 		return clickStatus;
@@ -131,11 +143,20 @@ public class Province {
 	public int iPosition(){ return iPosition; }
 	public int jPosition(){ return jPosition; }
 	
+	public int xDefaultPosition() { return xDefaultPosition; }
+	public int yDefaultPosition() { return yDefaultPosition; }		
+	
 	public int[] getThisLocation(){return thisLocation;}
+	
+	public Player getLastOwner() { return lastOwner; }
 	
 	public boolean isOccupied(){
 		if (occupyingUnit!=null){return true;}
 		else {return false;}
+	}
+	
+	public boolean isAdjacent(Point selectedProvince) {
+		return adjacents.contains(selectedProvince);
 	}
 	
 	public void addOccupyingUnit(MilitaryUnit unit, boolean created){ 
