@@ -257,12 +257,14 @@ public class FeudalWarClient extends BasicGame {
 							System.out.println("Request Sent");
 							}
 						else if (my_game.getTurnPhase() == 2) {
+							waitForUserList = true;
+							waitForGameList = true;
 							Vector<Vector<Point>> locations = new Vector<Vector<Point>>();
 							locations.add(mainGameHandler.getAttackerDepartingLocations());
 							locations.add(mainGameHandler.getAttackerDestinations());
 							locations.add(mainGameHandler.getSupporterBaseLocations());
 							locations.add(mainGameHandler.getSupporterSupportLocations());
-							client.sendTCP(new MovementPhaseRequest());
+							client.sendTCP(new MovementPhaseRequest(locations));
 							mainGameHandler.clearMovementPhaseInfo();
 						}
 					}
