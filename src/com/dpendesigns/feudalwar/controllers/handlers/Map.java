@@ -45,50 +45,116 @@ public class Map {
 		//setting adjacent provinces
 		for(int i = 0; i < provinceDatas.length; i++) {
 			for(int j = 0; j < provinceDatas[i].length; j++) {
-				try {
-					if(i % 2 == 0) {
-						provinceDatas[i][j].addAdjacent(new Point(
-								provinceDatas[i - 1][j - 1].iPosition(),
-								provinceDatas[i - 1][j - 1].jPosition()));
-						provinceDatas[i][j].addAdjacent(new Point(
-								provinceDatas[i - 1][j].iPosition(),
-								provinceDatas[i - 1][j].jPosition()));
-						provinceDatas[i][j].addAdjacent(new Point(
-								provinceDatas[i][j - 1].iPosition(),
-								provinceDatas[i][j - 1].jPosition()));
-						provinceDatas[i][j].addAdjacent(new Point(
-								provinceDatas[i][j + 1].iPosition(),
-								provinceDatas[i][j + 1].jPosition()));
-						provinceDatas[i][j].addAdjacent(new Point(
-								provinceDatas[i + 1][j - 1].iPosition(),
-								provinceDatas[i + 1][j - 1].jPosition()));
-						provinceDatas[i][j].addAdjacent(new Point(
-								provinceDatas[i + 1][j].iPosition(),
-								provinceDatas[i + 1][j].jPosition()));
-					} else {
+				if(i % 2 == 0) {
+					try {
 						provinceDatas[i][j].addAdjacent(new Point(
 								provinceDatas[i - 1][j + 1].iPosition(),
 								provinceDatas[i - 1][j + 1].jPosition()));
+					} catch (NullPointerException npe) {
+						//empty space
+					} catch (IndexOutOfBoundsException ioobe) {
+						//province on edge
+					}
+					try {
 						provinceDatas[i][j].addAdjacent(new Point(
 								provinceDatas[i - 1][j].iPosition(),
-								provinceDatas[i - 1][j].iPosition()));
+								provinceDatas[i - 1][j].jPosition()));
+					} catch (NullPointerException npe) {
+						//empty space
+					} catch (IndexOutOfBoundsException ioobe) {
+						//province on edge
+					}
+					try {
 						provinceDatas[i][j].addAdjacent(new Point(
 								provinceDatas[i][j - 1].iPosition(),
 								provinceDatas[i][j - 1].jPosition()));
+					} catch (NullPointerException npe) {
+						//empty space
+					} catch (IndexOutOfBoundsException ioobe) {
+						//province on edge
+					}
+					try {
 						provinceDatas[i][j].addAdjacent(new Point(
 								provinceDatas[i][j + 1].iPosition(),
 								provinceDatas[i][j + 1].jPosition()));
+					} catch (NullPointerException npe) {
+						//empty space
+					} catch (IndexOutOfBoundsException ioobe) {
+						//province on edge
+					}
+					try {
 						provinceDatas[i][j].addAdjacent(new Point(
 								provinceDatas[i + 1][j + 1].iPosition(),
 								provinceDatas[i + 1][j + 1].jPosition()));
+					} catch (NullPointerException npe) {
+						//empty space
+					} catch (IndexOutOfBoundsException ioobe) {
+						//province on edge
+					}
+					try {
 						provinceDatas[i][j].addAdjacent(new Point(
 								provinceDatas[i + 1][j].iPosition(),
 								provinceDatas[i + 1][j].jPosition()));
+					} catch (NullPointerException npe) {
+						//empty space
+					} catch (IndexOutOfBoundsException ioobe) {
+						//province on edge
 					}
-				} catch (NullPointerException npe) {
-					//empty space
-				} catch (IndexOutOfBoundsException ioobe) {
-					//province on edge
+				} else {
+					try {
+						provinceDatas[i][j].addAdjacent(new Point(
+								provinceDatas[i - 1][j - 1].iPosition(),
+								provinceDatas[i - 1][j - 1].jPosition()));
+					} catch (NullPointerException npe) {
+						//empty space
+					} catch (IndexOutOfBoundsException ioobe) {
+						//province on edge
+					}
+					try {
+						provinceDatas[i][j].addAdjacent(new Point(
+								provinceDatas[i - 1][j].iPosition(),
+								provinceDatas[i - 1][j].jPosition()));
+					} catch (NullPointerException npe) {
+						//empty space
+					} catch (IndexOutOfBoundsException ioobe) {
+						//province on edge
+					}
+					try {
+						provinceDatas[i][j].addAdjacent(new Point(
+								provinceDatas[i][j - 1].iPosition(),
+								provinceDatas[i][j - 1].jPosition()));
+					} catch (NullPointerException npe) {
+						//empty space
+					} catch (IndexOutOfBoundsException ioobe) {
+						//province on edge
+					}
+					try {
+						provinceDatas[i][j].addAdjacent(new Point(
+								provinceDatas[i][j + 1].iPosition(),
+								provinceDatas[i][j + 1].jPosition()));
+					} catch (NullPointerException npe) {
+						//empty space
+					} catch (IndexOutOfBoundsException ioobe) {
+						//province on edge
+					}
+					try {
+						provinceDatas[i][j].addAdjacent(new Point(
+								provinceDatas[i + 1][j - 1].iPosition(),
+								provinceDatas[i + 1][j - 1].jPosition()));
+					} catch (NullPointerException npe) {
+						//empty space
+					} catch (IndexOutOfBoundsException ioobe) {
+						//province on edge
+					}
+					try {
+						provinceDatas[i][j].addAdjacent(new Point(
+								provinceDatas[i + 1][j].iPosition(),
+								provinceDatas[i + 1][j].jPosition()));
+					} catch (NullPointerException npe) {
+						//empty space
+					} catch (IndexOutOfBoundsException ioobe) {
+						//province on edge
+					}
 				}
 			}
 		}

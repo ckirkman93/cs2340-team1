@@ -27,6 +27,8 @@ public class Province {
 	private int xDefaultPosition, yDefaultPosition;
 	private int iPosition, jPosition;
 	
+	private boolean shownAsOption;
+	
 	private int[] thisLocation;
 	
 	private int xDrift;
@@ -114,8 +116,10 @@ public class Province {
 	}
 
 	public void render(GameContainer gc, Graphics g) throws SlickException {
-		g.setColor(currentColor);
-		g.fill(area);
+		if(shownAsOption)
+			g.setColor(new Color(this.lastOwner.getColors()[1]));
+		else g.setColor(currentColor);
+		g.fill(area);	
 		g.setColor(Color.black);
 		g.draw(area);
 		
@@ -133,6 +137,10 @@ public class Province {
 					xDefaultPosition + xDrift + width/2 - 16, 
 					yDefaultPosition + yDrift + height/2 - 8);
 		}
+	}
+	
+	public void setShownAsOption(boolean b) {
+		shownAsOption = b;
 	}
 	
 	public void setDrift(int xAmount, int yAmount){

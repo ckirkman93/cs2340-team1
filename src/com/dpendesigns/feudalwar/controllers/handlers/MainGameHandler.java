@@ -153,6 +153,10 @@ public class MainGameHandler {
 		for(Province[] provinceArray : my_map) {
 			for(Province province : provinceArray) {
 				if(province != null) {
+					if(actionMenuStatus == ActionMenu.MOVE_STATUS
+							&& selectedProvince != null && province.isAdjacent(selectedProvince))
+						province.setShownAsOption(true);
+					
 					province.setDrift(xDrift,yDrift); 
 					
 					int provinceClickedStatus = province.update(gc, my_name, leftClickDownState, rightClickDownState);
