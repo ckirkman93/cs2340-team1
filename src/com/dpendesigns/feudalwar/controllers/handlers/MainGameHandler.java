@@ -172,7 +172,8 @@ public class MainGameHandler {
 								this.attackerDestinations.add(targetPosition);
 							}
 						} else if(this.actionMenuStatus == ActionMenu.SUPPORT_STATUS) {
-							if(province.isAdjacent(targetPosition)) {
+							if(province.isAdjacent(targetPosition) && province.isOccupied()
+									&& my_map[targetPosition.x][targetPosition.y].isOccupied()) {
 								this.supporterBaseLocations.add(selectedProvince);
 								this.supporterSupportLocations.add(targetPosition);
 							}
@@ -184,7 +185,8 @@ public class MainGameHandler {
 						availableGenerals--;
 						System.out.println("Right Clicked");
 					}
-					if (provinceClickedStatus == 2 && my_game.getTurnPhase() == 2) {
+					if (provinceClickedStatus == 2 && my_game.getTurnPhase() == 2 
+							&& province.getLastOwner().getName().equals(my_name)) {
 						actionMenuX = province.xDefaultPosition() + 39;
 						actionMenuY = province.yDefaultPosition() + 36;
 						selectedProvince = new Point(province.iPosition(), province.jPosition());
