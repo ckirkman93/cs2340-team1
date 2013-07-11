@@ -267,7 +267,7 @@ public class ServerListenerParser {
 				System.out.println(game.remainingWait());
 				if (game.remainingWait() == 0){
 					game.enterNextPhase();
-					game.enterNextPhase();
+					//game.enterNextPhase();
 					for (User user : game.getUsers()){
 						user.setState(loadGame);
 						server.sendToTCP(user.getConnectionID(), game);

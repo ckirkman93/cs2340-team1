@@ -157,13 +157,14 @@ public class MainGameHandler {
 					
 					int provinceClickedStatus = province.update(gc, my_name, leftClickDownState, rightClickDownState);
 					
-					if (provinceClickedStatus == 1 && availableInfantry > 0 && !province.isOccupied()){
+					if (provinceClickedStatus == 1 && availableInfantry > 0 && !province.isOccupied() && my_game.getTurnPhase() == 0){
 						placedInfantry.add(province.getThisLocation());
 						availableInfantry--;
 						province.addOccupyingUnit(new Infantry(), true);
 						System.out.println("Left Clicked");
 					}
-					else if (provinceClickedStatus == 1 && selectedProvince != null && my_game.getTurnPhase() == 2) {
+					else if (provinceClickedStatus == 1 && selectedProvince != null 
+							&& my_game.getTurnPhase() == 2) {
 						Point targetPosition = new Point(province.iPosition(), province.jPosition());
 						if(this.actionMenuStatus == ActionMenu.MOVE_STATUS) {
 							if(province.isAdjacent(targetPosition)) {
@@ -177,7 +178,8 @@ public class MainGameHandler {
 							}
 						}
 					}
-					else if (provinceClickedStatus == 2 && availableGenerals > 0  && !province.isOccupied()){
+					else if (provinceClickedStatus == 2 && availableGenerals > 0  && 
+							!province.isOccupied() && my_game.getTurnPhase() == 0){
 						placedGenerals.add(province.getThisLocation());
 						availableGenerals--;
 						System.out.println("Right Clicked");
@@ -211,7 +213,10 @@ public class MainGameHandler {
 			actionMenuStatus = actionMenu.update(gc);
 		}
 		
-		if (actionMenuStatus == ActionMenu.HOLD_STATUS) {
+		if (actionMenuStatus == ActionMenu.HOLD_STATUS
+				|| actionMenuStatus == ActionMenu.MOVE_STATUS
+				|| actionMenuStatus == ActionMenu.SUPPORT_STATUS
+				|| actionMenuStatus == ActionMenu.DO_NOTHING_STATUS) {
 			actionMenuDisplayed = false;
 		}
 		

@@ -31,6 +31,7 @@ public class ActionMenu {
 	public static final int HOLD_STATUS = 1;
 	public static final int SUPPORT_STATUS = 2;
 	public static final int MOVE_STATUS = 3;
+	public static final int WAITING_STATUS = 4;
 	
 	public ActionMenu(int x, int y, int color) {
 		xPos = x;
@@ -42,7 +43,7 @@ public class ActionMenu {
 	}
 	
 	public int update(GameContainer gc) throws SlickException {
-		currentStatus = DO_NOTHING_STATUS;
+		currentStatus = WAITING_STATUS;
 		
 		Input input = gc.getInput();
 		int xpos = input.getMouseX();
@@ -52,18 +53,16 @@ public class ActionMenu {
 			if (!input.isMouseButtonDown(0) && leftClickDownState) {
 				currentStatus = MOVE_STATUS;
 			}
-		}
-		
-		if (supportLocation.contains(xpos, ypos)) {
+		} else if (supportLocation.contains(xpos, ypos)) {
 			if (!input.isMouseButtonDown(0) && leftClickDownState) {
 				currentStatus = SUPPORT_STATUS;
 			}
-		}
-		
-		if (holdLocation.contains(xpos, ypos)) {
+		} else if (holdLocation.contains(xpos, ypos)) {
 			if (!input.isMouseButtonDown(0) && leftClickDownState) {
 				currentStatus = HOLD_STATUS;
 			}
+		} else if (!input.isMouseButtonDown(0) && leftClickDownState) {
+			currentStatus = DO_NOTHING_STATUS;
 		}
 		
 		if (input.isMouseButtonDown(0)) {
