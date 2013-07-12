@@ -154,8 +154,14 @@ public class MainGameHandler {
 			for(Province province : provinceArray) {
 				if(province != null) {
 					if(actionMenuStatus == ActionMenu.MOVE_STATUS
-							&& selectedProvince != null && province.isAdjacent(selectedProvince))
+							&& selectedProvince != null && province.isAdjacent(selectedProvince)) {
 						province.setShownAsOption(true);
+						System.out.println("Overriding color");
+					}
+					else if(actionMenuStatus == ActionMenu.DO_NOTHING_STATUS) {
+						province.setShownAsOption(false);
+						System.out.println("Reverting to default color");
+					}
 					
 					province.setDrift(xDrift,yDrift); 
 					
@@ -168,18 +174,20 @@ public class MainGameHandler {
 						System.out.println("Left Clicked");
 					}
 					else if (provinceClickedStatus == 1 && selectedProvince != null 
-							&& my_game.getTurnPhase() == 2 && province != null) {
+							&& my_game.getTurnPhase() == 2) {
 						Point targetPosition = new Point(province.iPosition(), province.jPosition());
 						if(this.actionMenuStatus == ActionMenu.MOVE_STATUS) {
-							if(province.isAdjacent(targetPosition)) {
+							if(province.isAdjacent(selectedProvince)) {
 								this.attackerDepartingLocations.add(selectedProvince);
 								this.attackerDestinations.add(targetPosition);
+								actionMenu.setStatus(ActionMenu.DO_NOTHING_STATUS);
 							}
 						} else if(this.actionMenuStatus == ActionMenu.SUPPORT_STATUS) {
-							if(province.isAdjacent(targetPosition) && province.isOccupied()
+							if(province.isAdjacent(selectedProvince) && province.isOccupied()
 									&& my_map[targetPosition.x][targetPosition.y].isOccupied()) {
 								this.supporterBaseLocations.add(selectedProvince);
 								this.supporterSupportLocations.add(targetPosition);
+								actionMenu.setStatus(ActionMenu.DO_NOTHING_STATUS);
 							}
 						}
 					}
@@ -190,14 +198,13 @@ public class MainGameHandler {
 						System.out.println("Right Clicked");
 					}
 					if (provinceClickedStatus == 2 && my_game.getTurnPhase() == 2 
-							&& province.getLastOwner().getName().equals(my_name)) {
+							&& province.isOccupied() && province.getLastOwner().getName().equals(my_name)) {
 						actionMenuX = province.xDefaultPosition() + 39;
 						actionMenuY = province.yDefaultPosition() + 36;
 						selectedProvince = new Point(province.iPosition(), province.jPosition());
 						actionMenu = new ActionMenu(actionMenuX, actionMenuY, province.getLastOwner().getColors()[0]);
 						actionMenuDisplayed = true;
-					}
-					
+					}					
 				}
 			}
 		}
@@ -216,14 +223,9 @@ public class MainGameHandler {
 		else {endTurn = endTurnSpriteSheet.getSubImage(0, 0);}
 		
 		if (actionMenuDisplayed) {
-			actionMenuStatus = actionMenu.update(gc);
-		}
-		
-		if (actionMenuStatus == ActionMenu.HOLD_STATUS
-				|| actionMenuStatus == ActionMenu.MOVE_STATUS
-				|| actionMenuStatus == ActionMenu.SUPPORT_STATUS
-				|| actionMenuStatus == ActionMenu.DO_NOTHING_STATUS) {
-			actionMenuDisplayed = false;
+			actionMenuStatus = actionMenu.update(gc, actionMenuDisplayed);
+			if(actionMenuStatus != ActionMenu.WAITING_STATUS)
+				this.actionMenuDisplayed = false;
 		}
 		
 		if (!input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {leftClickDownState = false;}

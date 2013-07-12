@@ -41,33 +41,35 @@ public class ActionMenu {
 		holdLocation = new Rectangle(xPos, yPos+36, 100, 18);		
 	}
 	
-	public int update(GameContainer gc) throws SlickException {
-		currentStatus = WAITING_STATUS;
-		
-		Input input = gc.getInput();
-		int xpos = input.getMouseX();
-		int ypos = input.getMouseY();
-		
-		if (moveLocation.contains(xpos, ypos)) {
-			if (!input.isMouseButtonDown(0) && leftClickDownState) {
-				currentStatus = MOVE_STATUS;
+	public int update(GameContainer gc, boolean defaultToWaiting) throws SlickException {
+		currentStatus = DO_NOTHING_STATUS;
+		if(defaultToWaiting) {
+			currentStatus = WAITING_STATUS;
+			Input input = gc.getInput();
+			int xpos = input.getMouseX();
+			int ypos = input.getMouseY();
+	
+			if (moveLocation.contains(xpos, ypos)) {
+				if (!input.isMouseButtonDown(0) && leftClickDownState) {
+					currentStatus = MOVE_STATUS;
+				}
+			} else if (supportLocation.contains(xpos, ypos)) {
+				if (!input.isMouseButtonDown(0) && leftClickDownState) {
+					currentStatus = SUPPORT_STATUS;
+				}
+			} else if (holdLocation.contains(xpos, ypos)) {
+				if (!input.isMouseButtonDown(0) && leftClickDownState) {
+					currentStatus = HOLD_STATUS;
+				}
+			} else if (!input.isMouseButtonDown(0) && leftClickDownState) {
+				currentStatus = DO_NOTHING_STATUS;
 			}
-		} else if (supportLocation.contains(xpos, ypos)) {
-			if (!input.isMouseButtonDown(0) && leftClickDownState) {
-				currentStatus = SUPPORT_STATUS;
+			
+			if (input.isMouseButtonDown(0)) {
+				leftClickDownState = true;
+			} else {
+				leftClickDownState = false;
 			}
-		} else if (holdLocation.contains(xpos, ypos)) {
-			if (!input.isMouseButtonDown(0) && leftClickDownState) {
-				currentStatus = HOLD_STATUS;
-			}
-		} else if (!input.isMouseButtonDown(0) && leftClickDownState) {
-			currentStatus = DO_NOTHING_STATUS;
-		}
-		
-		if (input.isMouseButtonDown(0)) {
-			leftClickDownState = true;
-		} else {
-			leftClickDownState = false;
 		}
 		
 		return currentStatus;
@@ -94,5 +96,9 @@ public class ActionMenu {
 		g.setColor(color);
 		g.draw(holdLocation);
 		g.drawString(hold, holdLocation.getX(), holdLocation.getY());	
+	}
+	
+	public void setStatus(int status) {
+		this.currentStatus = status;
 	}
 }
