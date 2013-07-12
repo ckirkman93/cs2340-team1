@@ -144,6 +144,10 @@ public class Province {
 		shownAsOption = b;
 	}
 	
+	public Vector<Point> getAdjacents() {
+		return adjacents;
+	}
+	
 	public void setDrift(int xAmount, int yAmount){
 		xDrift = xAmount;
 		yDrift = yAmount;

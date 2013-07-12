@@ -147,19 +147,16 @@ public class MainGameHandler {
 		mouseY = gc.getInput().getMouseY();
 		
 		calculateDrift(gc);
+		if(selectedProvince != null) {
+			System.out.println("Status " + actionMenuStatus);
+			if(actionMenuStatus == ActionMenu.MOVE_STATUS)
+				this.setAdjacentsHighlighted(my_map[selectedProvince.x][selectedProvince.y], true);
+			else this.setAdjacentsHighlighted(my_map[selectedProvince.x][selectedProvince.y], false);
+		}
 		
 		for(Province[] provinceArray : my_map) {
 			for(Province province : provinceArray) {
-				if(province != null) {
-					if(actionMenuStatus == ActionMenu.MOVE_STATUS
-							&& selectedProvince != null && province.isAdjacent(selectedProvince)) {
-						province.setShownAsOption(true);
-						System.out.println("Overriding color");
-					} else if(actionMenuStatus == ActionMenu.INACTIVE_STATUS) {
-						province.setShownAsOption(false);
-						System.out.println("Reverting to default color");
-					}
-					
+				if(province != null) {					
 					province.setDrift(xDrift,yDrift); 
 					
 					int provinceClickedStatus = province.update(gc, my_name, leftClickDownState, rightClickDownState);
@@ -180,6 +177,7 @@ public class MainGameHandler {
 								this.attackerDepartingLocations.add(selectedProvince);
 								this.attackerDestinations.add(targetPosition);
 								actionMenu.setStatus(ActionMenu.INACTIVE_STATUS);
+								this.actionMenuStatus = ActionMenu.INACTIVE_STATUS;
 								System.out.println("selected province to move to");
 							}
 						} else if(this.actionMenuStatus == ActionMenu.SUPPORT_STATUS) {
@@ -188,6 +186,7 @@ public class MainGameHandler {
 								this.supporterBaseLocations.add(selectedProvince);
 								this.supporterSupportLocations.add(targetPosition);
 								actionMenu.setStatus(ActionMenu.INACTIVE_STATUS);
+								this.actionMenuStatus = ActionMenu.INACTIVE_STATUS;
 								System.out.println("selected province to support");
 							}
 						}
@@ -198,7 +197,7 @@ public class MainGameHandler {
 						availableGenerals--;
 						System.out.println("Right Clicked");
 					}
-					if (provinceClickedStatus == 2 && my_game.getTurnPhase() == 2 
+					else if (provinceClickedStatus == 2 && my_game.getTurnPhase() == 2 
 							&& province.isOccupied() && province.getLastOwner().getName().equals(my_name)) {
 						actionMenuX = province.xDefaultPosition() + 39;
 						actionMenuY = province.yDefaultPosition() + 36;
@@ -301,6 +300,12 @@ public class MainGameHandler {
 	public void setTurnPhase(int phase){
 		myTurnPhase = phase;
 		turnPhase = turnPhaseSpriteSheet.getSubImage(myTurnPhase, 0);
+	}
+	
+	private void setAdjacentsHighlighted(Province center, boolean highlighted) {
+		for(Point p : center.getAdjacents()) {
+			my_map[p.x][p.y].setShownAsOption(highlighted);
+		}
 	}
 	
 	public boolean getTurnPhaseStatus(){return turnPhaseFinished;}
