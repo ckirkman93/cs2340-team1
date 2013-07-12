@@ -148,8 +148,8 @@ public class MainGameHandler {
 		
 		calculateDrift(gc);
 		if(selectedProvince != null) {
-			System.out.println("Status " + actionMenuStatus);
-			if(actionMenuStatus == ActionMenu.MOVE_STATUS)
+			if(actionMenuStatus == ActionMenu.MOVE_STATUS 
+					|| actionMenuStatus == ActionMenu.SUPPORT_STATUS)
 				this.setAdjacentsHighlighted(my_map[selectedProvince.x][selectedProvince.y], true);
 			else this.setAdjacentsHighlighted(my_map[selectedProvince.x][selectedProvince.y], false);
 		}
@@ -174,6 +174,11 @@ public class MainGameHandler {
 						Point targetPosition = new Point(province.iPosition(), province.jPosition());
 						if(this.actionMenuStatus == ActionMenu.MOVE_STATUS) {
 							if(province.isAdjacent(selectedProvince)) {
+								if(attackerDepartingLocations.contains(selectedProvince)) {
+									int index = attackerDepartingLocations.indexOf(selectedProvince);
+									attackerDepartingLocations.remove(index);
+									attackerDestinations.remove(index);
+								}
 								this.attackerDepartingLocations.add(selectedProvince);
 								this.attackerDestinations.add(targetPosition);
 								actionMenu.setStatus(ActionMenu.INACTIVE_STATUS);
@@ -183,6 +188,11 @@ public class MainGameHandler {
 						} else if(this.actionMenuStatus == ActionMenu.SUPPORT_STATUS) {
 							if(province.isAdjacent(selectedProvince) && province.isOccupied()
 									&& my_map[targetPosition.x][targetPosition.y].isOccupied()) {
+								if(supporterBaseLocations.contains(selectedProvince)) {
+									int index = supporterBaseLocations.indexOf(selectedProvince);
+									supporterBaseLocations.remove(index);
+									supporterSupportLocations.remove(index);
+								}
 								this.supporterBaseLocations.add(selectedProvince);
 								this.supporterSupportLocations.add(targetPosition);
 								actionMenu.setStatus(ActionMenu.INACTIVE_STATUS);
