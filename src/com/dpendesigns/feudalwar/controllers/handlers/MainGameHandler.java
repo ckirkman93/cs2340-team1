@@ -158,7 +158,7 @@ public class MainGameHandler {
 						province.setShownAsOption(true);
 						System.out.println("Overriding color");
 					}
-					else if(actionMenuStatus == ActionMenu.DO_NOTHING_STATUS) {
+					else if(actionMenuStatus == ActionMenu.INACTIVE_STATUS) {
 						province.setShownAsOption(false);
 						System.out.println("Reverting to default color");
 					}
@@ -180,14 +180,16 @@ public class MainGameHandler {
 							if(province.isAdjacent(selectedProvince)) {
 								this.attackerDepartingLocations.add(selectedProvince);
 								this.attackerDestinations.add(targetPosition);
-								actionMenu.setStatus(ActionMenu.DO_NOTHING_STATUS);
+								actionMenu.setStatus(ActionMenu.INACTIVE_STATUS);
+								System.out.println("selected province to move to");
 							}
 						} else if(this.actionMenuStatus == ActionMenu.SUPPORT_STATUS) {
 							if(province.isAdjacent(selectedProvince) && province.isOccupied()
 									&& my_map[targetPosition.x][targetPosition.y].isOccupied()) {
 								this.supporterBaseLocations.add(selectedProvince);
 								this.supporterSupportLocations.add(targetPosition);
-								actionMenu.setStatus(ActionMenu.DO_NOTHING_STATUS);
+								actionMenu.setStatus(ActionMenu.INACTIVE_STATUS);
+								System.out.println("selected province to support");
 							}
 						}
 					}

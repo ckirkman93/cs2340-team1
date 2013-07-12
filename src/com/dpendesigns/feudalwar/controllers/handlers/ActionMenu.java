@@ -26,7 +26,7 @@ public class ActionMenu {
 	private final String move = " Move";
 	
 	private int currentStatus;
-	public static final int DO_NOTHING_STATUS = 0;
+	public static final int INACTIVE_STATUS = 0;
 	public static final int HOLD_STATUS = 1;
 	public static final int SUPPORT_STATUS = 2;
 	public static final int MOVE_STATUS = 3;
@@ -41,9 +41,9 @@ public class ActionMenu {
 		holdLocation = new Rectangle(xPos, yPos+36, 100, 18);		
 	}
 	
-	public int update(GameContainer gc, boolean defaultToWaiting) throws SlickException {
-		currentStatus = DO_NOTHING_STATUS;
-		if(defaultToWaiting) {
+	public int update(GameContainer gc, boolean isVisible) throws SlickException {
+		currentStatus = INACTIVE_STATUS;
+		if(isVisible) {
 			currentStatus = WAITING_STATUS;
 			Input input = gc.getInput();
 			int xpos = input.getMouseX();
@@ -62,7 +62,7 @@ public class ActionMenu {
 					currentStatus = HOLD_STATUS;
 				}
 			} else if (!input.isMouseButtonDown(0) && leftClickDownState) {
-				currentStatus = DO_NOTHING_STATUS;
+				currentStatus = INACTIVE_STATUS;
 			}
 			
 			if (input.isMouseButtonDown(0)) {
