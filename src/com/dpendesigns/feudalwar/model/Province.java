@@ -87,7 +87,7 @@ public class Province {
 		int xpos = input.getMouseX();
 		int ypos = input.getMouseY();
 
-		if (area.contains(xpos, ypos) && lastOwner.getName().equals(observer)){
+		if (area.contains(xpos, ypos)){
 			if (input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
 				currentColor = new Color(lastOwner.getColors()[2]);
 			}
@@ -99,17 +99,18 @@ public class Province {
 				
 			}
 			
-			if (!input.isMouseButtonDown(Input.MOUSE_RIGHT_BUTTON) && rightClickDownState == true) {
+			if (!input.isMouseButtonDown(Input.MOUSE_RIGHT_BUTTON) && rightClickDownState == true
+					&& lastOwner.getName().equals(observer)) {
 				currentColor = new Color(lastOwner.getColors()[2]);
 				clickStatus = 2;
 			}
 		}
-		else if (area.contains(xpos, ypos) && !lastOwner.getName().equals(observer)) {
-			if (!input.isMouseButtonDown(Input.MOUSE_RIGHT_BUTTON) && rightClickDownState == true) {
-				currentColor = new Color(lastOwner.getColors()[2]);
-				clickStatus = 2;
-			}
-		}
+		//else if (area.contains(xpos, ypos) && !lastOwner.getName().equals(observer)) {
+			//if (!input.isMouseButtonDown(Input.MOUSE_RIGHT_BUTTON) && rightClickDownState == true) {
+				//currentColor = new Color(lastOwner.getColors()[2]);
+				//clickStatus = 2;
+			//}
+		//}
 		else {currentColor = new Color(lastOwner.getColors()[0]);}
 		
 		return clickStatus;

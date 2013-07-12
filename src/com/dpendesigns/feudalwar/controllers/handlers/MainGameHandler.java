@@ -72,8 +72,6 @@ public class MainGameHandler {
 	private int actionMenuX;
 	private int actionMenuY;
 	
-	//private AddArmyRequest addArmyRequest;
-	
 	public MainGameHandler(GameInstance game, String name) throws SlickException {
 		myTurnPhase = game.getTurnPhase();
 		
@@ -157,8 +155,7 @@ public class MainGameHandler {
 							&& selectedProvince != null && province.isAdjacent(selectedProvince)) {
 						province.setShownAsOption(true);
 						System.out.println("Overriding color");
-					}
-					else if(actionMenuStatus == ActionMenu.INACTIVE_STATUS) {
+					} else if(actionMenuStatus == ActionMenu.INACTIVE_STATUS) {
 						province.setShownAsOption(false);
 						System.out.println("Reverting to default color");
 					}
@@ -167,14 +164,16 @@ public class MainGameHandler {
 					
 					int provinceClickedStatus = province.update(gc, my_name, leftClickDownState, rightClickDownState);
 					
-					if (provinceClickedStatus == 1 && availableInfantry > 0 && !province.isOccupied() && my_game.getTurnPhase() == 0){
+					if (provinceClickedStatus == 1 && availableInfantry > 0 && !province.isOccupied() 
+							&& my_game.getTurnPhase() == 0 
+							&& province.getLastOwner().getName().equals(my_name)){
 						placedInfantry.add(province.getThisLocation());
 						availableInfantry--;
 						province.addOccupyingUnit(new Infantry(), true);
 						System.out.println("Left Clicked");
 					}
 					else if (provinceClickedStatus == 1 && selectedProvince != null 
-							&& my_game.getTurnPhase() == 2) {
+							&& my_game.getTurnPhase() == 2 && !this.actionMenuDisplayed) {
 						Point targetPosition = new Point(province.iPosition(), province.jPosition());
 						if(this.actionMenuStatus == ActionMenu.MOVE_STATUS) {
 							if(province.isAdjacent(selectedProvince)) {
@@ -236,6 +235,7 @@ public class MainGameHandler {
 		if (!input.isMouseButtonDown(Input.MOUSE_RIGHT_BUTTON)) {rightClickDownState = false;}
 		else {rightClickDownState = true;}
 	}
+	
 	public void render(GameContainer gc, Graphics g) throws SlickException {
 		mainGameBackground.draw(0,0);
 		for(Province[] p : my_map)
