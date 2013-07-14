@@ -31,6 +31,7 @@ public class MainGameHandler {
 	
 	private ActionMenu actionMenu;
 	private int actionMenuStatus = 0;
+	private ActionIndicatorHandler actionIndicator;
 	private Point selectedProvince;
 	
 	private int myTurnPhase;
@@ -101,6 +102,7 @@ public class MainGameHandler {
 			}
 		}
 		
+		actionIndicator = new ActionIndicatorHandler(my_map);		
 		
 		h1 = new TrueTypeFont(new Font(Font.MONOSPACED, Font.BOLD, 16), true);
 		h2 = new TrueTypeFont(new Font(Font.MONOSPACED, Font.BOLD, 12), true);
@@ -181,6 +183,7 @@ public class MainGameHandler {
 								}
 								this.attackerDepartingLocations.add(selectedProvince);
 								this.attackerDestinations.add(targetPosition);
+								actionIndicator.update(gc, attackerDepartingLocations, attackerDestinations, true);
 								actionMenu.setStatus(ActionMenu.INACTIVE_STATUS);
 								this.actionMenuStatus = ActionMenu.INACTIVE_STATUS;
 								System.out.println("selected province to move to");
@@ -195,6 +198,7 @@ public class MainGameHandler {
 								}
 								this.supporterBaseLocations.add(selectedProvince);
 								this.supporterSupportLocations.add(targetPosition);
+								actionIndicator.update(gc, supporterBaseLocations, supporterSupportLocations, false);
 								actionMenu.setStatus(ActionMenu.INACTIVE_STATUS);
 								this.actionMenuStatus = ActionMenu.INACTIVE_STATUS;
 								System.out.println("selected province to support");
@@ -298,6 +302,7 @@ public class MainGameHandler {
 		if (actionMenuDisplayed) {
 			actionMenu.render(gc, g, actionMenuX+xDrift, actionMenuY+yDrift);
 		}
+		actionIndicator.render(gc, g);
 	}
 	
 	public void calculateDrift(GameContainer gc){
