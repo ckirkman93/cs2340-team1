@@ -180,10 +180,15 @@ public class MainGameHandler {
 									int index = attackerDepartingLocations.indexOf(selectedProvince);
 									attackerDepartingLocations.remove(index);
 									attackerDestinations.remove(index);
+								} else if(supporterBaseLocations.contains(selectedProvince)) {
+									int index = supporterBaseLocations.indexOf(selectedProvince);
+									supporterBaseLocations.remove(index);
+									supporterSupportLocations.remove(index);
 								}
 								this.attackerDepartingLocations.add(selectedProvince);
 								this.attackerDestinations.add(targetPosition);
 								actionIndicator.update(gc, attackerDepartingLocations, attackerDestinations, true);
+								actionIndicator.update(gc, supporterBaseLocations, supporterSupportLocations, false);
 								actionMenu.setStatus(ActionMenu.INACTIVE_STATUS);
 								this.actionMenuStatus = ActionMenu.INACTIVE_STATUS;
 								System.out.println("selected province to move to");
@@ -195,10 +200,15 @@ public class MainGameHandler {
 									int index = supporterBaseLocations.indexOf(selectedProvince);
 									supporterBaseLocations.remove(index);
 									supporterSupportLocations.remove(index);
+								} else if(attackerDepartingLocations.contains(selectedProvince)) {
+									int index = attackerDepartingLocations.indexOf(selectedProvince);
+									attackerDepartingLocations.remove(index);
+									attackerDestinations.remove(index);
 								}
 								this.supporterBaseLocations.add(selectedProvince);
 								this.supporterSupportLocations.add(targetPosition);
 								actionIndicator.update(gc, supporterBaseLocations, supporterSupportLocations, false);
+								actionIndicator.update(gc, attackerDepartingLocations, attackerDestinations, true);
 								actionMenu.setStatus(ActionMenu.INACTIVE_STATUS);
 								this.actionMenuStatus = ActionMenu.INACTIVE_STATUS;
 								System.out.println("selected province to support");
