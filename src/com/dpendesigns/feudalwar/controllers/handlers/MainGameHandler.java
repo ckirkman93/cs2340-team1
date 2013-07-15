@@ -302,7 +302,7 @@ public class MainGameHandler {
 		if (actionMenuDisplayed) {
 			actionMenu.render(gc, g, actionMenuX+xDrift, actionMenuY+yDrift);
 		}
-		actionIndicator.render(gc, g);
+		actionIndicator.render(gc, g, xDrift, yDrift);
 	}
 	
 	public void calculateDrift(GameContainer gc){

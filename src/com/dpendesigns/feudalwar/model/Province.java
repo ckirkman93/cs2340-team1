@@ -158,7 +158,10 @@ public class Province {
 	public int jPosition(){ return jPosition; }
 	
 	public int xDefaultPosition() { return xDefaultPosition; }
-	public int yDefaultPosition() { return yDefaultPosition; }		
+	public int yDefaultPosition() { return yDefaultPosition; }
+	
+	public int centeredXDefaultPosition() { return xDefaultPosition + width/2; }
+	public int centeredYDefaultPosition() { return yDefaultPosition + height/2; }
 	
 	public int[] getThisLocation(){return thisLocation;}
 	
