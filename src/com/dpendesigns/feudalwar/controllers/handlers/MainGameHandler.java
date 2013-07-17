@@ -150,10 +150,11 @@ public class MainGameHandler {
 		
 		calculateDrift(gc);
 		if(selectedProvince != null) {
-			if(actionMenuStatus == ActionMenu.MOVE_STATUS 
-					|| actionMenuStatus == ActionMenu.SUPPORT_STATUS)
-				this.setAdjacentsHighlighted(my_map[selectedProvince.x][selectedProvince.y], true);
-			else this.setAdjacentsHighlighted(my_map[selectedProvince.x][selectedProvince.y], false);
+			if(actionMenuStatus == ActionMenu.MOVE_STATUS)
+				this.setAdjacentsHighlighted(my_map[selectedProvince.x][selectedProvince.y], true, true);
+			else if(actionMenuStatus == ActionMenu.SUPPORT_STATUS)
+				this.setAdjacentsHighlighted(my_map[selectedProvince.x][selectedProvince.y], true, false);
+			else this.setAdjacentsHighlighted(my_map[selectedProvince.x][selectedProvince.y], false, true);
 		}
 		
 		for(Province[] provinceArray : my_map) {
@@ -191,7 +192,7 @@ public class MainGameHandler {
 								actionIndicator.update(gc, supporterBaseLocations, supporterSupportLocations, false);
 								actionMenu.setStatus(ActionMenu.INACTIVE_STATUS);
 								this.actionMenuStatus = ActionMenu.INACTIVE_STATUS;
-								System.out.println("selected province to move to");
+								System.out.println("Selected province to which to move");
 							}
 						} else if(this.actionMenuStatus == ActionMenu.SUPPORT_STATUS) {
 							if(province.isAdjacent(selectedProvince) && province.isOccupied()
@@ -211,7 +212,7 @@ public class MainGameHandler {
 								actionIndicator.update(gc, attackerDepartingLocations, attackerDestinations, true);
 								actionMenu.setStatus(ActionMenu.INACTIVE_STATUS);
 								this.actionMenuStatus = ActionMenu.INACTIVE_STATUS;
-								System.out.println("selected province to support");
+								System.out.println("Selected province to support");
 							}
 						}
 					}
@@ -327,9 +328,13 @@ public class MainGameHandler {
 		turnPhase = turnPhaseSpriteSheet.getSubImage(myTurnPhase, 0);
 	}
 	
-	private void setAdjacentsHighlighted(Province center, boolean highlighted) {
+	private void setAdjacentsHighlighted(Province center, boolean highlighted, boolean affectUnoccupied) {
 		for(Point p : center.getAdjacents()) {
-			my_map[p.x][p.y].setShownAsOption(highlighted);
+			if(affectUnoccupied)
+				my_map[p.x][p.y].setShownAsOption(highlighted);
+			else 
+				if(my_map[p.x][p.y].isOccupied())
+					my_map[p.x][p.y].setShownAsOption(highlighted);
 		}
 	}
 	

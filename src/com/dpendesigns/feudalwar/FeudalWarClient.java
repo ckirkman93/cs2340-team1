@@ -352,7 +352,7 @@ public class FeudalWarClient extends BasicGame {
 				if (mainGameHandler!=null){
 					mainGameHandler.updateMap(my_game);
 					}
-				System.out.println("Repsonse Received");
+				System.out.println("Response Received");
 			}
 		}
 	}

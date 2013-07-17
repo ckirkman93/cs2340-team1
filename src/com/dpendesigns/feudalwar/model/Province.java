@@ -88,7 +88,6 @@ public class Province {
 		int ypos = input.getMouseY();
 
 		if (area.contains(xpos, ypos)){
-			System.out.println("i: " + iPosition + "; j: " + jPosition);
 			if (input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
 				currentColor = new Color(lastOwner.getColors()[2]);
 			}
