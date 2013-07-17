@@ -15,8 +15,10 @@ import org.newdawn.slick.TrueTypeFont;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Shape;
 
+
 import com.dpendesigns.feudalwar.model.GameInstance;
 import com.dpendesigns.feudalwar.model.Infantry;
+import com.dpendesigns.feudalwar.model.MovementPair;
 import com.dpendesigns.feudalwar.model.Player;
 import com.dpendesigns.feudalwar.model.Province;
 import com.dpendesigns.network.data.ProvinceData;
@@ -41,10 +43,8 @@ public class MainGameHandler {
 	private Vector<int[]> placedInfantry = new Vector<int[]>(); 
 	private Vector<int[]> placedGenerals = new Vector<int[]>();
 	
-	private Vector<Point> attackerDepartingLocations = new Vector<Point>();
-	private Vector<Point> attackerDestinations = new Vector<Point>();
-	private Vector<Point> supporterBaseLocations = new Vector<Point>();
-	private Vector<Point> supporterSupportLocations = new Vector<Point>();
+	private Vector<MovementPair> attackerMovementPairs = new Vector<MovementPair>();
+	private Vector<MovementPair> supporterMovementPairs = new Vector<MovementPair>();
 	
 	private static final int driftZone = 20;
 	private static final int driftSpeed = 2;
@@ -168,13 +168,11 @@ public class MainGameHandler {
 						Point targetPosition = new Point(province.iPosition(), province.jPosition());
 						if(this.actionMenuStatus == ActionMenu.MOVE_STATUS) {
 							if(province.isAdjacent(targetPosition)) {
-								this.attackerDepartingLocations.add(selectedProvince);
-								this.attackerDestinations.add(targetPosition);
+								this.attackerMovementPairs.add(new MovementPair(selectedProvince, targetPosition));
 							}
 						} else if(this.actionMenuStatus == ActionMenu.SUPPORT_STATUS) {
 							if(province.isAdjacent(targetPosition)) {
-								this.supporterBaseLocations.add(selectedProvince);
-								this.supporterSupportLocations.add(targetPosition);
+								this.supporterMovementPairs.add(new MovementPair(selectedProvince,targetPosition));
 							}
 						}
 					}
@@ -303,27 +301,17 @@ public class MainGameHandler {
 		return placedGenerals;
 	}
 	
-	public Vector<Point> getAttackerDepartingLocations() {
-		return attackerDepartingLocations;
+	public Vector<MovementPair> getAttackerMovementPairs() {
+		return attackerMovementPairs;
 	}
 
-	public Vector<Point> getAttackerDestinations() {
-		return attackerDestinations;
-	}
-
-	public Vector<Point> getSupporterBaseLocations() {
-		return supporterBaseLocations;
-	}
-
-	public Vector<Point> getSupporterSupportLocations() {
-		return supporterSupportLocations;
+	public Vector<MovementPair> getSupporterMovementPairs() {
+		return supporterMovementPairs;
 	}
 	
 	public void clearMovementPhaseInfo() {
-		this.attackerDepartingLocations.clear();
-		this.attackerDestinations.clear();
-		this.supporterBaseLocations.clear();
-		this.supporterSupportLocations.clear();
+		this.attackerMovementPairs.clear();
+		this.supporterMovementPairs.clear();
 		this.selectedProvince = null;
 		this.actionMenuStatus = 0;
 	}

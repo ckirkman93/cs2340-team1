@@ -10,6 +10,7 @@ import com.dpendesigns.feudalwar.controllers.handlers.HostGameHandler;
 import com.dpendesigns.feudalwar.controllers.handlers.JoinGameHandler;
 import com.dpendesigns.feudalwar.controllers.handlers.MainGameHandler;
 import com.dpendesigns.feudalwar.controllers.handlers.MainMenuHandler;
+import com.dpendesigns.feudalwar.model.MovementPair;
 import com.dpendesigns.feudalwar.controllers.handlers.PreGameHandler;
 import com.dpendesigns.feudalwar.controllers.handlers.SetupHandler;
 import com.dpendesigns.feudalwar.model.GameInstance;
@@ -24,6 +25,7 @@ import com.dpendesigns.network.requests.JoinGameRequest;
 import com.dpendesigns.network.requests.LoginRequest;
 import com.dpendesigns.network.requests.PlacementPhaseRequest;
 import com.dpendesigns.network.responses.LoginResponse;
+import com.dpendesigns.network.responses.MovementPhaseResponse;
 import com.dpendesigns.network.responses.PlacementPhaseResponse;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
@@ -257,12 +259,10 @@ public class FeudalWarClient extends BasicGame {
 							System.out.println("Request Sent");
 							}
 						else if (my_game.getTurnPhase() == 2) {
-							Vector<Vector<Point>> locations = new Vector<Vector<Point>>();
-							locations.add(mainGameHandler.getAttackerDepartingLocations());
-							locations.add(mainGameHandler.getAttackerDestinations());
-							locations.add(mainGameHandler.getSupporterBaseLocations());
-							locations.add(mainGameHandler.getSupporterSupportLocations());
-							client.sendTCP(new MovementPhaseRequest());
+							Vector<Vector<MovementPair>> locations = new Vector<Vector<MovementPair>>();
+							locations.add(mainGameHandler.getAttackerMovementPairs());
+							locations.add(mainGameHandler.getSupporterMovementPairs());
+							client.sendTCP(new MovementPhaseRequest(my_game.getGameName(), self.getName(),locations));
 							mainGameHandler.clearMovementPhaseInfo();
 						}
 					}
@@ -347,6 +347,11 @@ public class FeudalWarClient extends BasicGame {
 				joinGameBounced = true;
 				waitForResponse = false;
 			} else if (o instanceof PlacementPhaseResponse){
+				if (mainGameHandler!=null){
+					mainGameHandler.updateMap(my_game);
+					}
+				System.out.println("Repsonse Received");
+			} else if (o instanceof MovementPhaseResponse){
 				if (mainGameHandler!=null){
 					mainGameHandler.updateMap(my_game);
 					}

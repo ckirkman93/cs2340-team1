@@ -1,5 +1,6 @@
 package com.dpendesigns.feudalwar.model;
 
+import java.awt.Point;
 import java.util.Vector;
 
 public class Player {
@@ -10,6 +11,8 @@ public class Player {
 	private int infantry; 
 	private int generals;
 	private Vector<int[]> provinces = new Vector<int[]>();
+	
+	private Vector<Vector<MovementPair>> movementPhaseLocations = null;
 	
 	public Player(){}
 	
@@ -31,4 +34,11 @@ public class Player {
 	public int getInfantry() { return infantry; }
 	public int getGenerals() { return generals; }
 	public Vector<int[]> getProvinces() { return provinces; }
+	
+	public Vector<Vector<MovementPair>> getMovementPhaseLocations(){
+		return movementPhaseLocations;
+	}
+	public void setMovementPhaseLocations(Vector<Vector<MovementPair>> locations){ 
+		this.movementPhaseLocations = locations;
+	}
 }

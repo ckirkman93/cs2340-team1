@@ -1,15 +1,20 @@
 package com.dpendesigns.network;
 
+import java.awt.Point;
 import java.util.Collections;
+import java.util.Vector;
 
 import org.newdawn.slick.SlickException;
 
 import com.dpendesigns.feudalwar.controllers.handlers.BeginGameHandler;
+import com.dpendesigns.feudalwar.controllers.handlers.Map;
 import com.dpendesigns.feudalwar.model.GameInstance;
 import com.dpendesigns.feudalwar.model.General;
 import com.dpendesigns.feudalwar.model.Infantry;
 import com.dpendesigns.feudalwar.model.Player;
 import com.dpendesigns.feudalwar.model.User;
+import com.dpendesigns.feudalwar.model.MilitaryUnit;
+import com.dpendesigns.feudalwar.model.MovementPair;
 import com.dpendesigns.network.data.GameList;
 import com.dpendesigns.network.data.ProvinceData;
 import com.dpendesigns.network.data.UserList;
@@ -19,7 +24,9 @@ import com.dpendesigns.network.requests.ChangeStateRequest;
 import com.dpendesigns.network.requests.JoinGameRequest;
 import com.dpendesigns.network.requests.LoginRequest;
 import com.dpendesigns.network.requests.PlacementPhaseRequest;
+import com.dpendesigns.network.requests.MovementPhaseRequest;
 import com.dpendesigns.network.responses.LoginResponse;
+import com.dpendesigns.network.responses.MovementPhaseResponse;
 import com.dpendesigns.network.responses.PlacementPhaseResponse;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Server;
@@ -292,5 +299,116 @@ public class ServerListenerParser {
 			}	
 		}
 		game_list.remove(droppedGame);
+	}
+	
+	protected void parseMovementRequest(Connection c, Object o){
+		MovementPhaseRequest movementPhaseRequest = (MovementPhaseRequest)o;
+		System.out.println("Request Received");
+		for (GameInstance game : games_in_session){
+			System.out.println(game.getGameName());
+			System.out.println(movementPhaseRequest.getGameName());
+			System.out.println("");
+			if (game.getGameName().equals(movementPhaseRequest.getGameName())){
+				//System.out.println("Found the game");
+				Vector<Vector<Vector<MovementPair>>> players = new Vector<Vector<Vector<MovementPair>>>();
+				for (Player player: game.getPlayers()){
+					if (player.getName().equals(movementPhaseRequest.getUserName())){
+						//System.out.println("Found the player");
+						player.setMovementPhaseLocations(movementPhaseRequest.getLocations());
+						game.removePlayerFromWaiting(movementPhaseRequest.getUserName());
+						players.add(movementPhaseRequest.getLocations());
+					}
+				}
+				System.out.println(game.remainingWait());
+				if (game.remainingWait() == 0){
+					resolveConflicts(game, players);
+					game.enterNextPhase();
+					for (User user : game.getUsers()){
+						user.setState(loadGame);
+						server.sendToTCP(user.getConnectionID(), game);
+						server.sendToTCP(user.getConnectionID(), new MovementPhaseResponse());
+					}
+				}
+			}
+		}
+	}
+	
+	private void resolveConflicts(GameInstance game, Vector<Vector<Vector<MovementPair>>> players){
+		Map map = game.getMap();
+		Vector<Vector<Vector<MilitaryUnit>>> newUnresolvedPositions = new Vector<Vector<Vector<MilitaryUnit>>>();
+		for(int i=0;i<map.getProvinces().length;i++){
+			Vector<Vector<MilitaryUnit>> nextRow = new Vector<Vector<MilitaryUnit>>(); 
+			for(int j=0;j<map.getProvinces()[i].length;j++){
+				Vector<MilitaryUnit> addSet = new Vector<MilitaryUnit>();
+				if(map.getProvinces()[i][j].getOccupyingUnit()!=null){
+					addSet.add(map.getProvinces()[i][j].getOccupyingUnit());
+				}
+				nextRow.add(addSet);
+			}
+			newUnresolvedPositions.add(nextRow);
+		}
+		Vector<Point> resolutionConflicts = new Vector<Point>();
+		for(Vector<Vector<MovementPair>> player : players){
+			for(MovementPair elem : player.elementAt(0)){
+				Point dest = elem.getDestination();
+				Point base = elem.getBaseLocation();
+				MilitaryUnit movedUnit = map.getProvinces()[base.x][base.y].getOccupyingUnit();
+				newUnresolvedPositions.get(base.y).get(base.x).remove(movedUnit);
+				newUnresolvedPositions.get(dest.y).get(dest.x).add(movedUnit);
+				if(newUnresolvedPositions.get(dest.y).get(dest.x).size()>1){
+					resolutionConflicts.add(dest);
+				}
+			}
+		}
+		
+		for(Vector<Vector<MovementPair>> player : players){
+			for(MovementPair elem : player.elementAt(1)){
+				Point base = elem.getBaseLocation();
+				if(newUnresolvedPositions.get(base.y).get(base.x).size()!=1){
+					player.elementAt(1).remove(elem);
+				}
+				else{
+					Point target = elem.getDestination();
+					map.getProvinces()[target.x][target.y].getOccupyingUnit().upSupportStrength(); 
+				}
+			}
+		}
+		
+		while(!resolutionConflicts.isEmpty()){
+			Point conflictPoint = resolutionConflicts.remove(resolutionConflicts.size()-1);
+			Vector<MilitaryUnit> potentialVictors = new Vector<MilitaryUnit>();
+			int maxStrength = 0;
+			for(MilitaryUnit unit : newUnresolvedPositions.get(conflictPoint.y).get(conflictPoint.x)){
+				if(unit.getStrength()+unit.getSupportStrength()>maxStrength){
+					potentialVictors.clear();
+					maxStrength=unit.getStrength()+unit.getSupportStrength();
+					potentialVictors.add(unit);
+				}
+				else if(unit.getStrength()+unit.getSupportStrength()==maxStrength){
+					potentialVictors.add(unit);
+				}
+				unit.resetSupportStrength();
+			}
+			if(potentialVictors.size()==1){
+				boolean isDefender = true;
+				Vector<Point> emptyAdjacentPoints = new Vector<Point>();
+				for(Point adj : map.getProvinces()[conflictPoint.x][conflictPoint.y].getAdjacents()){
+					if(map.getProvinces()[adj.x][adj.y].getOccupyingUnit()==null){
+						emptyAdjacentPoints.add(adj);
+					}
+					else if(map.getProvinces()[adj.x][adj.y].getOccupyingUnit().equals(potentialVictors.get(0))){
+						map.getProvinces()[adj.x][adj.y].addOccupyingUnit(null,false);
+						isDefender=false;
+					}
+				}
+				if(!isDefender && emptyAdjacentPoints.size()!=0){
+					java.util.Random rand = new java.util.Random();
+					Point pushTo = emptyAdjacentPoints.get(rand.nextInt(emptyAdjacentPoints.size()));
+					map.getProvinces()[pushTo.x][pushTo.y].addOccupyingUnit(map.getProvinces()[conflictPoint.x][conflictPoint.y].getOccupyingUnit(),false);
+				}
+				map.getProvinces()[conflictPoint.x][conflictPoint.y].addOccupyingUnit(potentialVictors.get(0),false);
+				newUnresolvedPositions.get(conflictPoint.y).get(conflictPoint.x).remove(potentialVictors.get(0));
+			}
+		}
 	}
 }

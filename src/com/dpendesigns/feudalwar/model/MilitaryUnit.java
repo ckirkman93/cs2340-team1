@@ -6,6 +6,7 @@ public abstract class MilitaryUnit {
 	private Player owner;
 	private int strength;
 	private boolean active = false;
+	private int supportStrength = 0;
 	
 	public MilitaryUnit(){}
 	public MilitaryUnit(Player owner, int strength){ 
@@ -17,4 +18,7 @@ public abstract class MilitaryUnit {
 	public Player getOwner(){ return owner;}
 	public int getStrength(){ return strength;}
 	public boolean isActive(){return active;}
+	public int getSupportStrength(){return supportStrength;}
+	public void resetSupportStrength(){supportStrength=0;}
+	public void upSupportStrength(){supportStrength++;}
 }

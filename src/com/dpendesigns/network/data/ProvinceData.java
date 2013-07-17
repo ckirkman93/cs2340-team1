@@ -61,16 +61,18 @@ public class ProvinceData {
 		}
 	}
 	public void addOccupyingUnit(MilitaryUnit unit, boolean created){ 
-		occupyingUnit = unit; 
-		if (unit.isActive()){
-			lastOwner = unit.getOwner();
-			if(!lastOwner.getProvinces().contains(thisLocation)){
-				lastOwner.getProvinces().add(thisLocation);
+		occupyingUnit = unit;
+		if(unit!=null){
+			if (unit.isActive()){
+				lastOwner = unit.getOwner();
+				if(!lastOwner.getProvinces().contains(thisLocation)){
+					lastOwner.getProvinces().add(thisLocation);
+				}
 			}
-		}
-		if (created){
-			if (unit instanceof Infantry){lastOwner.addInfantry(1);}
-			else if (unit instanceof General){lastOwner.addGeneral(1);}
+			if (created){
+				if (unit instanceof Infantry){lastOwner.addInfantry(1);}
+				else if (unit instanceof General){lastOwner.addGeneral(1);}
+			}
 		}
 	}
 	
