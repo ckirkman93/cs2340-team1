@@ -115,7 +115,8 @@ public class FeudalWarServer {
 			kryo.register(com.dpendesigns.feudalwar.model.Infantry.class);
 			kryo.register(com.dpendesigns.feudalwar.model.General.class);
 			kryo.register(com.dpendesigns.feudalwar.model.MilitaryUnit.class);
-			
+			kryo.register(com.dpendesigns.network.requests.SendMessageRequest.class);
+
 			server.start();
 			server.bind(54555, 54777);
 			
