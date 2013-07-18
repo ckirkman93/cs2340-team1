@@ -30,7 +30,7 @@ public class MainGameHandler {
 	private GameContainer gc;
 	
 	private Province[][] my_map;
-	private ChatWindow chat;
+	private static ChatWindow chat;
 	private ActionMenu actionMenu;
 	private int actionMenuStatus = 0;
 	private ActionIndicatorHandler actionIndicator;
