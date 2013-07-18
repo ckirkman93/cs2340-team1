@@ -27,6 +27,8 @@ public class Province {
 	private int xDefaultPosition, yDefaultPosition;
 	private int iPosition, jPosition;
 	
+	private boolean shownAsOption;
+	
 	private int[] thisLocation;
 	
 	private int xDrift;
@@ -85,37 +87,40 @@ public class Province {
 		int xpos = input.getMouseX();
 		int ypos = input.getMouseY();
 
-		if (area.contains(xpos, ypos) && lastOwner.getName().equals(observer)){
+		if (area.contains(xpos, ypos)){
 			if (input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
 				currentColor = new Color(lastOwner.getColors()[2]);
 			}
 			else {currentColor = new Color(lastOwner.getColors()[1]);}
 
-			if ( !input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON) && leftClickDownState == true) {
+			if (!input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON) && leftClickDownState == true) {
 				currentColor = new Color(lastOwner.getColors()[0]);
 				clickStatus = 1;
 				
 			}
 			
-			if (!input.isMouseButtonDown(Input.MOUSE_RIGHT_BUTTON) && rightClickDownState == true) {
+			if (!input.isMouseButtonDown(Input.MOUSE_RIGHT_BUTTON) && rightClickDownState == true
+					&& lastOwner.getName().equals(observer)) {
 				currentColor = new Color(lastOwner.getColors()[2]);
 				clickStatus = 2;
 			}
 		}
-		else if (area.contains(xpos, ypos) && !lastOwner.getName().equals(observer)) {
-			if (!input.isMouseButtonDown(Input.MOUSE_RIGHT_BUTTON) && rightClickDownState == true) {
-				currentColor = new Color(lastOwner.getColors()[2]);
-				clickStatus = 2;
-			}
-		}
+		//else if (area.contains(xpos, ypos) && !lastOwner.getName().equals(observer)) {
+			//if (!input.isMouseButtonDown(Input.MOUSE_RIGHT_BUTTON) && rightClickDownState == true) {
+				//currentColor = new Color(lastOwner.getColors()[2]);
+				//clickStatus = 2;
+			//}
+		//}
 		else {currentColor = new Color(lastOwner.getColors()[0]);}
 		
 		return clickStatus;
 	}
 
 	public void render(GameContainer gc, Graphics g) throws SlickException {
-		g.setColor(currentColor);
-		g.fill(area);
+		if(shownAsOption)
+			g.setColor(new Color(this.lastOwner.getColors()[1]));
+		else g.setColor(currentColor);
+		g.fill(area);	
 		g.setColor(Color.black);
 		g.draw(area);
 		
@@ -135,6 +140,14 @@ public class Province {
 		}
 	}
 	
+	public void setShownAsOption(boolean b) {
+		shownAsOption = b;
+	}
+	
+	public Vector<Point> getAdjacents() {
+		return adjacents;
+	}
+	
 	public void setDrift(int xAmount, int yAmount){
 		xDrift = xAmount;
 		yDrift = yAmount;
@@ -144,7 +157,10 @@ public class Province {
 	public int jPosition(){ return jPosition; }
 	
 	public int xDefaultPosition() { return xDefaultPosition; }
-	public int yDefaultPosition() { return yDefaultPosition; }		
+	public int yDefaultPosition() { return yDefaultPosition; }
+	
+	public int centeredXDefaultPosition() { return xDefaultPosition + width/2; }
+	public int centeredYDefaultPosition() { return yDefaultPosition + height/2; }
 	
 	public int[] getThisLocation(){return thisLocation;}
 	

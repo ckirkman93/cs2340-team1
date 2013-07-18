@@ -15,10 +15,8 @@ import org.newdawn.slick.TrueTypeFont;
 import org.newdawn.slick.geom.Rectangle;
 import org.newdawn.slick.geom.Shape;
 
-
 import com.dpendesigns.feudalwar.model.GameInstance;
 import com.dpendesigns.feudalwar.model.Infantry;
-import com.dpendesigns.feudalwar.model.MovementPair;
 import com.dpendesigns.feudalwar.model.Player;
 import com.dpendesigns.feudalwar.model.Province;
 import com.dpendesigns.network.data.ProvinceData;
@@ -33,6 +31,7 @@ public class MainGameHandler {
 	
 	private ActionMenu actionMenu;
 	private int actionMenuStatus = 0;
+	private ActionIndicatorHandler actionIndicator;
 	private Point selectedProvince;
 	
 	private int myTurnPhase;
@@ -43,8 +42,10 @@ public class MainGameHandler {
 	private Vector<int[]> placedInfantry = new Vector<int[]>(); 
 	private Vector<int[]> placedGenerals = new Vector<int[]>();
 	
-	private Vector<MovementPair> attackerMovementPairs = new Vector<MovementPair>();
-	private Vector<MovementPair> supporterMovementPairs = new Vector<MovementPair>();
+	private Vector<Point> attackerDepartingLocations = new Vector<Point>();
+	private Vector<Point> attackerDestinations = new Vector<Point>();
+	private Vector<Point> supporterBaseLocations = new Vector<Point>();
+	private Vector<Point> supporterSupportLocations = new Vector<Point>();
 	
 	private static final int driftZone = 20;
 	private static final int driftSpeed = 2;
@@ -71,8 +72,6 @@ public class MainGameHandler {
 	
 	private int actionMenuX;
 	private int actionMenuY;
-	
-	//private AddArmyRequest addArmyRequest;
 	
 	public MainGameHandler(GameInstance game, String name) throws SlickException {
 		myTurnPhase = game.getTurnPhase();
@@ -103,6 +102,7 @@ public class MainGameHandler {
 			}
 		}
 		
+		actionIndicator = new ActionIndicatorHandler(my_map);		
 		
 		h1 = new TrueTypeFont(new Font(Font.MONOSPACED, Font.BOLD, 16), true);
 		h2 = new TrueTypeFont(new Font(Font.MONOSPACED, Font.BOLD, 12), true);
@@ -149,30 +149,70 @@ public class MainGameHandler {
 		mouseY = gc.getInput().getMouseY();
 		
 		calculateDrift(gc);
+		if(selectedProvince != null) {
+			if(actionMenuStatus == ActionMenu.MOVE_STATUS)
+				this.setAdjacentsHighlighted(my_map[selectedProvince.x][selectedProvince.y], true, true);
+			else if(actionMenuStatus == ActionMenu.SUPPORT_STATUS)
+				this.setAdjacentsHighlighted(my_map[selectedProvince.x][selectedProvince.y], true, false);
+			else this.setAdjacentsHighlighted(my_map[selectedProvince.x][selectedProvince.y], false, true);
+		}
 		
 		for(Province[] provinceArray : my_map) {
 			for(Province province : provinceArray) {
-				if(province != null) {
+				if(province != null) {					
 					province.setDrift(xDrift,yDrift); 
 					
 					int provinceClickedStatus = province.update(gc, my_name, leftClickDownState, rightClickDownState);
 					
-					if (provinceClickedStatus == 1 && availableInfantry > 0 && !province.isOccupied() && my_game.getTurnPhase() == 0){
+					if (provinceClickedStatus == 1 && availableInfantry > 0 && !province.isOccupied() 
+							&& my_game.getTurnPhase() == 0 
+							&& province.getLastOwner().getName().equals(my_name)){
 						placedInfantry.add(province.getThisLocation());
 						availableInfantry--;
 						province.addOccupyingUnit(new Infantry(), true);
 						System.out.println("Left Clicked");
 					}
 					else if (provinceClickedStatus == 1 && selectedProvince != null 
-							&& my_game.getTurnPhase() == 2) {
+							&& my_game.getTurnPhase() == 2 && !this.actionMenuDisplayed) {
 						Point targetPosition = new Point(province.iPosition(), province.jPosition());
 						if(this.actionMenuStatus == ActionMenu.MOVE_STATUS) {
-							if(province.isAdjacent(targetPosition)) {
-								this.attackerMovementPairs.add(new MovementPair(selectedProvince, targetPosition));
+							if(province.isAdjacent(selectedProvince)) {
+								if(attackerDepartingLocations.contains(selectedProvince)) {
+									int index = attackerDepartingLocations.indexOf(selectedProvince);
+									attackerDepartingLocations.remove(index);
+									attackerDestinations.remove(index);
+								} else if(supporterBaseLocations.contains(selectedProvince)) {
+									int index = supporterBaseLocations.indexOf(selectedProvince);
+									supporterBaseLocations.remove(index);
+									supporterSupportLocations.remove(index);
+								}
+								this.attackerDepartingLocations.add(selectedProvince);
+								this.attackerDestinations.add(targetPosition);
+								actionIndicator.update(gc, attackerDepartingLocations, attackerDestinations, true);
+								actionIndicator.update(gc, supporterBaseLocations, supporterSupportLocations, false);
+								actionMenu.setStatus(ActionMenu.INACTIVE_STATUS);
+								this.actionMenuStatus = ActionMenu.INACTIVE_STATUS;
+								System.out.println("Selected province to which to move");
 							}
 						} else if(this.actionMenuStatus == ActionMenu.SUPPORT_STATUS) {
-							if(province.isAdjacent(targetPosition)) {
-								this.supporterMovementPairs.add(new MovementPair(selectedProvince,targetPosition));
+							if(province.isAdjacent(selectedProvince) && province.isOccupied()
+									&& my_map[targetPosition.x][targetPosition.y].isOccupied()) {
+								if(supporterBaseLocations.contains(selectedProvince)) {
+									int index = supporterBaseLocations.indexOf(selectedProvince);
+									supporterBaseLocations.remove(index);
+									supporterSupportLocations.remove(index);
+								} else if(attackerDepartingLocations.contains(selectedProvince)) {
+									int index = attackerDepartingLocations.indexOf(selectedProvince);
+									attackerDepartingLocations.remove(index);
+									attackerDestinations.remove(index);
+								}
+								this.supporterBaseLocations.add(selectedProvince);
+								this.supporterSupportLocations.add(targetPosition);
+								actionIndicator.update(gc, supporterBaseLocations, supporterSupportLocations, false);
+								actionIndicator.update(gc, attackerDepartingLocations, attackerDestinations, true);
+								actionMenu.setStatus(ActionMenu.INACTIVE_STATUS);
+								this.actionMenuStatus = ActionMenu.INACTIVE_STATUS;
+								System.out.println("Selected province to support");
 							}
 						}
 					}
@@ -182,14 +222,14 @@ public class MainGameHandler {
 						availableGenerals--;
 						System.out.println("Right Clicked");
 					}
-					if (provinceClickedStatus == 2 && my_game.getTurnPhase() == 2) {
+					else if (provinceClickedStatus == 2 && my_game.getTurnPhase() == 2 
+							&& province.isOccupied() && province.getLastOwner().getName().equals(my_name)) {
 						actionMenuX = province.xDefaultPosition() + 39;
 						actionMenuY = province.yDefaultPosition() + 36;
 						selectedProvince = new Point(province.iPosition(), province.jPosition());
 						actionMenu = new ActionMenu(actionMenuX, actionMenuY, province.getLastOwner().getColors()[0]);
 						actionMenuDisplayed = true;
-					}
-					
+					}					
 				}
 			}
 		}
@@ -208,14 +248,9 @@ public class MainGameHandler {
 		else {endTurn = endTurnSpriteSheet.getSubImage(0, 0);}
 		
 		if (actionMenuDisplayed) {
-			actionMenuStatus = actionMenu.update(gc);
-		}
-		
-		if (actionMenuStatus == ActionMenu.HOLD_STATUS
-				|| actionMenuStatus == ActionMenu.MOVE_STATUS
-				|| actionMenuStatus == ActionMenu.SUPPORT_STATUS
-				|| actionMenuStatus == ActionMenu.DO_NOTHING_STATUS) {
-			actionMenuDisplayed = false;
+			actionMenuStatus = actionMenu.update(gc, actionMenuDisplayed);
+			if(actionMenuStatus != ActionMenu.WAITING_STATUS)
+				this.actionMenuDisplayed = false;
 		}
 		
 		if (!input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {leftClickDownState = false;}
@@ -224,6 +259,7 @@ public class MainGameHandler {
 		if (!input.isMouseButtonDown(Input.MOUSE_RIGHT_BUTTON)) {rightClickDownState = false;}
 		else {rightClickDownState = true;}
 	}
+	
 	public void render(GameContainer gc, Graphics g) throws SlickException {
 		mainGameBackground.draw(0,0);
 		for(Province[] p : my_map)
@@ -277,6 +313,7 @@ public class MainGameHandler {
 		if (actionMenuDisplayed) {
 			actionMenu.render(gc, g, actionMenuX+xDrift, actionMenuY+yDrift);
 		}
+		actionIndicator.render(gc, g, xDrift, yDrift);
 	}
 	
 	public void calculateDrift(GameContainer gc){
@@ -291,6 +328,16 @@ public class MainGameHandler {
 		turnPhase = turnPhaseSpriteSheet.getSubImage(myTurnPhase, 0);
 	}
 	
+	private void setAdjacentsHighlighted(Province center, boolean highlighted, boolean affectUnoccupied) {
+		for(Point p : center.getAdjacents()) {
+			if(affectUnoccupied)
+				my_map[p.x][p.y].setShownAsOption(highlighted);
+			else 
+				if(my_map[p.x][p.y].isOccupied())
+					my_map[p.x][p.y].setShownAsOption(highlighted);
+		}
+	}
+	
 	public boolean getTurnPhaseStatus(){return turnPhaseFinished;}
 
 	public Vector<int[]> getInfantryPlacements() {
@@ -301,17 +348,27 @@ public class MainGameHandler {
 		return placedGenerals;
 	}
 	
-	public Vector<MovementPair> getAttackerMovementPairs() {
-		return attackerMovementPairs;
+	public Vector<Point> getAttackerDepartingLocations() {
+		return attackerDepartingLocations;
 	}
 
-	public Vector<MovementPair> getSupporterMovementPairs() {
-		return supporterMovementPairs;
+	public Vector<Point> getAttackerDestinations() {
+		return attackerDestinations;
+	}
+
+	public Vector<Point> getSupporterBaseLocations() {
+		return supporterBaseLocations;
+	}
+
+	public Vector<Point> getSupporterSupportLocations() {
+		return supporterSupportLocations;
 	}
 	
 	public void clearMovementPhaseInfo() {
-		this.attackerMovementPairs.clear();
-		this.supporterMovementPairs.clear();
+		this.attackerDepartingLocations.clear();
+		this.attackerDestinations.clear();
+		this.supporterBaseLocations.clear();
+		this.supporterSupportLocations.clear();
 		this.selectedProvince = null;
 		this.actionMenuStatus = 0;
 	}

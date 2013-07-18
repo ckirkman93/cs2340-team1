@@ -20,7 +20,7 @@ public class ProvinceData {
 	
 	private int xDrift;
 	private int yDrift;
-	private Vector<Point> adjacents;
+	private Vector<Point> adjacents = new Vector<Point>();
 
 	private Player lastOwner = new Player();
 	

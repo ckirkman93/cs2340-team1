@@ -97,6 +97,7 @@ public class FeudalWarServer {
 			// Register the response classes for serialization
 			kryo.register(com.dpendesigns.network.responses.LoginResponse.class);
 			kryo.register(com.dpendesigns.network.responses.PlacementPhaseResponse.class);
+			kryo.register(com.dpendesigns.network.responses.MovementPhaseResponse.class);
 			
 			kryo.register(com.dpendesigns.feudalwar.controllers.handlers.Map.class);
 			kryo.register(java.util.Vector.class);

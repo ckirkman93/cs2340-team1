@@ -10,7 +10,6 @@ import com.dpendesigns.feudalwar.controllers.handlers.HostGameHandler;
 import com.dpendesigns.feudalwar.controllers.handlers.JoinGameHandler;
 import com.dpendesigns.feudalwar.controllers.handlers.MainGameHandler;
 import com.dpendesigns.feudalwar.controllers.handlers.MainMenuHandler;
-import com.dpendesigns.feudalwar.model.MovementPair;
 import com.dpendesigns.feudalwar.controllers.handlers.PreGameHandler;
 import com.dpendesigns.feudalwar.controllers.handlers.SetupHandler;
 import com.dpendesigns.feudalwar.model.GameInstance;
@@ -127,6 +126,7 @@ public class FeudalWarClient extends BasicGame {
 			// Register the response classes for serialization
 			kryo.register(com.dpendesigns.network.responses.LoginResponse.class);
 			kryo.register(com.dpendesigns.network.responses.PlacementPhaseResponse.class);
+			kryo.register(com.dpendesigns.network.responses.MovementPhaseResponse.class);
 			
 			kryo.register(com.dpendesigns.feudalwar.controllers.handlers.Map.class);
 			kryo.register(java.util.Vector.class);
@@ -259,11 +259,16 @@ public class FeudalWarClient extends BasicGame {
 							System.out.println("Request Sent");
 							}
 						else if (my_game.getTurnPhase() == 2) {
-							Vector<Vector<MovementPair>> locations = new Vector<Vector<MovementPair>>();
-							locations.add(mainGameHandler.getAttackerMovementPairs());
-							locations.add(mainGameHandler.getSupporterMovementPairs());
-							client.sendTCP(new MovementPhaseRequest(my_game.getGameName(), self.getName(),locations));
+							waitForUserList = true;
+							waitForGameList = true;
+							Vector<Vector<Point>> locations = new Vector<Vector<Point>>();
+							locations.add(mainGameHandler.getAttackerDepartingLocations());
+							locations.add(mainGameHandler.getAttackerDestinations());
+							locations.add(mainGameHandler.getSupporterBaseLocations());
+							locations.add(mainGameHandler.getSupporterSupportLocations());
+							client.sendTCP(new MovementPhaseRequest(my_game.getGameName(), self.getName(), locations));
 							mainGameHandler.clearMovementPhaseInfo();
+							System.out.println("Move Request Sent");
 						}
 					}
 				}
@@ -350,12 +355,13 @@ public class FeudalWarClient extends BasicGame {
 				if (mainGameHandler!=null){
 					mainGameHandler.updateMap(my_game);
 					}
-				System.out.println("Repsonse Received");
-			} else if (o instanceof MovementPhaseResponse){
+				System.out.println("Response Received");
+			}
+			else if (o instanceof MovementPhaseResponse){
 				if (mainGameHandler!=null){
 					mainGameHandler.updateMap(my_game);
 					}
-				System.out.println("Repsonse Received");
+				System.out.println("Response Received");
 			}
 		}
 	}

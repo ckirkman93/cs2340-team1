@@ -11,10 +11,9 @@ import com.dpendesigns.feudalwar.controllers.handlers.Map;
 import com.dpendesigns.feudalwar.model.GameInstance;
 import com.dpendesigns.feudalwar.model.General;
 import com.dpendesigns.feudalwar.model.Infantry;
+import com.dpendesigns.feudalwar.model.MilitaryUnit;
 import com.dpendesigns.feudalwar.model.Player;
 import com.dpendesigns.feudalwar.model.User;
-import com.dpendesigns.feudalwar.model.MilitaryUnit;
-import com.dpendesigns.feudalwar.model.MovementPair;
 import com.dpendesigns.network.data.GameList;
 import com.dpendesigns.network.data.ProvinceData;
 import com.dpendesigns.network.data.UserList;
@@ -23,8 +22,8 @@ import com.dpendesigns.network.requests.BeginGameRequest;
 import com.dpendesigns.network.requests.ChangeStateRequest;
 import com.dpendesigns.network.requests.JoinGameRequest;
 import com.dpendesigns.network.requests.LoginRequest;
-import com.dpendesigns.network.requests.PlacementPhaseRequest;
 import com.dpendesigns.network.requests.MovementPhaseRequest;
+import com.dpendesigns.network.requests.PlacementPhaseRequest;
 import com.dpendesigns.network.responses.LoginResponse;
 import com.dpendesigns.network.responses.MovementPhaseResponse;
 import com.dpendesigns.network.responses.PlacementPhaseResponse;
@@ -310,18 +309,21 @@ public class ServerListenerParser {
 			System.out.println("");
 			if (game.getGameName().equals(movementPhaseRequest.getGameName())){
 				//System.out.println("Found the game");
-				Vector<Vector<Vector<MovementPair>>> players = new Vector<Vector<Vector<MovementPair>>>();
 				for (Player player: game.getPlayers()){
 					if (player.getName().equals(movementPhaseRequest.getUserName())){
 						//System.out.println("Found the player");
-						player.setMovementPhaseLocations(movementPhaseRequest.getLocations());
+						player.setAttackerDepartingLocations(movementPhaseRequest.getAttackerDepartingLocations());
+						player.setAttackerDestinations(movementPhaseRequest.getAttackerDestinations());
+						player.setSupporterBaseLocations(movementPhaseRequest.getSupporterBaseLocations());
+						player.setSupporterDefenseLocations(movementPhaseRequest.getSupporterDefenseLocations());
 						game.removePlayerFromWaiting(movementPhaseRequest.getUserName());
-						players.add(movementPhaseRequest.getLocations());
+						System.out.print(player.getAttackerDepartingLocations().size()+"-");
+						System.out.println("Player Request Received");
 					}
 				}
 				System.out.println(game.remainingWait());
 				if (game.remainingWait() == 0){
-					resolveConflicts(game, players);
+					resolveConflicts(game);
 					game.enterNextPhase();
 					for (User user : game.getUsers()){
 						user.setState(loadGame);
@@ -333,52 +335,62 @@ public class ServerListenerParser {
 		}
 	}
 	
-	private void resolveConflicts(GameInstance game, Vector<Vector<Vector<MovementPair>>> players){
-		Map map = game.getMap();
+	private void resolveConflicts(GameInstance game){
+		Vector<Player> players = game.getPlayers();
 		Vector<Vector<Vector<MilitaryUnit>>> newUnresolvedPositions = new Vector<Vector<Vector<MilitaryUnit>>>();
-		for(int i=0;i<map.getProvinces().length;i++){
+		for(int i=0;i<game.getMap().getProvinces().length;i++){
 			Vector<Vector<MilitaryUnit>> nextRow = new Vector<Vector<MilitaryUnit>>(); 
-			for(int j=0;j<map.getProvinces()[i].length;j++){
+			for(int j=0;j<game.getMap().getProvinces()[i].length;j++){
 				Vector<MilitaryUnit> addSet = new Vector<MilitaryUnit>();
-				if(map.getProvinces()[i][j].getOccupyingUnit()!=null){
-					addSet.add(map.getProvinces()[i][j].getOccupyingUnit());
+				if(game.getMap().getProvinces()[i][j]!=null && game.getMap().getProvinces()[i][j].getOccupyingUnit()!=null){
+					addSet.add(game.getMap().getProvinces()[i][j].getOccupyingUnit());
 				}
 				nextRow.add(addSet);
 			}
 			newUnresolvedPositions.add(nextRow);
 		}
+		Vector<MovementPair> noConflicts = new Vector<MovementPair>();
 		Vector<Point> resolutionConflicts = new Vector<Point>();
-		for(Vector<Vector<MovementPair>> player : players){
-			for(MovementPair elem : player.elementAt(0)){
-				Point dest = elem.getDestination();
-				Point base = elem.getBaseLocation();
-				MilitaryUnit movedUnit = map.getProvinces()[base.x][base.y].getOccupyingUnit();
-				newUnresolvedPositions.get(base.y).get(base.x).remove(movedUnit);
-				newUnresolvedPositions.get(dest.y).get(dest.x).add(movedUnit);
-				if(newUnresolvedPositions.get(dest.y).get(dest.x).size()>1){
+		for(Player player : players){
+			for(Point base : player.getAttackerDepartingLocations()){
+				Point dest = player.getAttackerDestinations().elementAt(player.getAttackerDepartingLocations().indexOf(base));
+				MilitaryUnit movedUnit = game.getMap().getProvinces()[base.x][base.y].getOccupyingUnit();
+				newUnresolvedPositions.get(base.x).get(base.y).remove(movedUnit);
+				newUnresolvedPositions.get(dest.x).get(dest.y).add(movedUnit);
+				MovementPair pair = new MovementPair(dest,base);
+				if(newUnresolvedPositions.get(dest.x).get(dest.y).size()>1){
 					resolutionConflicts.add(dest);
-				}
-			}
-		}
-		
-		for(Vector<Vector<MovementPair>> player : players){
-			for(MovementPair elem : player.elementAt(1)){
-				Point base = elem.getBaseLocation();
-				if(newUnresolvedPositions.get(base.y).get(base.x).size()!=1){
-					player.elementAt(1).remove(elem);
+					noConflicts.remove(pair);
 				}
 				else{
-					Point target = elem.getDestination();
-					map.getProvinces()[target.x][target.y].getOccupyingUnit().upSupportStrength(); 
+					noConflicts.add(pair);
 				}
 			}
 		}
-		
+		for(MovementPair pair : noConflicts){
+			Point dest = pair.getDest();
+			Point base = pair.getBase();
+			game.getMap().getProvinces()[dest.x][dest.y].addOccupyingUnit(game.getMap().getProvinces()[base.x][base.y].getOccupyingUnit(),false);
+			game.getMap().getProvinces()[base.x][base.y].addOccupyingUnit(null,false);
+			System.out.println("Moved");
+		}
+		for(Player player : players){
+			for(Point base : player.getSupporterBaseLocations()){
+				Point target = player.getSupporterDefenseLocations().elementAt(player.getSupporterBaseLocations().indexOf(base));
+				if(newUnresolvedPositions.get(base.x).get(base.y).size()!=1){
+					player.getSupporterBaseLocations().remove(base);
+					player.getSupporterDefenseLocations().remove(target);
+				}
+				else{
+					game.getMap().getProvinces()[target.x][target.y].getOccupyingUnit().upSupportStrength(); 
+				}
+			}
+		}
 		while(!resolutionConflicts.isEmpty()){
 			Point conflictPoint = resolutionConflicts.remove(resolutionConflicts.size()-1);
 			Vector<MilitaryUnit> potentialVictors = new Vector<MilitaryUnit>();
 			int maxStrength = 0;
-			for(MilitaryUnit unit : newUnresolvedPositions.get(conflictPoint.y).get(conflictPoint.x)){
+			for(MilitaryUnit unit : newUnresolvedPositions.get(conflictPoint.x).get(conflictPoint.y)){
 				if(unit.getStrength()+unit.getSupportStrength()>maxStrength){
 					potentialVictors.clear();
 					maxStrength=unit.getStrength()+unit.getSupportStrength();
@@ -389,26 +401,50 @@ public class ServerListenerParser {
 				}
 				unit.resetSupportStrength();
 			}
+			newUnresolvedPositions.get(conflictPoint.x).get(conflictPoint.y).removeAllElements();
 			if(potentialVictors.size()==1){
 				boolean isDefender = true;
 				Vector<Point> emptyAdjacentPoints = new Vector<Point>();
-				for(Point adj : map.getProvinces()[conflictPoint.x][conflictPoint.y].getAdjacents()){
-					if(map.getProvinces()[adj.x][adj.y].getOccupyingUnit()==null){
+				for(Point adj : game.getMap().getProvinces()[conflictPoint.x][conflictPoint.y].getAdjacents()){
+					if(newUnresolvedPositions.get(adj.x).get(adj.y).isEmpty()){
 						emptyAdjacentPoints.add(adj);
 					}
-					else if(map.getProvinces()[adj.x][adj.y].getOccupyingUnit().equals(potentialVictors.get(0))){
-						map.getProvinces()[adj.x][adj.y].addOccupyingUnit(null,false);
+					else if(game.getMap().getProvinces()[adj.x][adj.y].getOccupyingUnit().equals(potentialVictors.get(0))){
+						game.getMap().getProvinces()[adj.x][adj.y].addOccupyingUnit(null,false);
 						isDefender=false;
 					}
 				}
 				if(!isDefender && emptyAdjacentPoints.size()!=0){
 					java.util.Random rand = new java.util.Random();
 					Point pushTo = emptyAdjacentPoints.get(rand.nextInt(emptyAdjacentPoints.size()));
-					map.getProvinces()[pushTo.x][pushTo.y].addOccupyingUnit(map.getProvinces()[conflictPoint.x][conflictPoint.y].getOccupyingUnit(),false);
+					game.getMap().getProvinces()[pushTo.x][pushTo.y].addOccupyingUnit(game.getMap().getProvinces()[conflictPoint.x][conflictPoint.y].getOccupyingUnit(),false);
 				}
-				map.getProvinces()[conflictPoint.x][conflictPoint.y].addOccupyingUnit(potentialVictors.get(0),false);
-				newUnresolvedPositions.get(conflictPoint.y).get(conflictPoint.x).remove(potentialVictors.get(0));
+				game.getMap().getProvinces()[conflictPoint.x][conflictPoint.y].addOccupyingUnit(potentialVictors.get(0),false);
+				newUnresolvedPositions.get(conflictPoint.x).get(conflictPoint.y).remove(potentialVictors.get(0));
 			}
+		}
+	}
+	
+	private class MovementPair{
+		Point dest;
+		Point base;
+		
+		public MovementPair(){}
+		public MovementPair(Point dest, Point base){
+			this.dest=dest;
+			this.base=base;
+		}
+		
+		public Point getDest(){return dest;}
+		public Point getBase(){return base;}
+		public void setDest(Point dest){this.dest=dest;}
+		public void setBase(Point base){this.base=base;}
+		
+		public boolean equals(Object o){
+			if(o instanceof MovementPair){
+				if(((MovementPair) o).dest.equals(dest)) return true;
+			}
+			return false;
 		}
 	}
 }
