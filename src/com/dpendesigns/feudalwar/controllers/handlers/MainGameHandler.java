@@ -25,10 +25,11 @@ public class MainGameHandler {
 	private GameInstance my_game;
 	private String my_gameID;
 	
-	private String my_name;
+	private String my_name; 
+	private GameContainer gc;
 	
 	private Province[][] my_map;
-	
+	private ChatWindow chat;
 	private ActionMenu actionMenu;
 	private int actionMenuStatus = 0;
 	private ActionIndicatorHandler actionIndicator;
@@ -138,8 +139,13 @@ public class MainGameHandler {
 	
 	
 	public void update(GameContainer gc) throws SlickException {
+		if(gc != null && chat == null)
+			chat = new ChatWindow(my_game.getUsers(), my_name, gc);
 		endTurnLocation.setLocation(4, gc.getHeight() - 68);
 		turnPhaseFinished = false;
+		
+		if(chat != null)
+			chat.update(gc);
 		
 		Input input = gc.getInput();
 		int xpos = input.getMouseX();
@@ -260,7 +266,7 @@ public class MainGameHandler {
 		else {rightClickDownState = true;}
 	}
 	
-	public void render(GameContainer gc, Graphics g) throws SlickException {
+	public void render(GameContainer gc, Graphics g) throws SlickException {		
 		mainGameBackground.draw(0,0);
 		for(Province[] p : my_map)
 			for(Province province : p)
@@ -314,6 +320,8 @@ public class MainGameHandler {
 			actionMenu.render(gc, g, actionMenuX+xDrift, actionMenuY+yDrift);
 		}
 		actionIndicator.render(gc, g, xDrift, yDrift);
+		if(chat != null)
+			chat.render(gc, g);
 	}
 	
 	public void calculateDrift(GameContainer gc){
