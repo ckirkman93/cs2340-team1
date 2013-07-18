@@ -2,6 +2,7 @@ package com.dpendesigns.network;
 
 import java.awt.Point;
 import java.util.Collections;
+import java.util.PriorityQueue;
 import java.util.Vector;
 
 import org.newdawn.slick.SlickException;
@@ -321,8 +322,6 @@ public class ServerListenerParser {
 						player.setSupporterBaseLocations(movementPhaseRequest.getSupporterBaseLocations());
 						player.setSupporterDefenseLocations(movementPhaseRequest.getSupporterDefenseLocations());
 						game.removePlayerFromWaiting(movementPhaseRequest.getUserName());
-						System.out.print(player.getAttackerDepartingLocations().size()+"-");
-						System.out.println("Player Request Received");
 					}
 				}
 				System.out.println(game.remainingWait());
@@ -355,6 +354,39 @@ public class ServerListenerParser {
 		}
 		Vector<MovementPair> noConflicts = new Vector<MovementPair>();
 		Vector<Point> resolutionConflicts = new Vector<Point>();
+		Vector<Vector<MovementPair>> allAttackerPaths = new Vector<Vector<MovementPair>>();
+		for(int i=0;i<players.size();i++){
+			Player player=players.get(i);
+			Vector<MovementPair> playerAttackerPaths = new Vector<MovementPair>();
+			for(Point base : player.getAttackerDepartingLocations()){
+				Point dest = player.getAttackerDestinations().elementAt(player.getAttackerDepartingLocations().indexOf(base));
+				int index = player.getAttackerDepartingLocations().indexOf(base);
+				playerAttackerPaths.add(new MovementPair(dest,base,index));
+			}
+			allAttackerPaths.add(playerAttackerPaths);
+		}
+		for(int i=0;i<players.size();i++){
+			PriorityQueue<Integer> indexList = new PriorityQueue<Integer>();
+			for(int j=0;j<players.size();j++){
+				for(int k=0;k<allAttackerPaths.get(i).size();k++){
+					for(int l=0;l<allAttackerPaths.get(j).size();l++){
+						if(allAttackerPaths.get(i).get(k).getBase().equals(allAttackerPaths.get(j).get(l).getDest()) &&
+								allAttackerPaths.get(i).get(k).getDest().equals(allAttackerPaths.get(j).get(l).getBase())){
+							indexList.add(-1*allAttackerPaths.get(i).get(k).getOriginalIndex());
+						}
+					}
+				}
+			}
+			Vector<Point> attackerDepartingList = players.get(i).getAttackerDepartingLocations();
+			Vector<Point> attackerDestinationList = players.get(i).getAttackerDestinations();
+			for(int k=0;k<indexList.size();k++){
+				attackerDepartingList.remove(-1*indexList.peek());
+				attackerDestinationList.remove(-1*indexList.poll());
+			}
+			players.get(i).setAttackerDepartingLocations(attackerDepartingList);
+			players.get(i).setAttackerDestinations(attackerDestinationList);
+		}
+		
 		for(Player player : players){
 			for(Point base : player.getAttackerDepartingLocations()){
 				Point dest = player.getAttackerDestinations().elementAt(player.getAttackerDepartingLocations().indexOf(base));
@@ -379,13 +411,14 @@ public class ServerListenerParser {
 			System.out.println("Moved");
 		}
 		for(Player player : players){
-			for(Point base : player.getSupporterBaseLocations()){
-				Point target = player.getSupporterDefenseLocations().elementAt(player.getSupporterBaseLocations().indexOf(base));
+			for(int i=0;i < player.getSupporterBaseLocations().size();i++){
+				Point base = player.getSupporterBaseLocations().get(i);
+				Point target = player.getSupporterDefenseLocations().get(i);
 				if(newUnresolvedPositions.get(base.x).get(base.y).size()!=1){
 					player.getSupporterBaseLocations().remove(base);
 					player.getSupporterDefenseLocations().remove(target);
 				}
-				else{
+				else if(game.getMap().getProvinces()[target.x][target.y].getOccupyingUnit()!=null){
 					game.getMap().getProvinces()[target.x][target.y].getOccupyingUnit().upSupportStrength(); 
 				}
 			}
@@ -407,20 +440,135 @@ public class ServerListenerParser {
 			}
 			newUnresolvedPositions.get(conflictPoint.x).get(conflictPoint.y).removeAllElements();
 			if(potentialVictors.size()==1){
-				boolean isDefender = true;
 				Vector<Point> emptyAdjacentPoints = new Vector<Point>();
+				Vector<Point> emptyAdjacentAlliedPoints = new Vector<Point>();
+				Point source=null;
 				for(Point adj : game.getMap().getProvinces()[conflictPoint.x][conflictPoint.y].getAdjacents()){
-					if(newUnresolvedPositions.get(adj.x).get(adj.y).isEmpty()){
+					if(game.getMap().getProvinces()[adj.x][adj.y].getOccupyingUnit()!=null && game.getMap().getProvinces()[adj.x][adj.y].getOccupyingUnit().equals(potentialVictors.get(0))){
+						game.getMap().getProvinces()[adj.x][adj.y].addOccupyingUnit(null,false);
+						source = adj;
+					}
+					else if(newUnresolvedPositions.get(adj.x).get(adj.y).isEmpty()){
+						if(game.getMap().getProvinces()[adj.x][adj.y].getLastOwner().equals(
+								game.getMap().getProvinces()[conflictPoint.x][conflictPoint.y].getLastOwner())){
+							emptyAdjacentAlliedPoints.add(adj);
+						}
 						emptyAdjacentPoints.add(adj);
 					}
-					else if(game.getMap().getProvinces()[adj.x][adj.y].getOccupyingUnit().equals(potentialVictors.get(0))){
-						game.getMap().getProvinces()[adj.x][adj.y].addOccupyingUnit(null,false);
-						isDefender=false;
-					}
 				}
-				if(!isDefender && emptyAdjacentPoints.size()!=0){
-					java.util.Random rand = new java.util.Random();
-					Point pushTo = emptyAdjacentPoints.get(rand.nextInt(emptyAdjacentPoints.size()));
+				if(emptyAdjacentPoints.size()!=0 && source!=null){
+					Vector<Point> preference = new Vector<Point>();
+					if(conflictPoint.x%2==0){
+						if(conflictPoint.x==source.x){
+							preference.add(new Point(conflictPoint.x,(2*conflictPoint.y-source.y)));
+							if(conflictPoint.y<source.y){
+								preference.add(new Point(conflictPoint.x-1,conflictPoint.y-1));
+								preference.add(new Point(conflictPoint.x+1,conflictPoint.y-1));
+								preference.add(new Point(conflictPoint.x-1,conflictPoint.y));
+								preference.add(new Point(conflictPoint.x+1,conflictPoint.y));
+							}
+							else{
+								preference.add(new Point(conflictPoint.x-1,conflictPoint.y));
+								preference.add(new Point(conflictPoint.x+1,conflictPoint.y));
+								preference.add(new Point(conflictPoint.x-1,conflictPoint.y-1));
+								preference.add(new Point(conflictPoint.x+1,conflictPoint.y-1));
+							}
+						}
+						else if(conflictPoint.x<source.x){
+							if(conflictPoint.y==source.y){
+								preference.add(new Point(conflictPoint.x-1,conflictPoint.y-1));
+								preference.add(new Point(conflictPoint.x-1,conflictPoint.y));
+								preference.add(new Point(conflictPoint.x,conflictPoint.y-1));
+								preference.add(new Point(conflictPoint.x,conflictPoint.y+1));
+								preference.add(new Point(conflictPoint.x+1,conflictPoint.y-1));
+							}
+							else{
+								preference.add(new Point(conflictPoint.x-1,conflictPoint.y));
+								preference.add(new Point(conflictPoint.x-1,conflictPoint.y-1));
+								preference.add(new Point(conflictPoint.x,conflictPoint.y+1));
+								preference.add(new Point(conflictPoint.x,conflictPoint.y-1));
+								preference.add(new Point(conflictPoint.x+1,conflictPoint.y));
+							}
+						}
+						else{
+							if(conflictPoint.y==source.y){
+								preference.add(new Point(conflictPoint.x+1,conflictPoint.y-1));
+								preference.add(new Point(conflictPoint.x+1,conflictPoint.y));
+								preference.add(new Point(conflictPoint.x,conflictPoint.y-1));
+								preference.add(new Point(conflictPoint.x,conflictPoint.y+1));
+								preference.add(new Point(conflictPoint.x-1,conflictPoint.y-1));
+							}
+							else{
+								preference.add(new Point(conflictPoint.x+1,conflictPoint.y));
+								preference.add(new Point(conflictPoint.x+1,conflictPoint.y-1));
+								preference.add(new Point(conflictPoint.x,conflictPoint.y+1));
+								preference.add(new Point(conflictPoint.x,conflictPoint.y-1));
+								preference.add(new Point(conflictPoint.x-1,conflictPoint.y));
+							}
+						}
+					}
+					else{
+						if(conflictPoint.x==source.x){
+							preference.add(new Point(conflictPoint.x,(2*conflictPoint.y-source.y)));
+							if(conflictPoint.y<source.y){
+								preference.add(new Point(conflictPoint.x-1,conflictPoint.y));
+								preference.add(new Point(conflictPoint.x+1,conflictPoint.y));
+								preference.add(new Point(conflictPoint.x-1,conflictPoint.y+1));
+								preference.add(new Point(conflictPoint.x+1,conflictPoint.y+1));
+							}
+							else{
+								preference.add(new Point(conflictPoint.x-1,conflictPoint.y+1));
+								preference.add(new Point(conflictPoint.x+1,conflictPoint.y+1));
+								preference.add(new Point(conflictPoint.x-1,conflictPoint.y));
+								preference.add(new Point(conflictPoint.x+1,conflictPoint.y));
+							}
+						}
+						else if(conflictPoint.x<source.x){
+							if(conflictPoint.y==source.y){
+								preference.add(new Point(conflictPoint.x-1,conflictPoint.y));
+								preference.add(new Point(conflictPoint.x-1,conflictPoint.y+1));
+								preference.add(new Point(conflictPoint.x,conflictPoint.y-1));
+								preference.add(new Point(conflictPoint.x,conflictPoint.y+1));
+								preference.add(new Point(conflictPoint.x+1,conflictPoint.y));
+							}
+							else{
+								preference.add(new Point(conflictPoint.x-1,conflictPoint.y+1));
+								preference.add(new Point(conflictPoint.x-1,conflictPoint.y));
+								preference.add(new Point(conflictPoint.x,conflictPoint.y+1));
+								preference.add(new Point(conflictPoint.x,conflictPoint.y-1));
+								preference.add(new Point(conflictPoint.x+1,conflictPoint.y+1));
+							}
+						}
+						else{
+							if(conflictPoint.y==source.y){
+								preference.add(new Point(conflictPoint.x+1,conflictPoint.y));
+								preference.add(new Point(conflictPoint.x+1,conflictPoint.y+1));
+								preference.add(new Point(conflictPoint.x,conflictPoint.y-1));
+								preference.add(new Point(conflictPoint.x,conflictPoint.y+1));
+								preference.add(new Point(conflictPoint.x-1,conflictPoint.y));
+							}
+							else{
+								preference.add(new Point(conflictPoint.x+1,conflictPoint.y+1));
+								preference.add(new Point(conflictPoint.x+1,conflictPoint.y));
+								preference.add(new Point(conflictPoint.x,conflictPoint.y+1));
+								preference.add(new Point(conflictPoint.x,conflictPoint.y-1));
+								preference.add(new Point(conflictPoint.x-1,conflictPoint.y+1));
+							}
+						}
+					}
+					Point pushTo = null;
+					for(int i=preference.size()-1;i>=0;i--){
+						if(emptyAdjacentAlliedPoints.contains(preference.get(i))){
+							pushTo=preference.get(i);
+						}
+					}
+					if(pushTo==null)
+						for(int i=preference.size()-1;i>=0;i--){
+						if(emptyAdjacentPoints.contains(preference.get(i))){
+							pushTo=preference.get(i);
+						}
+					}
+					
 					game.getMap().getProvinces()[pushTo.x][pushTo.y].addOccupyingUnit(game.getMap().getProvinces()[conflictPoint.x][conflictPoint.y].getOccupyingUnit(),false);
 				}
 				game.getMap().getProvinces()[conflictPoint.x][conflictPoint.y].addOccupyingUnit(potentialVictors.get(0),false);
@@ -430,17 +578,25 @@ public class ServerListenerParser {
 	}
 	
 	private class MovementPair{
-		Point dest;
-		Point base;
+		private Point dest;
+		private Point base;
+		private int originalIndex;
 		
 		public MovementPair(){}
 		public MovementPair(Point dest, Point base){
 			this.dest=dest;
 			this.base=base;
+			originalIndex=-1;
+		}
+		public MovementPair(Point dest, Point base, int index){
+			this.dest=dest;
+			this.base=base;
+			originalIndex=index;
 		}
 		
 		public Point getDest(){return dest;}
 		public Point getBase(){return base;}
+		public int getOriginalIndex(){return originalIndex;}
 		public void setDest(Point dest){this.dest=dest;}
 		public void setBase(Point base){this.base=base;}
 		
