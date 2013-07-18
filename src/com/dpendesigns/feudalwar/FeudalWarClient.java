@@ -23,6 +23,7 @@ import com.dpendesigns.network.requests.ConnectRequest;
 import com.dpendesigns.network.requests.JoinGameRequest;
 import com.dpendesigns.network.requests.LoginRequest;
 import com.dpendesigns.network.requests.PlacementPhaseRequest;
+import com.dpendesigns.network.requests.SendMessageRequest;
 import com.dpendesigns.network.responses.LoginResponse;
 import com.dpendesigns.network.responses.MovementPhaseResponse;
 import com.dpendesigns.network.responses.PlacementPhaseResponse;
@@ -145,6 +146,7 @@ public class FeudalWarClient extends BasicGame {
 			kryo.register(com.dpendesigns.feudalwar.model.Infantry.class);
 			kryo.register(com.dpendesigns.feudalwar.model.General.class);
 			kryo.register(com.dpendesigns.feudalwar.model.MilitaryUnit.class);
+			kryo.register(com.dpendesigns.network.requests.SendMessageRequest.class);
 			
 			client.start();
 			client.connect(5000, "127.0.0.1", 54555, 54777);
@@ -249,6 +251,11 @@ public class FeudalWarClient extends BasicGame {
 					client.sendTCP(new ChangeStateRequest(mainGame));
 				} else if (self.getCurrentState() == mainGame){
 					mainGameHandler.update(gc);
+					SendMessageRequest sendMessageRequest = mainGameHandler.getSendMessageRequest();
+					if(sendMessageRequest != null) {
+						client.sendTCP(sendMessageRequest);
+						mainGameHandler.closeOutgoingMessage();
+					}
 					boolean turnPhaseFinished = mainGameHandler.getTurnPhaseStatus();
 					if (turnPhaseFinished){
 						if (my_game.getTurnPhase() == 0){ 
@@ -362,6 +369,12 @@ public class FeudalWarClient extends BasicGame {
 					mainGameHandler.updateMap(my_game);
 					}
 				System.out.println("Response Received");
+			}
+			else if (o instanceof SendMessageRequest) {
+				SendMessageRequest messageData = (SendMessageRequest) o;
+				if(!messageData.getFrom().equals(mainGameHandler.getName()) 
+						&& messageData.getTo().equals(mainGameHandler.getName()))
+					mainGameHandler.sendMessageToChat(messageData.getMessage(), messageData.getFrom());
 			}
 		}
 	}

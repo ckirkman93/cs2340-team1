@@ -300,6 +300,10 @@ public class ServerListenerParser {
 		game_list.remove(droppedGame);
 	}
 	
+	protected void parseSendMessageRequest(Object o) {
+		server.sendToAllTCP(o);
+	}
+	
 	protected void parseMovementRequest(Connection c, Object o){
 		MovementPhaseRequest movementPhaseRequest = (MovementPhaseRequest)o;
 		System.out.println("Request Received");
@@ -447,4 +451,6 @@ public class ServerListenerParser {
 			return false;
 		}
 	}
+
+	
 }

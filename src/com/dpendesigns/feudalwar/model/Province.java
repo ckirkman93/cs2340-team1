@@ -81,8 +81,6 @@ public class Province {
 	public int update(GameContainer gc, String observer, boolean leftClickDownState, boolean rightClickDownState) throws SlickException {
 		int clickStatus = 0;
 		
-		area.setLocation(xDefaultPosition + xDrift, yDefaultPosition + yDrift);
-		
 		Input input = gc.getInput();
 		int xpos = input.getMouseX();
 		int ypos = input.getMouseY();
@@ -117,6 +115,7 @@ public class Province {
 	}
 
 	public void render(GameContainer gc, Graphics g) throws SlickException {
+		area.setLocation(xDefaultPosition + xDrift, yDefaultPosition + yDrift);
 		if(shownAsOption)
 			g.setColor(new Color(this.lastOwner.getColors()[1]));
 		else g.setColor(currentColor);

@@ -11,6 +11,7 @@ import org.newdawn.slick.TrueTypeFont;
 import org.newdawn.slick.gui.TextField;
 
 import com.dpendesigns.feudalwar.model.User;
+import com.dpendesigns.network.requests.SendMessageRequest;
 
 public class ChatWindow {
 	
@@ -41,7 +42,12 @@ public class ChatWindow {
 		}
 	}
 	
-	public void update(GameContainer gc) {
+	public boolean isVisible() {
+		return visible;
+	}
+	
+	public SendMessageRequest update(GameContainer gc) {
+		SendMessageRequest sendMessageRequest = null;
 		if(gc.getInput().isKeyDown(Input.KEY_TAB))
 			tabDown = true;
 		else if(tabDown) {
@@ -64,16 +70,21 @@ public class ChatWindow {
 				enterDown = true;
 			else if (enterDown) {
 				enterDown = false;
+				String outgoingMessage = field.getText();
+				sendMessageRequest = new SendMessageRequest(
+						outgoingMessage, my_name, 
+						conversations.get(currentConversationIndex).otherName);
 				conversations.get(currentConversationIndex).
-						addMessage(field.getText(), false);
+						addMessage(outgoingMessage, false);
 				field.setText("");
 			}
 		}
+		return sendMessageRequest;
 	}
 	
 	public void render(GameContainer gc, Graphics g) {
 		if(visible) {
-			g.setColor(Color.lightGray);
+			g.setColor(new Color(255, 255, 255, 150));
 			g.fillRect(25, 25, 590, 310);
 			g.setColor(Color.black);
 			g.drawRect(25, 25, 590, 310);
@@ -82,6 +93,11 @@ public class ChatWindow {
 			int lengthSum = 25;
 			for(Conversation c : conversations) {
 				g.drawRect(lengthSum, 25, 100, 18);
+				if(conversations.indexOf(c) == currentConversationIndex) {
+					g.setColor(new Color(150, 150, 150, 150));
+					g.fillRect(lengthSum, 25, 100, 18);
+					g.setColor(Color.black);
+				}
 				g.drawString(c.otherName, lengthSum + 10, 25);
 				lengthSum += 100;
 			}
