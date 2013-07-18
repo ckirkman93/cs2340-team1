@@ -46,7 +46,7 @@ public class ActionIndicatorHandler {
 		g.setLineWidth(3);
 		for (Tuple a : attackActions) {
 			g.drawGradientLine(a.getFromX()+xDrift, a.getFromY()+yDrift, 0, 0, 0, 175, 
-						a.getToX()+xDrift, a.getToY()+yDrift, 255, 0, 0, 175);
+								a.getToX()+xDrift, a.getToY()+yDrift, 255, 0, 0, 175);
 			g.setColor(new Color(255, 0, 0, 175));
 			g.fill(new Circle(a.getToX()+xDrift, a.getToY()+yDrift, 3));
 			g.setColor(Color.black);
