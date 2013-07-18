@@ -55,6 +55,7 @@ public class ChatWindow {
 			visible = !visible;
 		}
 		if(visible) {
+			field.setFocus(true);
 			int mouseX = gc.getInput().getMouseX();
 			int mouseY = gc.getInput().getMouseY();
 			if(gc.getInput().isMouseButtonDown(0))
