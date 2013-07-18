@@ -24,6 +24,7 @@ import com.dpendesigns.network.requests.JoinGameRequest;
 import com.dpendesigns.network.requests.LoginRequest;
 import com.dpendesigns.network.requests.PlacementPhaseRequest;
 import com.dpendesigns.network.responses.LoginResponse;
+import com.dpendesigns.network.responses.MovementPhaseResponse;
 import com.dpendesigns.network.responses.PlacementPhaseResponse;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
@@ -125,6 +126,7 @@ public class FeudalWarClient extends BasicGame {
 			// Register the response classes for serialization
 			kryo.register(com.dpendesigns.network.responses.LoginResponse.class);
 			kryo.register(com.dpendesigns.network.responses.PlacementPhaseResponse.class);
+			kryo.register(com.dpendesigns.network.responses.MovementPhaseResponse.class);
 			
 			kryo.register(com.dpendesigns.feudalwar.controllers.handlers.Map.class);
 			kryo.register(java.util.Vector.class);
@@ -264,8 +266,9 @@ public class FeudalWarClient extends BasicGame {
 							locations.add(mainGameHandler.getAttackerDestinations());
 							locations.add(mainGameHandler.getSupporterBaseLocations());
 							locations.add(mainGameHandler.getSupporterSupportLocations());
-							client.sendTCP(new MovementPhaseRequest(locations));
+							client.sendTCP(new MovementPhaseRequest(my_game.getGameName(), self.getName(), locations));
 							mainGameHandler.clearMovementPhaseInfo();
+							System.out.println("Move Request Sent");
 						}
 					}
 				}
@@ -349,6 +352,12 @@ public class FeudalWarClient extends BasicGame {
 				joinGameBounced = true;
 				waitForResponse = false;
 			} else if (o instanceof PlacementPhaseResponse){
+				if (mainGameHandler!=null){
+					mainGameHandler.updateMap(my_game);
+					}
+				System.out.println("Response Received");
+			}
+			else if (o instanceof MovementPhaseResponse){
 				if (mainGameHandler!=null){
 					mainGameHandler.updateMap(my_game);
 					}
