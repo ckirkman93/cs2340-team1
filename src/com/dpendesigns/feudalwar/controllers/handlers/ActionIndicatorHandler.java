@@ -43,19 +43,25 @@ public class ActionIndicatorHandler {
 	}
 	
 	public void render(GameContainer gc, Graphics g, int xDrift, int yDrift) throws SlickException {
-		g.setColor(Color.black);
+		g.setLineWidth(3);
 		for (Tuple a : attackActions) {
-			g.drawLine(a.getFromX()+xDrift, a.getFromY()+yDrift, a.getToX()+xDrift, a.getToY()+yDrift);
-			g.setColor(Color.red);
-			g.draw(new Circle(a.getToX()+xDrift, a.getToY()+yDrift, 3));
+			g.drawGradientLine(a.getFromX()+xDrift, a.getFromY()+yDrift, 0, 0, 0, 175, 
+						a.getToX()+xDrift, a.getToY()+yDrift, 255, 0, 0, 175);
+			g.setColor(new Color(255, 0, 0, 175));
+			g.fill(new Circle(a.getToX()+xDrift, a.getToY()+yDrift, 3));
+			g.setColor(Color.black);
+			g.draw(new Circle(a.getToX()+xDrift, a.getToY()+yDrift, 1));
 		}
 		
-		g.setColor(Color.white);
 		for (Tuple s : supportActions) {
-			g.drawLine(s.getFromX()+xDrift, s.getFromY()+yDrift, s.getToX()+xDrift, s.getToY()+yDrift);
-			g.setColor(Color.cyan);
-			g.draw(new Circle(s.getToX()+xDrift, s.getToY()+yDrift, 3));
+			g.drawGradientLine(s.getFromX()+xDrift, s.getFromY()+yDrift, new Color(30, 144, 255, 175),
+								s.getToX()+xDrift, s.getToY()+yDrift, Color.white);
+			g.setColor(new Color(30, 144, 255, 175));
+			g.fill(new Circle(s.getToX()+xDrift, s.getToY()+yDrift, 3));
+			g.setColor(Color.white);
+			g.draw(new Circle(s.getToX()+xDrift, s.getToY()+yDrift, 1));
 		}
+		g.setLineWidth(1);
 	}
 	
 	public int computeActionType(Point from, Point to) {
