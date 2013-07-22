@@ -108,7 +108,7 @@ public class FeudalWarClient extends BasicGame {
 		gc.setShowFPS(false);
 		
 		try {
-			client = new Client(32768,32768);
+			client = new Client(65536,65536);
 			
 			kryo = client.getKryo();
 			kryo.register(User.class);
