@@ -77,7 +77,7 @@ public class FeudalWarServer {
 		System.out.println("Booting Server...");
 		try{
 			
-			server = new Server(32768,32768);
+			server = new Server(65536,65536);
 			
 			kryo = server.getKryo();
 			kryo.register(User.class);

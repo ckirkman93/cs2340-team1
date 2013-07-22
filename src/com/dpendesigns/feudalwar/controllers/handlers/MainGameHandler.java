@@ -137,7 +137,7 @@ public class MainGameHandler {
 		for (Player player : my_game.getPlayers()){
 			if (player!=null){
 				if (player.getName().equals(my_name)){
-					availableInfantry = ((player.getProvinces().size()/4) - player.getInfantry());
+					availableInfantry = ((player.getProvinces().size()/3) - player.getInfantry());
 					if (availableInfantry <= 0){availableInfantry = 0;}
 				}
 			}
@@ -286,6 +286,21 @@ public class MainGameHandler {
 				
 				if (actionMenuDisplayed) {
 					actionMenuStatus = actionMenu.update(gc, actionMenuDisplayed);
+					 if(this.actionMenuStatus == ActionMenu.HOLD_STATUS) {
+							if(supporterBaseLocations.contains(selectedProvince)) {
+								int index = supporterBaseLocations.indexOf(selectedProvince);
+								supporterBaseLocations.remove(index);
+								supporterSupportLocations.remove(index);
+							} else if(attackerDepartingLocations.contains(selectedProvince)) {
+								int index = attackerDepartingLocations.indexOf(selectedProvince);
+								attackerDepartingLocations.remove(index);
+								attackerDestinations.remove(index);
+							}
+							actionIndicator.update(gc, supporterBaseLocations, supporterSupportLocations, false);
+							actionIndicator.update(gc, attackerDepartingLocations, attackerDestinations, true);
+							actionMenu.setStatus(ActionMenu.INACTIVE_STATUS);
+							this.actionMenuStatus = ActionMenu.INACTIVE_STATUS;
+						}
 					if(actionMenuStatus != ActionMenu.WAITING_STATUS)
 						this.actionMenuDisplayed = false;
 				}
@@ -367,7 +382,7 @@ public class MainGameHandler {
 				chat.render(gc, g);
 		} else {
 			g.setColor(Color.black);
-			g.drawString(my_game.getWinner() + "has won the game by controlling more than two-thirds of the map.", 10, 50);
+			g.drawString(my_game.getWinner() + " has won the game by controlling more than two-thirds of the map.", 10, 50);
 			g.drawString("Would you like to start a new game (Y) or (N)?" , 10 , 80);
 		}
 	}
