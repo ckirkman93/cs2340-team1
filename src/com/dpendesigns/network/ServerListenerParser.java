@@ -441,7 +441,6 @@ public class ServerListenerParser {
 			}
 			newUnresolvedPositions.get(conflictPoint.x).get(conflictPoint.y).removeAllElements();
 			if(potentialVictors.size()==1){
-				Vector<Point> emptyAdjacentPoints = new Vector<Point>();
 				Vector<Point> emptyAdjacentAlliedPoints = new Vector<Point>();
 				Point source=null;
 				for(Point adj : game.getMap().getProvinces()[conflictPoint.x][conflictPoint.y].getAdjacents()){
@@ -454,10 +453,9 @@ public class ServerListenerParser {
 								game.getMap().getProvinces()[conflictPoint.x][conflictPoint.y].getLastOwner())){
 							emptyAdjacentAlliedPoints.add(adj);
 						}
-						emptyAdjacentPoints.add(adj);
 					}
 				}
-				if(emptyAdjacentPoints.size()!=0 && source!=null){
+				if(emptyAdjacentAlliedPoints.size()!=0 && source!=null){
 					Vector<Point> preference = new Vector<Point>();
 					if(conflictPoint.x%2==0){
 						if(conflictPoint.x==source.x){
@@ -563,14 +561,9 @@ public class ServerListenerParser {
 							pushTo=preference.get(i);
 						}
 					}
-					if(pushTo==null)
-						for(int i=preference.size()-1;i>=0;i--){
-						if(emptyAdjacentPoints.contains(preference.get(i))){
-							pushTo=preference.get(i);
-						}
+					if(pushTo!=null){
+						game.getMap().getProvinces()[pushTo.x][pushTo.y].addOccupyingUnit(game.getMap().getProvinces()[conflictPoint.x][conflictPoint.y].getOccupyingUnit(),false);
 					}
-					
-
 				}
 				game.getMap().getProvinces()[conflictPoint.x][conflictPoint.y].addOccupyingUnit(potentialVictors.get(0),false);
 				newUnresolvedPositions.get(conflictPoint.x).get(conflictPoint.y).remove(potentialVictors.get(0));
