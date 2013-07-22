@@ -353,6 +353,19 @@ public class ServerListenerParser {
 			}
 			newUnresolvedPositions.add(nextRow);
 		}
+		for(Player player : players){
+			for(int i=0;i < player.getSupporterBaseLocations().size();i++){
+				Point base = player.getSupporterBaseLocations().get(i);
+				Point target = player.getSupporterDefenseLocations().get(i);
+				if(newUnresolvedPositions.get(base.x).get(base.y).size()!=1){
+					player.getSupporterBaseLocations().remove(base);
+					player.getSupporterDefenseLocations().remove(target);
+				}
+				else if(game.getMap().getProvinces()[target.x][target.y].getOccupyingUnit()!=null){
+					game.getMap().getProvinces()[target.x][target.y].getOccupyingUnit().upSupportStrength(); 
+				}
+			}
+		}
 		Vector<MovementPair> noConflicts = new Vector<MovementPair>();
 		Vector<Point> resolutionConflicts = new Vector<Point>();
 		Vector<Vector<MovementPair>> allAttackerPaths = new Vector<Vector<MovementPair>>();
@@ -411,19 +424,7 @@ public class ServerListenerParser {
 			game.getMap().getProvinces()[base.x][base.y].addOccupyingUnit(null,false);
 			System.out.println("Moved");
 		}
-		for(Player player : players){
-			for(int i=0;i < player.getSupporterBaseLocations().size();i++){
-				Point base = player.getSupporterBaseLocations().get(i);
-				Point target = player.getSupporterDefenseLocations().get(i);
-				if(newUnresolvedPositions.get(base.x).get(base.y).size()!=1){
-					player.getSupporterBaseLocations().remove(base);
-					player.getSupporterDefenseLocations().remove(target);
-				}
-				else if(game.getMap().getProvinces()[target.x][target.y].getOccupyingUnit()!=null){
-					game.getMap().getProvinces()[target.x][target.y].getOccupyingUnit().upSupportStrength(); 
-				}
-			}
-		}
+		
 		while(!resolutionConflicts.isEmpty()){
 			Point conflictPoint = resolutionConflicts.remove(resolutionConflicts.size()-1);
 			Vector<MilitaryUnit> potentialVictors = new Vector<MilitaryUnit>();
@@ -455,6 +456,7 @@ public class ServerListenerParser {
 						}
 					}
 				}
+				System.out.println("Adj Allied Points size: " + emptyAdjacentAlliedPoints.size());
 				if(emptyAdjacentAlliedPoints.size()!=0 && source!=null){
 					Vector<Point> preference = new Vector<Point>();
 					if(conflictPoint.x%2==0){
@@ -561,6 +563,7 @@ public class ServerListenerParser {
 							pushTo=preference.get(i);
 						}
 					}
+					if(pushTo!=null)System.out.println(pushTo.toString);
 					if(pushTo!=null){
 						game.getMap().getProvinces()[pushTo.x][pushTo.y].addOccupyingUnit(game.getMap().getProvinces()[conflictPoint.x][conflictPoint.y].getOccupyingUnit(),false);
 					}
