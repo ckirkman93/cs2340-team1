@@ -18,13 +18,12 @@ import com.dpendesigns.feudalwar.model.User;
 import com.dpendesigns.network.ServerListener;
 import com.dpendesigns.network.data.GameList;
 import com.dpendesigns.network.data.UserList;
-import com.dpendesigns.network.requests.AddArmyRequest;
+import com.dpendesigns.network.requests.MovementPhaseRequest;
 import com.dpendesigns.network.requests.BeginGameRequest;
 import com.dpendesigns.network.requests.ChangeStateRequest;
 import com.dpendesigns.network.requests.ConnectRequest;
 import com.dpendesigns.network.requests.JoinGameRequest;
 import com.dpendesigns.network.requests.LoginRequest;
-import com.dpendesigns.network.requests.MovementPhaseRequest;
 import com.dpendesigns.network.requests.PlacementPhaseRequest;
 import com.dpendesigns.network.responses.LoginResponse;
 import com.esotericsoftware.kryo.Kryo;
@@ -94,10 +93,11 @@ public class FeudalWarServer {
 			kryo.register(BeginGameRequest.class);
 			kryo.register(PlacementPhaseRequest.class);
 			kryo.register(MovementPhaseRequest.class);
-			
+
 			// Register the response classes for serialization
 			kryo.register(com.dpendesigns.network.responses.LoginResponse.class);
 			kryo.register(com.dpendesigns.network.responses.PlacementPhaseResponse.class);
+			kryo.register(com.dpendesigns.network.responses.MovementPhaseResponse.class);
 			
 			kryo.register(com.dpendesigns.feudalwar.controllers.handlers.Map.class);
 			kryo.register(java.util.Vector.class);
@@ -115,7 +115,8 @@ public class FeudalWarServer {
 			kryo.register(com.dpendesigns.feudalwar.model.Infantry.class);
 			kryo.register(com.dpendesigns.feudalwar.model.General.class);
 			kryo.register(com.dpendesigns.feudalwar.model.MilitaryUnit.class);
-			
+			kryo.register(com.dpendesigns.network.requests.SendMessageRequest.class);
+
 			server.start();
 			server.bind(54555, 54777);
 			

@@ -1,5 +1,8 @@
 package com.dpendesigns.feudalwar.model;
 
+import java.awt.Point;
+import java.util.Vector;
+
 import org.newdawn.slick.Color;
 import org.newdawn.slick.GameContainer;
 import org.newdawn.slick.Graphics;
@@ -9,6 +12,7 @@ import org.newdawn.slick.geom.Polygon;
 import org.newdawn.slick.geom.Shape;
 import org.newdawn.slick.state.StateBasedGame;
 
+import com.dpendesigns.feudalwar.controllers.handlers.ActionMenu;
 import com.dpendesigns.network.data.ProvinceData;
 import com.dpendesigns.network.requests.AddArmyRequest;
 
@@ -23,10 +27,14 @@ public class Province {
 	private int xDefaultPosition, yDefaultPosition;
 	private int iPosition, jPosition;
 	
+	private boolean shownAsOption;
+	
 	private int[] thisLocation;
 	
 	private int xDrift;
 	private int yDrift;
+	
+	private Vector<Point> adjacents;
 	
 	private Player lastOwner;
 	private MilitaryUnit occupyingUnit;
@@ -36,7 +44,7 @@ public class Province {
 	//private AddArmyRequest addArmyRequest;
 	
 	public Province (ProvinceData data){
-		
+		adjacents = data.getAdjacents();		
 		lastOwner = data.getLastOwner();
 		occupyingUnit = data.getOccupyingUnit();
 		
@@ -73,37 +81,45 @@ public class Province {
 	public int update(GameContainer gc, String observer, boolean leftClickDownState, boolean rightClickDownState) throws SlickException {
 		int clickStatus = 0;
 		
-		area.setLocation(xDefaultPosition + xDrift, yDefaultPosition + yDrift);
-		
 		Input input = gc.getInput();
 		int xpos = input.getMouseX();
 		int ypos = input.getMouseY();
 
-		if (area.contains(xpos, ypos) && lastOwner.getName().equals(observer)){
+		if (area.contains(xpos, ypos)){
 			if (input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON)) {
 				currentColor = new Color(lastOwner.getColors()[2]);
 			}
 			else {currentColor = new Color(lastOwner.getColors()[1]);}
 
-			if ( !input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON) && leftClickDownState == true) {
+			if (!input.isMouseButtonDown(Input.MOUSE_LEFT_BUTTON) && leftClickDownState == true) {
 				currentColor = new Color(lastOwner.getColors()[0]);
 				clickStatus = 1;
 				
 			}
 			
-			if (!input.isMouseButtonDown(Input.MOUSE_RIGHT_BUTTON) && rightClickDownState == true) {
+			if (!input.isMouseButtonDown(Input.MOUSE_RIGHT_BUTTON) && rightClickDownState == true
+					&& lastOwner.getName().equals(observer)) {
 				currentColor = new Color(lastOwner.getColors()[2]);
 				clickStatus = 2;
 			}
 		}
+		//else if (area.contains(xpos, ypos) && !lastOwner.getName().equals(observer)) {
+			//if (!input.isMouseButtonDown(Input.MOUSE_RIGHT_BUTTON) && rightClickDownState == true) {
+				//currentColor = new Color(lastOwner.getColors()[2]);
+				//clickStatus = 2;
+			//}
+		//}
 		else {currentColor = new Color(lastOwner.getColors()[0]);}
 		
 		return clickStatus;
 	}
 
 	public void render(GameContainer gc, Graphics g) throws SlickException {
-		g.setColor(currentColor);
-		g.fill(area);
+		area.setLocation(xDefaultPosition + xDrift, yDefaultPosition + yDrift);
+		if(shownAsOption)
+			g.setColor(new Color(this.lastOwner.getColors()[1]));
+		else g.setColor(currentColor);
+		g.fill(area);	
 		g.setColor(Color.black);
 		g.draw(area);
 		
@@ -123,6 +139,14 @@ public class Province {
 		}
 	}
 	
+	public void setShownAsOption(boolean b) {
+		shownAsOption = b;
+	}
+	
+	public Vector<Point> getAdjacents() {
+		return adjacents;
+	}
+	
 	public void setDrift(int xAmount, int yAmount){
 		xDrift = xAmount;
 		yDrift = yAmount;
@@ -131,11 +155,23 @@ public class Province {
 	public int iPosition(){ return iPosition; }
 	public int jPosition(){ return jPosition; }
 	
+	public int xDefaultPosition() { return xDefaultPosition; }
+	public int yDefaultPosition() { return yDefaultPosition; }
+	
+	public int centeredXDefaultPosition() { return xDefaultPosition + width/2; }
+	public int centeredYDefaultPosition() { return yDefaultPosition + height/2; }
+	
 	public int[] getThisLocation(){return thisLocation;}
+	
+	public Player getLastOwner() { return lastOwner; }
 	
 	public boolean isOccupied(){
 		if (occupyingUnit!=null){return true;}
 		else {return false;}
+	}
+	
+	public boolean isAdjacent(Point selectedProvince) {
+		return adjacents.contains(selectedProvince);
 	}
 	
 	public void addOccupyingUnit(MilitaryUnit unit, boolean created){ 

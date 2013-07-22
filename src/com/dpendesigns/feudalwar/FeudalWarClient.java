@@ -1,5 +1,6 @@
 package com.dpendesigns.feudalwar;
 
+import java.awt.Point;
 import java.io.IOException;
 import java.util.Vector;
 
@@ -15,15 +16,16 @@ import com.dpendesigns.feudalwar.model.GameInstance;
 import com.dpendesigns.feudalwar.model.User;
 import com.dpendesigns.network.data.GameList;
 import com.dpendesigns.network.data.UserList;
-import com.dpendesigns.network.requests.AddArmyRequest;
+import com.dpendesigns.network.requests.MovementPhaseRequest;
 import com.dpendesigns.network.requests.BeginGameRequest;
 import com.dpendesigns.network.requests.ChangeStateRequest;
 import com.dpendesigns.network.requests.ConnectRequest;
 import com.dpendesigns.network.requests.JoinGameRequest;
 import com.dpendesigns.network.requests.LoginRequest;
-import com.dpendesigns.network.requests.MovementPhaseRequest;
 import com.dpendesigns.network.requests.PlacementPhaseRequest;
+import com.dpendesigns.network.requests.SendMessageRequest;
 import com.dpendesigns.network.responses.LoginResponse;
+import com.dpendesigns.network.responses.MovementPhaseResponse;
 import com.dpendesigns.network.responses.PlacementPhaseResponse;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryonet.Client;
@@ -125,6 +127,7 @@ public class FeudalWarClient extends BasicGame {
 			// Register the response classes for serialization
 			kryo.register(com.dpendesigns.network.responses.LoginResponse.class);
 			kryo.register(com.dpendesigns.network.responses.PlacementPhaseResponse.class);
+			kryo.register(com.dpendesigns.network.responses.MovementPhaseResponse.class);
 			
 			kryo.register(com.dpendesigns.feudalwar.controllers.handlers.Map.class);
 			kryo.register(java.util.Vector.class);
@@ -143,6 +146,7 @@ public class FeudalWarClient extends BasicGame {
 			kryo.register(com.dpendesigns.feudalwar.model.Infantry.class);
 			kryo.register(com.dpendesigns.feudalwar.model.General.class);
 			kryo.register(com.dpendesigns.feudalwar.model.MilitaryUnit.class);
+			kryo.register(com.dpendesigns.network.requests.SendMessageRequest.class);
 			
 			client.start();
 			client.connect(5000, "127.0.0.1", 54555, 54777);
@@ -247,6 +251,11 @@ public class FeudalWarClient extends BasicGame {
 					client.sendTCP(new ChangeStateRequest(mainGame));
 				} else if (self.getCurrentState() == mainGame){
 					mainGameHandler.update(gc);
+					SendMessageRequest sendMessageRequest = mainGameHandler.getSendMessageRequest();
+					if(sendMessageRequest != null) {
+						client.sendTCP(sendMessageRequest);
+						mainGameHandler.closeOutgoingMessage();
+					}
 					boolean turnPhaseFinished = mainGameHandler.getTurnPhaseStatus();
 					if (turnPhaseFinished){
 						if (my_game.getTurnPhase() == 0){ 
@@ -256,7 +265,18 @@ public class FeudalWarClient extends BasicGame {
 							mainGameHandler.clearPlacementChoices();
 							System.out.println("Request Sent");
 							}
-						else if (my_game.getTurnPhase() == 2){client.sendTCP(new MovementPhaseRequest());}
+						else if (my_game.getTurnPhase() == 2) {
+							waitForUserList = true;
+							waitForGameList = true;
+							Vector<Vector<Point>> locations = new Vector<Vector<Point>>();
+							locations.add(mainGameHandler.getAttackerDepartingLocations());
+							locations.add(mainGameHandler.getAttackerDestinations());
+							locations.add(mainGameHandler.getSupporterBaseLocations());
+							locations.add(mainGameHandler.getSupporterSupportLocations());
+							client.sendTCP(new MovementPhaseRequest(my_game.getGameName(), self.getName(), locations));
+							mainGameHandler.clearMovementPhaseInfo();
+							System.out.println("Move Request Sent");
+						}
 					}
 				}
 			}
@@ -342,7 +362,19 @@ public class FeudalWarClient extends BasicGame {
 				if (mainGameHandler!=null){
 					mainGameHandler.updateMap(my_game);
 					}
-				System.out.println("Repsonse Received");
+				System.out.println("Response Received");
+			}
+			else if (o instanceof MovementPhaseResponse){
+				if (mainGameHandler!=null){
+					mainGameHandler.updateMap(my_game);
+					}
+				System.out.println("Response Received");
+			}
+			else if (o instanceof SendMessageRequest) {
+				SendMessageRequest messageData = (SendMessageRequest) o;
+				if(!messageData.getFrom().equals(mainGameHandler.getName()) 
+						&& messageData.getTo().equals(mainGameHandler.getName()))
+					mainGameHandler.sendMessageToChat(messageData.getMessage(), messageData.getFrom());
 			}
 		}
 	}

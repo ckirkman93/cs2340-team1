@@ -1,5 +1,8 @@
 package com.dpendesigns.network.data;
 
+import java.awt.Point;
+import java.util.Vector;
+
 import com.dpendesigns.feudalwar.model.General;
 import com.dpendesigns.feudalwar.model.Infantry;
 import com.dpendesigns.feudalwar.model.MilitaryUnit;
@@ -17,6 +20,7 @@ public class ProvinceData {
 	
 	private int xDrift;
 	private int yDrift;
+	private Vector<Point> adjacents = new Vector<Point>();
 
 	private Player lastOwner = new Player();
 	
@@ -37,6 +41,14 @@ public class ProvinceData {
 		yDrift = 0;
 	}
 	
+	public void addAdjacent(Point adjacent) {
+		adjacents.add(adjacent);
+	}
+	
+	public Vector<Point> getAdjacents() {
+		return adjacents;
+	}
+	
 	public void setDrift(int xAmount, int yAmount){
 		xDrift = xAmount;
 		yDrift = yAmount;
@@ -49,16 +61,18 @@ public class ProvinceData {
 		}
 	}
 	public void addOccupyingUnit(MilitaryUnit unit, boolean created){ 
-		occupyingUnit = unit; 
-		if (unit.isActive()){
-			lastOwner = unit.getOwner();
-			if(!lastOwner.getProvinces().contains(thisLocation)){
-				lastOwner.getProvinces().add(thisLocation);
+		occupyingUnit = unit;
+		if(unit!=null){
+			if (unit.isActive()){
+				lastOwner = unit.getOwner();
+				if(!lastOwner.getProvinces().contains(thisLocation)){
+					lastOwner.getProvinces().add(thisLocation);
+				}
 			}
-		}
-		if (created){
-			if (unit instanceof Infantry){lastOwner.addInfantry(1);}
-			else if (unit instanceof General){lastOwner.addGeneral(1);}
+			if (created){
+				if (unit instanceof Infantry){lastOwner.addInfantry(1);}
+				else if (unit instanceof General){lastOwner.addGeneral(1);}
+			}
 		}
 	}
 	

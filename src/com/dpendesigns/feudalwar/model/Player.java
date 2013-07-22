@@ -1,5 +1,6 @@
 package com.dpendesigns.feudalwar.model;
 
+import java.awt.Point;
 import java.util.Vector;
 
 public class Player {
@@ -10,6 +11,10 @@ public class Player {
 	private int infantry; 
 	private int generals;
 	private Vector<int[]> provinces = new Vector<int[]>();
+	private Vector<Point> attackerDepartingLocations = new Vector<Point>();
+	private Vector<Point> attackerDestinations = new Vector<Point>();
+	private Vector<Point> supporterBaseLocations = new Vector<Point>();
+	private Vector<Point> supporterDefenseLocations = new Vector<Point>();
 	
 	public Player(){}
 	
@@ -31,4 +36,32 @@ public class Player {
 	public int getInfantry() { return infantry; }
 	public int getGenerals() { return generals; }
 	public Vector<int[]> getProvinces() { return provinces; }
+	
+	public Vector<Point> getAttackerDepartingLocations(){
+		return attackerDepartingLocations;
+	}
+	public void setAttackerDepartingLocations(Vector<Point> locations){ 
+		this.attackerDepartingLocations = locations;
+	}
+	
+	public Vector<Point> getAttackerDestinations(){
+		return attackerDestinations;
+	}
+	public void setAttackerDestinations(Vector<Point> locations){ 
+		this.attackerDestinations = locations;
+	}
+	
+	public Vector<Point> getSupporterBaseLocations(){
+		return supporterBaseLocations;
+	}
+	public void setSupporterBaseLocations(Vector<Point> locations){ 
+		this.supporterBaseLocations = locations;
+	}
+	
+	public Vector<Point> getSupporterDefenseLocations(){
+		return supporterDefenseLocations;
+	}
+	public void setSupporterDefenseLocations(Vector<Point> locations){ 
+		this.supporterDefenseLocations = locations;
+	}
 }
