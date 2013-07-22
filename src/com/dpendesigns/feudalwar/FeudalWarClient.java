@@ -24,6 +24,7 @@ import com.dpendesigns.network.requests.JoinGameRequest;
 import com.dpendesigns.network.requests.LoginRequest;
 import com.dpendesigns.network.requests.PlacementPhaseRequest;
 import com.dpendesigns.network.requests.SendMessageRequest;
+import com.dpendesigns.network.responses.ClearMyGameResponse;
 import com.dpendesigns.network.responses.LoginResponse;
 import com.dpendesigns.network.responses.MovementPhaseResponse;
 import com.dpendesigns.network.responses.PlacementPhaseResponse;
@@ -107,7 +108,7 @@ public class FeudalWarClient extends BasicGame {
 		gc.setShowFPS(false);
 		
 		try {
-			client = new Client(16384,16384);
+			client = new Client(32768,32768);
 			
 			kryo = client.getKryo();
 			kryo.register(User.class);
@@ -128,6 +129,7 @@ public class FeudalWarClient extends BasicGame {
 			kryo.register(com.dpendesigns.network.responses.LoginResponse.class);
 			kryo.register(com.dpendesigns.network.responses.PlacementPhaseResponse.class);
 			kryo.register(com.dpendesigns.network.responses.MovementPhaseResponse.class);
+			kryo.register(com.dpendesigns.network.responses.ClearMyGameResponse.class);
 			
 			kryo.register(com.dpendesigns.feudalwar.controllers.handlers.Map.class);
 			kryo.register(java.util.Vector.class);
@@ -250,32 +252,47 @@ public class FeudalWarClient extends BasicGame {
 					waitForGameList = true;
 					client.sendTCP(new ChangeStateRequest(mainGame));
 				} else if (self.getCurrentState() == mainGame){
-					mainGameHandler.update(gc);
-					SendMessageRequest sendMessageRequest = mainGameHandler.getSendMessageRequest();
-					if(sendMessageRequest != null) {
-						client.sendTCP(sendMessageRequest);
-						mainGameHandler.closeOutgoingMessage();
-					}
-					boolean turnPhaseFinished = mainGameHandler.getTurnPhaseStatus();
-					if (turnPhaseFinished){
-						if (my_game.getTurnPhase() == 0){ 
-							waitForUserList = true;
-							waitForGameList = true;
-							client.sendTCP(new PlacementPhaseRequest(my_game.getGameName(), self.getName(),mainGameHandler.getInfantryPlacements(),mainGameHandler.getGeneralPlacements()));
-							mainGameHandler.clearPlacementChoices();
-							System.out.println("Request Sent");
+					if (!mainGameHandler.getExitStatus()){
+						mainGameHandler.update(gc);
+						SendMessageRequest sendMessageRequest = mainGameHandler.getSendMessageRequest();
+						if(sendMessageRequest != null) {
+							client.sendTCP(sendMessageRequest);
+							mainGameHandler.closeOutgoingMessage();
+						}
+						boolean turnPhaseFinished = mainGameHandler.getTurnPhaseStatus();
+						if (turnPhaseFinished){
+							if (my_game.getTurnPhase() == 0){ 
+								waitForUserList = true;
+								waitForGameList = true;
+								client.sendTCP(new PlacementPhaseRequest(my_game.getGameName(), self.getName(),mainGameHandler.getInfantryPlacements(),mainGameHandler.getGeneralPlacements()));
+								mainGameHandler.clearPlacementChoices();
+								System.out.println("Request Sent");
+								}
+							else if (my_game.getTurnPhase() == 2) {
+								waitForUserList = true;
+								waitForGameList = true;
+								Vector<Vector<Point>> locations = new Vector<Vector<Point>>();
+								locations.add(mainGameHandler.getAttackerDepartingLocations());
+								locations.add(mainGameHandler.getAttackerDestinations());
+								locations.add(mainGameHandler.getSupporterBaseLocations());
+								locations.add(mainGameHandler.getSupporterSupportLocations());
+								client.sendTCP(new MovementPhaseRequest(my_game.getGameName(), self.getName(), locations));
+								mainGameHandler.clearMovementPhaseInfo();
+								System.out.println("Move Request Sent");
 							}
-						else if (my_game.getTurnPhase() == 2) {
+						}
+					}
+					else {
+						if (mainGameHandler.getNewGameStatus()){
+							my_game = null; game_in_session = false;
 							waitForUserList = true;
 							waitForGameList = true;
-							Vector<Vector<Point>> locations = new Vector<Vector<Point>>();
-							locations.add(mainGameHandler.getAttackerDepartingLocations());
-							locations.add(mainGameHandler.getAttackerDestinations());
-							locations.add(mainGameHandler.getSupporterBaseLocations());
-							locations.add(mainGameHandler.getSupporterSupportLocations());
-							client.sendTCP(new MovementPhaseRequest(my_game.getGameName(), self.getName(), locations));
-							mainGameHandler.clearMovementPhaseInfo();
-							System.out.println("Move Request Sent");
+							client.sendTCP(new ChangeStateRequest(mainMenu));
+							mainMenuHandler = new MainMenuHandler();
+							mainMenuHandler.init(gc);
+						}
+						else {
+							System.exit(0);
 						}
 					}
 				}
@@ -375,6 +392,9 @@ public class FeudalWarClient extends BasicGame {
 				if(!messageData.getFrom().equals(mainGameHandler.getName()) 
 						&& messageData.getTo().equals(mainGameHandler.getName()))
 					mainGameHandler.sendMessageToChat(messageData.getMessage(), messageData.getFrom());
+			}
+			else if (o instanceof ClearMyGameResponse) {
+				my_game = null; game_in_session = false;
 			}
 		}
 	}

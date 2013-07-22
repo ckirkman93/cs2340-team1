@@ -327,6 +327,7 @@ public class ServerListenerParser {
 				System.out.println(game.remainingWait());
 				if (game.remainingWait() == 0){
 					resolveConflicts(game);
+					String winner = declareWinner(game);
 					game.enterNextPhase();
 					for (User user : game.getUsers()){
 						user.setState(loadGame);
@@ -607,6 +608,15 @@ public class ServerListenerParser {
 			return false;
 		}
 	}
-
 	
+	private String declareWinner(GameInstance game) {
+		String winner = null;
+		for (Player player: game.getPlayers()){
+			if (player.getProvinces().size() >= 73) {
+				winner = player.getName();
+				game.gameOver(winner);
+			}
+		}
+		return winner;
+	}
 }

@@ -77,7 +77,7 @@ public class FeudalWarServer {
 		System.out.println("Booting Server...");
 		try{
 			
-			server = new Server(16384,16384);
+			server = new Server(32768,32768);
 			
 			kryo = server.getKryo();
 			kryo.register(User.class);
@@ -98,6 +98,7 @@ public class FeudalWarServer {
 			kryo.register(com.dpendesigns.network.responses.LoginResponse.class);
 			kryo.register(com.dpendesigns.network.responses.PlacementPhaseResponse.class);
 			kryo.register(com.dpendesigns.network.responses.MovementPhaseResponse.class);
+			kryo.register(com.dpendesigns.network.responses.ClearMyGameResponse.class);
 			
 			kryo.register(com.dpendesigns.feudalwar.controllers.handlers.Map.class);
 			kryo.register(java.util.Vector.class);

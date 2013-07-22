@@ -12,6 +12,7 @@ import com.dpendesigns.network.requests.LoginRequest;
 import com.dpendesigns.network.requests.MovementPhaseRequest;
 import com.dpendesigns.network.requests.PlacementPhaseRequest;
 import com.dpendesigns.network.requests.SendMessageRequest;
+import com.dpendesigns.network.responses.ClearMyGameResponse;
 import com.esotericsoftware.kryonet.Connection;
 import com.esotericsoftware.kryonet.Listener;
 import com.esotericsoftware.kryonet.Server;
@@ -81,6 +82,7 @@ public class ServerListener extends Listener{
 		for(User currentUser: user_list){ if(droppedGame.isActive()){
 				if (droppedGame.getUsers().contains(currentUser)){
 					currentUser.setState(mainMenu);
+					server.sendToTCP(currentUser.getConnectionID(), new ClearMyGameResponse());
 				}
 			}	
 		}

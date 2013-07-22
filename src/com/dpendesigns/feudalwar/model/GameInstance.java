@@ -17,6 +17,8 @@ import com.dpendesigns.network.data.UserList;
 
 public class GameInstance {
 	private String gameName;
+	private String gameWinner;
+	private boolean winnerStatus = false;
 	private User host;
 	private Vector<User> users;
 	private Vector<Player> players;
@@ -148,6 +150,18 @@ public class GameInstance {
 			waitingForPlayers.add(player.getName());
 		}
 	}
+	public void gameOver(String winner){
+		winnerStatus = true;
+		gameWinner = winner;
+	}
+	public String getWinner(){
+		return gameWinner;
+	}
+	
+	public boolean isWinner(){
+		return winnerStatus;
+	}
+	
 	public int remainingWait(){return waitingForPlayers.size();}
 	public void removePlayerFromWaiting(String playerName){waitingForPlayers.remove(playerName);}
 }
