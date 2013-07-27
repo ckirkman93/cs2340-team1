@@ -563,7 +563,7 @@ public class ServerListenerParser {
 							pushTo=preference.get(i);
 						}
 					}
-					if(pushTo!=null)System.out.println(pushTo.toString);
+					if(pushTo!=null)System.out.println(pushTo.toString());
 					if(pushTo!=null){
 						game.getMap().getProvinces()[pushTo.x][pushTo.y].addOccupyingUnit(game.getMap().getProvinces()[conflictPoint.x][conflictPoint.y].getOccupyingUnit(),false);
 					}
